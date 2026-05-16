@@ -36,7 +36,7 @@ PAYMENT_WEIGHTS  = [0.60,   0.25,   0.15]
 # Index = hour (0–23). Higher = more likely to have transactions.
 HOUR_WEIGHTS = np.array([
     0.10, 0.05, 0.03, 0.02, 0.02, 0.05,  # 0–5  (late night / pre-dawn low)
-    0.20, 0.60, 1.00, 0.90, 0.70, 0.50,  # 6–11 (morning ramp → peak 8–10)
+    0.20, 0.60, 1.00, 0.90, 0.70, 0.50,  # 6–11 (morning ramp -> peak 8–10)
     0.90, 0.95, 0.70, 0.50, 0.40, 0.70,  # 12–17 (lunch peak 12–14)
     0.85, 0.95, 1.00, 0.80, 0.50, 0.20,  # 18–23 (evening peak 17–20)
 ])
@@ -166,7 +166,7 @@ eng_df.to_csv(ENG_PATH, index=False)
 # ── Summary ──────────────────────────────────────────────────────────────────
 total_txns    = len(tx_df)
 total_revenue = tx_df["amount_sar"].sum()
-date_range    = f"{tx_df['timestamp'].min()[:10]} → {tx_df['timestamp'].max()[:10]}"
+date_range    = f"{tx_df['timestamp'].min()[:10]} -> {tx_df['timestamp'].max()[:10]}"
 avg_daily     = total_txns / 30
 
 # Find the anomaly date by locating the day with 3AM transactions
