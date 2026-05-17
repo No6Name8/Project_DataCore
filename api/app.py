@@ -1,7 +1,7 @@
 """
 app.py  --  DataCore Mock REST API
 Serves 30-day simulated datasets for 6 Saudi SME businesses.
-DSCR and fraud endpoints now use live DSCRModel computation.
+AI engine: DSCR, fraud (Isolation Forest), revenue forecast (Prophet).
 Run from project root: python api/app.py
 """
 
@@ -15,9 +15,10 @@ ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 sys.path.insert(0, ROOT)
 
-from models.dscr_model     import DSCRModel
-from models.dbr_model      import DBRModel
-from models.fraud_detector import FraudDetector
+from models.dscr_model        import DSCRModel
+from models.dbr_model         import DBRModel
+from models.fraud_detector    import FraudDetector
+from models.revenue_forecaster import RevenueForecaster
 
 app = Flask(__name__)
 CORS(app)
@@ -37,6 +38,8 @@ _dscr_model     = DSCRModel()
 _dbr_model      = DBRModel()
 _fraud_detector = FraudDetector()
 _fraud_detector.load(os.path.join(ROOT, "models", "saved", "fraud_detector.pkl"))
+_forecaster = RevenueForecaster()
+_forecaster.load(os.path.join(ROOT, "models", "saved", "revenue_forecaster.pkl"))
 
 # ── Model result cache (computed once per business per process lifetime) ──────
 _MODEL_CACHE  = {}
@@ -104,6 +107,7 @@ def build_summary(bid):
 def shape_dscr(bid, r):
     fr = r["fraud_assessment"]
     first_reason = fr["anomalies"][0]["description"] if fr["anomalies"] else None
+    dynamic = _forecaster.compute_dynamic_credit_limit(bid, r["credit_limit_sar"])
     return {
         "business_id":              bid,
         "computed_at":              r["computed_at"],
@@ -113,6 +117,7 @@ def shape_dscr(bid, r):
         "loan_requested_sar":       r["loan_requested_sar"],
         "risk_tier":                r["risk_tier"],
         "approved_credit_limit_sar": r["credit_limit_sar"],
+        "dynamic_credit_limit":     dynamic,
         "interest_rate_base":       r["interest_rate_base"],
         "sustainability_discount":  r["sustainability_discount"],
         "final_interest_rate":      r["final_interest_rate"],
@@ -186,6 +191,18 @@ def get_fraud(bid):
     require(bid)
     return jsonify(get_fraud_result(bid))
 
+
+@app.route("/api/<bid>/forecast")
+def get_forecast(bid):
+    require(bid)
+    base_limit = get_model_result(bid)["credit_limit_sar"]
+    return jsonify({
+        "business_id":  bid,
+        "summary":      _forecaster.summaries[bid],
+        "series":       _forecaster.get_forecast_series(bid),
+        "dynamic_credit": _forecaster.compute_dynamic_credit_limit(bid, base_limit),
+    })
+
 # =============================================================================
 # ROUTES -- Dashboard feed
 # =============================================================================
@@ -202,11 +219,18 @@ def get_dashboard(bid):
                       .to_dict(orient="records"))
     energy_trend = en.tail(7).to_dict(orient="records")
 
+    fc_summary = _forecaster.summaries[bid]
+    fc_series  = _forecaster.get_forecast_series(bid)[:7]
+
     return jsonify({
         "business":             BUSINESSES[bid],
         "summary":              build_summary(bid),
         "dscr":                 shape_dscr(bid, r),
         "fraud":                get_fraud_result(bid),
+        "forecast": {
+            "summary": fc_summary,
+            "series":  fc_series,
+        },
         "recent_transactions":  recent_tx,
         "energy_trend":         energy_trend,
     })
