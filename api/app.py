@@ -15,8 +15,9 @@ ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 sys.path.insert(0, ROOT)
 
-from models.dscr_model import DSCRModel
-from models.dbr_model  import DBRModel
+from models.dscr_model     import DSCRModel
+from models.dbr_model      import DBRModel
+from models.fraud_detector import FraudDetector
 
 app = Flask(__name__)
 CORS(app)
@@ -32,16 +33,24 @@ BUSINESSES = {
 }
 
 # ── Model instances ───────────────────────────────────────────────────────────
-_dscr_model = DSCRModel()
-_dbr_model  = DBRModel()
+_dscr_model     = DSCRModel()
+_dbr_model      = DBRModel()
+_fraud_detector = FraudDetector()
+_fraud_detector.load(os.path.join(ROOT, "models", "saved", "fraud_detector.pkl"))
 
 # ── Model result cache (computed once per business per process lifetime) ──────
-_MODEL_CACHE = {}
+_MODEL_CACHE  = {}
+_FRAUD_CACHE  = {}
 
 def get_model_result(bid):
     if bid not in _MODEL_CACHE:
         _MODEL_CACHE[bid] = _dscr_model.run(bid)
     return _MODEL_CACHE[bid]
+
+def get_fraud_result(bid):
+    if bid not in _FRAUD_CACHE:
+        _FRAUD_CACHE[bid] = _fraud_detector.assess(bid)
+    return _FRAUD_CACHE[bid]
 
 # ── Raw CSV cache ─────────────────────────────────────────────────────────────
 _TX = {}
@@ -175,7 +184,7 @@ def get_dscr(bid):
 @app.route("/api/<bid>/fraud-check")
 def get_fraud(bid):
     require(bid)
-    return jsonify(shape_fraud(bid, get_model_result(bid)))
+    return jsonify(get_fraud_result(bid))
 
 # =============================================================================
 # ROUTES -- Dashboard feed
@@ -197,7 +206,7 @@ def get_dashboard(bid):
         "business":             BUSINESSES[bid],
         "summary":              build_summary(bid),
         "dscr":                 shape_dscr(bid, r),
-        "fraud":                shape_fraud(bid, r),
+        "fraud":                get_fraud_result(bid),
         "recent_transactions":  recent_tx,
         "energy_trend":         energy_trend,
     })
