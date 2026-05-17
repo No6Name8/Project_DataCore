@@ -9,6 +9,7 @@ import os, sys, warnings
 import numpy as np
 import pandas as pd
 import joblib
+from collections import OrderedDict
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -119,6 +120,57 @@ class BusinessFeatureExtractor:
             "digital_payment_ratio":     round(digital_ratio, 4),
             "cash_ratio":                round(cash_ratio, 4),
         }
+
+    def extract_from_intake(self, intake_dict: dict) -> OrderedDict:
+        """
+        Maps intake form answers to the same 15-feature vector format
+        as extract(). Used for Track 2 (zero transaction history).
+        """
+        t          = intake_dict
+        ticket     = float(t["typical_ticket_sar"])
+        daily_tx   = float(t["expected_daily_customers"])
+        hours      = float(t["operating_hours_per_day"])
+        consumer   = bool(t["is_consumer_facing"])
+        high_value = bool(t["sells_high_value_items"])
+        payment    = t["expected_payment_mix"]
+        late_night = bool(t["operates_late_night"])
+        biz_days   = float(t["business_days_per_week"])
+
+        digital_ratio = 0.2 if payment == "mostly_cash" else (0.8 if payment == "mostly_digital" else 0.5)
+        cash_ratio    = 0.7 if payment == "mostly_cash" else (0.1 if payment == "mostly_digital" else 0.35)
+
+        return OrderedDict([
+            ("avg_ticket_sar",            ticket),
+            ("median_ticket_sar",         ticket * 0.85),
+            ("ticket_cv",                 0.8 if high_value else 0.3),
+            ("ticket_p90_p10_ratio",      8.0 if high_value else 2.5),
+            ("avg_daily_transactions",    daily_tx),
+            ("transaction_velocity",      daily_tx / hours),
+            ("active_days_ratio",         biz_days / 7.0),
+            ("peak_hour_concentration",   0.10 if consumer else 0.16),
+            ("night_transaction_ratio",   0.015 if late_night else 0.005),
+            ("weekend_lift",              1.05 if consumer else 0.80),
+            ("hour_entropy",              0.80 if consumer else 0.60),
+            ("revenue_cv",                0.65 if high_value else 0.28),
+            ("inter_transaction_gap_cv",  1.30 if high_value else (3.00 if ticket < 50 else 1.60)),
+            ("digital_payment_ratio",     digital_ratio),
+            ("cash_ratio",                cash_ratio),
+        ])
+
+    def blend(self, real_features: dict, intake_features: dict,
+              real_data_days: int) -> OrderedDict:
+        """
+        Blends real data features with intake features during transition.
+        Weight shifts from intake toward real data as days accumulate.
+        At 30 days: 100% real data. At 0 days: 100% intake.
+        """
+        weight_real   = min(real_data_days / 30.0, 1.0)
+        weight_intake = 1.0 - weight_real
+        blended = OrderedDict()
+        for key in real_features:
+            blended[key] = (real_features[key] * weight_real +
+                            intake_features[key] * weight_intake)
+        return blended
 
 FEATURE_COLS = [
     "avg_ticket_sar", "median_ticket_sar", "ticket_cv", "ticket_p90_p10_ratio",
@@ -317,8 +369,11 @@ class BusinessClassifier:
             cluster_selection_method="leaf",
             prediction_data=True,
         )
-        self.cluster_profiles = {}
-        self.trained          = False
+        self.cluster_profiles  = {}
+        self.trained           = False
+        self.extractor         = BusinessFeatureExtractor()
+        self.feature_names     = FEATURE_COLS
+        self.outlier_threshold = 4.0
 
     # Stage 4: train
     def train(self, df: pd.DataFrame):
@@ -397,6 +452,123 @@ class BusinessClassifier:
             "cluster_purity":     profile["purity"],
             "confidence":         round(confidence, 4),
             "was_noise":          was_noise,
+        }
+
+    def _find_nearest_cluster(self, pca_point: np.ndarray):
+        """Returns (cluster_id, distance) for the closest cluster centroid."""
+        best_cid, best_dist = -1, float("inf")
+        for cid, prof in self.cluster_profiles.items():
+            cent = np.array([prof["centroid"][c] for c in FEATURE_COLS], dtype=float)
+            cent[_LOG_COLS] = np.log1p(cent[_LOG_COLS])
+            c_pca = self.pca.transform(self.scaler.transform(cent.reshape(1, -1)))[0]
+            dist  = float(np.linalg.norm(pca_point - c_pca))
+            if dist < best_dist:
+                best_dist, best_cid = dist, cid
+        return best_cid, best_dist
+
+    def classify_from_data(self, transactions_df: pd.DataFrame,
+                           period_days: int = 30) -> dict:
+        """Extracts features from a real transaction DataFrame, classifies, and enriches output."""
+        features = self.extractor.extract(transactions_df)
+        result   = self.classify(features)
+
+        tx = transactions_df.copy()
+        tx["timestamp"] = pd.to_datetime(tx["timestamp"])
+        data_days = min(int(tx["timestamp"].dt.date.nunique()), period_days)
+
+        if   data_days >= 25: refinement_status = "mature"
+        elif data_days >= 14: refinement_status = "developing"
+        elif data_days >= 7:  refinement_status = "early"
+        else:                 refinement_status = "predicted"
+
+        result["profile_source"]    = "real_data"
+        result["data_days"]         = data_days
+        result["refinement_status"] = refinement_status
+        result["raw_features"]      = {k: round(float(v), 4) for k, v in features.items()}
+        return result
+
+    def classify_from_intake(self, intake_dict: dict) -> dict:
+        """
+        Track 2: classify a brand new business with zero transaction history.
+        Uses intake form answers mapped to the same 15-feature vector.
+        Max confidence capped at 0.65 — model is honest about uncertainty.
+        """
+        features = self.extractor.extract_from_intake(intake_dict)
+        x = np.array([features[f] for f in self.feature_names], dtype=float).reshape(1, -1)
+
+        x_log              = x.copy()
+        x_log[:, _LOG_COLS] = np.log1p(x_log[:, _LOG_COLS])
+        x_scaled = self.scaler.transform(x_log)
+        x_pca    = self.pca.transform(x_scaled)
+
+        cluster_id, distance = self._find_nearest_cluster(x_pca[0])
+        is_outlier = distance > self.outlier_threshold
+        confidence = float(np.clip(
+            (1.0 - (distance / self.outlier_threshold)) * 0.65,
+            0.05, 0.65))
+
+        profile = self.cluster_profiles.get(cluster_id, {})
+        return {
+            "cluster_id":              cluster_id,
+            "cluster_size":            profile.get("size", 0),
+            "behavioral_profile":      profile.get("tags", {}),
+            "archetype_description":   profile.get("archetype_label", "unknown"),
+            "profile_source":          "intake_form",
+            "confidence":              round(confidence, 4),
+            "data_days":               0,
+            "is_outlier":              is_outlier,
+            "distance_to_centroid":    round(float(distance), 4),
+            "refinement_status":       "predicted",
+            "raw_features":            {k: round(float(v), 4) for k, v in features.items()},
+        }
+
+    def classify_hybrid(self, transactions_df: pd.DataFrame,
+                        intake_dict: dict, period_days: int = 30) -> dict:
+        """
+        Track 2 transition: blend real data with intake form.
+        As real data accumulates the intake form weight approaches zero.
+        This is the refinement loop — runs during the first 30 days.
+        """
+        real_result   = self.classify_from_data(transactions_df, period_days)
+        intake_result = self.classify_from_intake(intake_dict)
+
+        data_days = real_result["data_days"]
+        blended   = self.extractor.blend(
+                        real_result["raw_features"],
+                        intake_result["raw_features"],
+                        data_days)
+
+        x = np.array([blended[f] for f in self.feature_names], dtype=float).reshape(1, -1)
+        x_log              = x.copy()
+        x_log[:, _LOG_COLS] = np.log1p(x_log[:, _LOG_COLS])
+        x_scaled = self.scaler.transform(x_log)
+        x_pca    = self.pca.transform(x_scaled)
+
+        cluster_id, distance = self._find_nearest_cluster(x_pca[0])
+        blend_weight = min(data_days / 30.0, 1.0)
+        confidence   = float(np.clip(
+            real_result["confidence"]   * blend_weight +
+            intake_result["confidence"] * (1 - blend_weight),
+            0.05, 0.99))
+
+        if   data_days >= 25: refinement_status = "mature"
+        elif data_days >= 14: refinement_status = "developing"
+        elif data_days >= 7:  refinement_status = "early"
+        else:                 refinement_status = "predicted"
+
+        profile = self.cluster_profiles.get(cluster_id, {})
+        return {
+            "cluster_id":              cluster_id,
+            "behavioral_profile":      profile.get("tags", {}),
+            "archetype_description":   profile.get("archetype_label", "unknown"),
+            "profile_source":          "hybrid",
+            "confidence":              round(confidence, 4),
+            "data_days":               data_days,
+            "blend_weight_real_data":  round(blend_weight, 2),
+            "is_outlier":              distance > self.outlier_threshold,
+            "distance_to_centroid":    round(float(distance), 4),
+            "refinement_status":       refinement_status,
+            "raw_features":            {k: round(float(v), 4) for k, v in blended.items()},
         }
 
     # Stage 7: validate against known archetypes in synthetic data
@@ -537,3 +709,75 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+    print("\n" + "=" * 60)
+    print("TRACK 2 -- INTAKE FORM (new businesses, zero history)")
+    print("=" * 60)
+
+    test_intakes = [
+        ("New Shawarma Shop", {
+            "typical_ticket_sar":        28,
+            "expected_daily_customers":  85,
+            "operating_hours_per_day":   14,
+            "is_consumer_facing":        True,
+            "sells_high_value_items":    False,
+            "expected_payment_mix":      "mixed",
+            "operates_late_night":       True,
+            "business_days_per_week":    7,
+        }),
+        ("New Luxury Car Showroom", {
+            "typical_ticket_sar":        160000,
+            "expected_daily_customers":  3,
+            "operating_hours_per_day":   12,
+            "is_consumer_facing":        True,
+            "sells_high_value_items":    True,
+            "expected_payment_mix":      "mostly_digital",
+            "operates_late_night":       False,
+            "business_days_per_week":    6,
+        }),
+        ("New Dental Clinic", {
+            "typical_ticket_sar":        420,
+            "expected_daily_customers":  18,
+            "operating_hours_per_day":   9,
+            "is_consumer_facing":        True,
+            "sells_high_value_items":    False,
+            "expected_payment_mix":      "mostly_digital",
+            "operates_late_night":       False,
+            "business_days_per_week":    6,
+        }),
+    ]
+
+    clf2 = BusinessClassifier()
+    clf2.load()
+
+    for name, intake in test_intakes:
+        r = clf2.classify_from_intake(intake)
+        print(f"\n{name}")
+        print(f"  Cluster   : {r['cluster_id']} | Confidence: {r['confidence']:.2f}")
+        print(f"  Profile   : {r['archetype_description']}")
+        print(f"  Source    : {r['profile_source']} | Status: {r['refinement_status']}")
+
+    print("\n" + "=" * 60)
+    print("HYBRID -- Cafe with only 7 days real data + intake form")
+    print("=" * 60)
+
+    tx_cafe = pd.read_csv(os.path.join(DATA_DIR, "cafe_transactions.csv"))
+    tx_cafe["timestamp"] = pd.to_datetime(tx_cafe["timestamp"])
+    tx_7days = tx_cafe[tx_cafe["timestamp"] < "2025-06-08"].copy()
+
+    cafe_intake = {
+        "typical_ticket_sar":        30,
+        "expected_daily_customers":  90,
+        "operating_hours_per_day":   14,
+        "is_consumer_facing":        True,
+        "sells_high_value_items":    False,
+        "expected_payment_mix":      "mostly_digital",
+        "operates_late_night":       False,
+        "business_days_per_week":    7,
+    }
+
+    r = clf2.classify_hybrid(tx_7days, cafe_intake)
+    print(f"  Cluster   : {r['cluster_id']} | Confidence: {r['confidence']:.2f}")
+    print(f"  Profile   : {r['archetype_description']}")
+    print(f"  Source    : {r['profile_source']} (real weight: {r['blend_weight_real_data']})")
+    print(f"  Status    : {r['refinement_status']}")
