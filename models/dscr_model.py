@@ -11,6 +11,9 @@ ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 sys.path.insert(0, ROOT)
 
+from models.business_classifier import BusinessClassifier
+from models.expense_estimator   import ExpenseEstimator
+
 # Industry expense ratios (fraction of revenue consumed by operating costs)
 EXPENSE_RATIOS = {
     "laundromat": 0.55,   # utilities, rent, staff
@@ -38,6 +41,11 @@ CREDIT_CEILINGS = {
 
 
 class DSCRModel:
+
+    def __init__(self):
+        self.classifier = BusinessClassifier()
+        self.classifier.load()
+        self.estimator  = ExpenseEstimator()
 
     # ── Data loading ──────────────────────────────────────────────────────────
 
@@ -94,14 +102,36 @@ class DSCRModel:
     # ── Operating expenses ────────────────────────────────────────────────────
 
     def compute_operating_expenses(self, tx, business_id):
-        total_revenue    = float(tx["amount_sar"].sum())
-        expense_ratio    = EXPENSE_RATIOS[business_id]
-        expenses         = total_revenue * expense_ratio
-        noi              = total_revenue - expenses
+        try:
+            expense_result    = self.estimator.estimate_from_classifier(
+                tx, self.classifier)
+            expense_ratio     = expense_result["total_expense_ratio"]
+            source            = "ai_derived"
+            breakdown         = expense_result["breakdown"]
+            model2_confidence = expense_result["confidence"]
+        except Exception as e:
+            print(f"  [WARN] Model 2 fallback for {business_id}: {e}")
+            expense_ratio     = EXPENSE_RATIOS[business_id]
+            source            = "hardcoded_fallback"
+            breakdown         = {
+                "cogs_ratio":     round(expense_ratio * 0.6, 4),
+                "labor_ratio":    round(expense_ratio * 0.3, 4),
+                "overhead_ratio": 0.08,
+                "stability_adj":  0.0,
+            }
+            model2_confidence = 0.5
+
+        total_revenue = float(tx["amount_sar"].sum())
+        expenses      = total_revenue * expense_ratio
+        noi           = total_revenue - expenses
+
         return {
             "estimated_monthly_expenses": round(expenses, 2),
             "net_operating_income":       round(noi, 2),
             "expense_ratio":              expense_ratio,
+            "expense_source":             source,
+            "expense_breakdown":          breakdown,
+            "model2_confidence":          model2_confidence,
         }
 
     # ── DSCR calculation ──────────────────────────────────────────────────────
@@ -285,6 +315,9 @@ class DSCRModel:
             "computed_at":           "2025-06-30",
             "revenue_metrics":       rev,
             "expense_ratio":         exp["expense_ratio"],
+            "expense_source":        exp["expense_source"],
+            "expense_breakdown":     exp["expense_breakdown"],
+            "model2_confidence":     exp["model2_confidence"],
             "net_operating_income":  exp["net_operating_income"],
             "dscr_score":            dscr["dscr_score"],
             "risk_tier":             dscr["risk_tier"],
