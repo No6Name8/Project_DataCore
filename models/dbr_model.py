@@ -120,8 +120,11 @@ class DBRModel:
             }
 
         # Rule 3: zero-revenue days < 5
+        # Use only Sun-Thu (business days in Saudi Arabia) so that legitimate
+        # Fri/Sat closures (real estate, offices) are not penalised.
         tx_dates   = set(tx["date"].tolist())
-        zero_days  = sum(1 for d in ALL_DATES if d not in tx_dates)
+        biz_days   = [d for d in ALL_DATES if pd.Timestamp(d).weekday() not in [4, 5]]
+        zero_days  = sum(1 for d in biz_days if d not in tx_dates)
         if zero_days >= 5:
             return {
                 "business_id":          business_id,

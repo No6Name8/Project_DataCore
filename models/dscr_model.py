@@ -23,9 +23,18 @@ EXPENSE_RATIOS = {
 
 BASE_RATE     = 0.065
 LOAN_TERM     = 36        # months
-LOAN_PCT      = 0.15      # 15% of annual projected revenue
+LOAN_PCT      = 0.40      # 40% of annual revenue -- more realistic loan size
 PERIOD_DAYS   = 30
 ALL_DATES     = pd.date_range("2025-06-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
+
+CREDIT_CEILINGS = {
+    "laundromat":   500_000,
+    "cafe":         400_000,
+    "minimarket": 1_500_000,
+    "realestate": 2_000_000,
+    "cardealer":  5_000_000,
+    "motorbike":  1_000_000,
+}
 
 
 class DSCRModel:
@@ -61,8 +70,12 @@ class DSCRModel:
         wkdy_avg = day_type[~day_type["is_wknd"]]["amount_sar"].mean()
         wknd_mult = round(float(wknd_avg / wkdy_avg), 3) if wkdy_avg > 0 else 1.0
 
-        tx_dates          = set(tx["date"].tolist())
-        zero_revenue_days = sum(1 for d in ALL_DATES if d not in tx_dates)
+        tx_dates = set(tx["date"].tolist())
+        # For real estate offices, Fri/Sat are legitimate non-working days.
+        # Only count zero-revenue days on actual business days (Sun-Thu).
+        # weekday(): Mon=0 Tue=1 Wed=2 Thu=3 Fri=4 Sat=5 Sun=6
+        business_days     = [d for d in ALL_DATES if pd.Timestamp(d).weekday() not in [4, 5]]
+        zero_revenue_days = sum(1 for d in business_days if d not in tx_dates)
 
         peak_d = daily.idxmax()
         low_d  = daily.idxmin()
@@ -124,7 +137,7 @@ class DSCRModel:
 
     # ── Credit limit ──────────────────────────────────────────────────────────
 
-    def compute_credit_limit(self, avg_daily, dscr_score, risk_tier, std_dev):
+    def compute_credit_limit(self, avg_daily, dscr_score, risk_tier, std_dev, business_id):
         multipliers = {
             "very_low": 1.5, "low": 1.2, "medium": 0.9,
             "high": 0.6, "critical": 0.0,
@@ -136,6 +149,8 @@ class DSCRModel:
         if avg_daily > 0 and (std_dev / avg_daily) > 0.5:
             limit *= 0.85
 
+        ceiling = CREDIT_CEILINGS.get(business_id, 2_000_000)
+        limit   = min(limit, ceiling)
         return int(round(limit / 5000) * 5000)
 
     # ── Sustainability discount ───────────────────────────────────────────────
@@ -157,7 +172,7 @@ class DSCRModel:
 
     # ── Fraud detection ───────────────────────────────────────────────────────
 
-    def detect_fraud(self, tx):
+    def detect_fraud(self, tx, business_id=""):
         tx    = tx.copy()
         tx["hour"] = tx["timestamp"].dt.hour
         tx["date"] = tx["timestamp"].dt.strftime("%Y-%m-%d")
@@ -181,20 +196,37 @@ class DSCRModel:
                     "amount_if_applicable": None,
                 })
 
-        # CHECK 2 -- Statistical amount outlier (mean + 4*std)
+        # CHECK 2 -- Statistical amount outlier (context-aware per business type)
+        # High-ticket businesses have naturally large variance; use looser sigma.
+        HIGH_TICKET      = {"cardealer", "realestate"}
+        sigma_threshold  = 5.0 if business_id in HIGH_TICKET else 3.5
+
         mean_amt  = tx["amount_sar"].mean()
         std_amt   = tx["amount_sar"].std()
-        threshold = mean_amt + 4 * std_amt
+        threshold = mean_amt + sigma_threshold * std_amt
         outliers  = tx[tx["amount_sar"] > threshold]
+
+        # Apply a percentile guard to suppress false positives from high-end
+        # but legitimate products at the tail of the price distribution.
+        if business_id in HIGH_TICKET:
+            # Cardealer/realestate: must be > 3x the p95 (fleet sale, not a big deal)
+            p95      = tx["amount_sar"].quantile(0.95)
+            outliers = outliers[outliers["amount_sar"] > p95 * 3]
+        else:
+            # All others: must be > 2x the p99 so valid high-end SKUs (dry-clean,
+            # premium bike) are never flagged — only true outliers like 4500 SAR
+            # cash at a minimarket clear this bar.
+            p99      = tx["amount_sar"].quantile(0.99)
+            outliers = outliers[outliers["amount_sar"] > p99 * 2]
 
         for _, row in outliers.iterrows():
             sigmas   = (row["amount_sar"] - mean_amt) / std_amt if std_amt > 0 else 0
-            severity = "critical" if sigmas > 6 else "high"
+            severity = "critical" if sigmas > 8 else "high"
             anomalies.append({
                 "date":       str(row["date"]),
                 "type":       "amount_outlier",
                 "description": (f"Transaction SAR {row['amount_sar']:,.2f} is "
-                                f"{sigmas:.1f}x std above mean (mean SAR {mean_amt:,.2f})"),
+                                f"{sigmas:.1f} std above mean (mean SAR {mean_amt:,.2f})"),
                 "severity":   severity,
                 "amount_if_applicable": float(row["amount_sar"]),
             })
@@ -221,7 +253,7 @@ class DSCRModel:
         sev_pts = {"critical": 40, "high": 25, "medium": 10}
         fraud_score = min(100, sum(sev_pts.get(a["severity"], 10) for a in anomalies))
 
-        approval_frozen = fraud_score > 35
+        approval_frozen = fraud_score > 55
         overall_status  = "clear" if fraud_score == 0 else ("frozen" if approval_frozen else "flagged")
 
         return {
@@ -242,9 +274,9 @@ class DSCRModel:
         dscr   = self.compute_dscr(exp["net_operating_income"], rev["avg_daily_revenue"])
         limit  = self.compute_credit_limit(
                      rev["avg_daily_revenue"], dscr["dscr_score"],
-                     dscr["risk_tier"], rev["revenue_std_dev"])
+                     dscr["risk_tier"], rev["revenue_std_dev"], business_id)
         sus    = self.compute_sustainability_discount(en)
-        fraud  = self.detect_fraud(tx)
+        fraud  = self.detect_fraud(tx, business_id)
 
         final_rate = round(BASE_RATE - sus["discount"], 4)
 
