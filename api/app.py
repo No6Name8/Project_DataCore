@@ -15,10 +15,12 @@ ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 sys.path.insert(0, ROOT)
 
-from models.dscr_model        import DSCRModel
-from models.dbr_model         import DBRModel
-from models.fraud_detector    import FraudDetector
+from models.dscr_model         import DSCRModel
+from models.dbr_model          import DBRModel
+from models.fraud_detector     import FraudDetector
 from models.revenue_forecaster import RevenueForecaster
+from models.business_classifier import BusinessClassifier
+from models.expense_estimator   import ExpenseEstimator
 
 app = Flask(__name__)
 CORS(app)
@@ -40,6 +42,9 @@ _fraud_detector = FraudDetector()
 _fraud_detector.load(os.path.join(ROOT, "models", "saved", "fraud_detector.pkl"))
 _forecaster = RevenueForecaster()
 _forecaster.load(os.path.join(ROOT, "models", "saved", "revenue_forecaster.pkl"))
+_classifier = BusinessClassifier()
+_classifier.load(os.path.join(ROOT, "models", "saved", "business_classifier.pkl"))
+_estimator  = ExpenseEstimator()
 
 # ── Model result cache (computed once per business per process lifetime) ──────
 _MODEL_CACHE  = {}
@@ -241,17 +246,84 @@ def get_dashboard(bid):
 
 @app.route("/api/incubator/dbr-assessment")
 def dbr_assessment():
-    salary   = request.args.get("monthly_salary",      type=float)
-    existing = request.args.get("existing_obligations", type=float, default=0.0)
-    loan_amt = request.args.get("requested_loan",       type=float)
-    term     = request.args.get("loan_term_months",     type=int,   default=24)
+    salary          = request.args.get("monthly_salary",       type=float)
+    existing        = request.args.get("existing_obligations",  type=float, default=0.0)
+    loan_amt        = request.args.get("requested_loan",        type=float)
+    term            = request.args.get("loan_term_months",      type=int,   default=24)
+    holds_inventory = request.args.get("holds_inventory", "false").lower() == "true"
 
     if not salary or not loan_amt:
         return jsonify({"error": "monthly_salary and requested_loan are required"}), 400
     if salary <= 0:
         return jsonify({"error": "monthly_salary must be positive"}), 400
 
-    return jsonify(_dbr_model.assess(salary, existing, loan_amt, term))
+    result = _dbr_model.assess(salary, existing, loan_amt, term)
+    result["holds_inventory_flag"] = holds_inventory
+    return jsonify(result)
+
+
+@app.route("/api/incubator/business-profile")
+def intake_business_profile():
+    try:
+        ticket     = request.args.get("typical_ticket_sar",        type=float)
+        customers  = request.args.get("expected_daily_customers",   type=int)
+        hours      = request.args.get("operating_hours_per_day",    type=int)
+        consumer   = request.args.get("is_consumer_facing",    "true").lower()  == "true"
+        high_value = request.args.get("sells_high_value_items", "false").lower() == "true"
+        payment    = request.args.get("expected_payment_mix",       default="mixed")
+        late_night = request.args.get("operates_late_night",   "false").lower() == "true"
+        biz_days   = request.args.get("business_days_per_week",     type=int, default=6)
+        holds_inv  = request.args.get("holds_physical_inventory","false").lower() == "true"
+
+        if not ticket or not customers or not hours:
+            return jsonify({"error": (
+                "typical_ticket_sar, expected_daily_customers, "
+                "and operating_hours_per_day are required")}), 400
+
+        intake = {
+            "typical_ticket_sar":        ticket,
+            "expected_daily_customers":  customers,
+            "operating_hours_per_day":   hours,
+            "is_consumer_facing":        consumer,
+            "sells_high_value_items":    high_value,
+            "expected_payment_mix":      payment,
+            "operates_late_night":       late_night,
+            "business_days_per_week":    biz_days,
+            "holds_physical_inventory":  holds_inv,
+        }
+
+        clf_result = _classifier.classify_from_intake(intake)
+        expense    = _estimator.estimate_from_intake(intake, _classifier)
+
+        net_margin   = expense["net_margin_estimate"]
+        stab_tag     = expense["tags_used"].get("revenue_stability", "moderate")
+        if net_margin > 0.35 and stab_tag in ("stable", "very_stable"):
+            risk_ind = "low"
+        elif net_margin > 0.20:
+            risk_ind = "medium"
+        else:
+            risk_ind = "high"
+
+        return jsonify({
+            "cluster_id":           int(clf_result["cluster_id"]),
+            "archetype_description": clf_result.get("archetype_description", "unknown"),
+            "confidence":           float(clf_result["confidence"]),
+            "refinement_status":    "predicted",
+            "behavioral_profile":   expense["tags_used"],
+            "expense_estimate": {
+                "total_expense_ratio": expense["total_expense_ratio"],
+                "breakdown":           expense["breakdown"],
+                "net_margin_estimate": expense["net_margin_estimate"],
+                "holds_inventory":     expense["holds_inventory"],
+            },
+            "preliminary_credit_profile": {
+                "risk_indication": risk_ind,
+                "note": ("Based on intake form only. "
+                         "Connect POS data for full assessment."),
+            },
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/incubator/transition-check/<bid>")

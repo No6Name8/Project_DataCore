@@ -103,24 +103,39 @@ class ExpenseEstimator:
 
     # ── Core estimate ─────────────────────────────────────────────────────────
 
-    def estimate(self, behavioral_profile: dict) -> dict:
+    def estimate(self, behavioral_profile: dict,
+                 holds_inventory: bool = False) -> dict:
         """
         Derives an expense ratio from behavioral tags.
         Input dict must contain: ticket_size, transaction_velocity,
         revenue_stability. Optional: payment_mix, nocturnal_activity,
         profile_source, is_outlier.
         """
-        ticket_size  = behavioral_profile.get("ticket_size",          "low")
-        velocity_tag = behavioral_profile.get("transaction_velocity",  "moderate")
+        ticket_size   = behavioral_profile.get("ticket_size",          "low")
+        velocity_tag  = behavioral_profile.get("transaction_velocity",  "moderate")
         stability_tag = behavioral_profile.get("revenue_stability",    "moderate")
-        payment_mix  = behavioral_profile.get("payment_mix",          "mixed")
-        nocturnal    = behavioral_profile.get("nocturnal_activity",    "minimal")
-        profile_src  = behavioral_profile.get("profile_source",       "real_data")
-        is_outlier   = behavioral_profile.get("is_outlier",           False)
+        payment_mix   = behavioral_profile.get("payment_mix",          "mixed")
+        nocturnal     = behavioral_profile.get("nocturnal_activity",    "minimal")
+        profile_src   = behavioral_profile.get("profile_source",       "real_data")
+        is_outlier    = behavioral_profile.get("is_outlier",           False)
 
         cogs_ratio  = self.cogs_by_ticket.get(ticket_size, 0.35)
         labor_ratio = self.labor_by_velocity.get(velocity_tag, 0.12)
         stab_adj    = self.stability_adjustment.get(stability_tag, 0.01)
+
+        # Inventory override — businesses holding physical stock have
+        # high COGS regardless of ticket size behavioral signal.
+        # Ticket size tells us PRICE not MARGIN for inventory businesses.
+        if holds_inventory:
+            # Values calibrated so that total (COGS + labor + overhead + stab_adj)
+            # lands near observed industry expense ratios once secondary adjustments
+            # (volatility, payment-mix) are stacked on top.
+            if ticket_size in ["very_high", "high"]:
+                cogs_ratio = 0.65   # high-value inventory (vehicles, machinery)
+            elif ticket_size == "mid":
+                cogs_ratio = 0.58   # mid-value inventory (electronics, appliances)
+            else:
+                cogs_ratio = 0.52   # low-value inventory (clothing, pharmacy, hardware)
 
         # Payment mix adjustment: cash handling raises labor cost
         if payment_mix == "cash_heavy":
@@ -166,7 +181,8 @@ class ExpenseEstimator:
 
     # ── Full pipeline: real transaction data ──────────────────────────────────
 
-    def estimate_from_classifier(self, transactions_df, classifier) -> dict:
+    def estimate_from_classifier(self, transactions_df, classifier,
+                                  holds_inventory: bool = False) -> dict:
         """Full pipeline: classify business then estimate expenses."""
         result  = classifier.classify_from_data(transactions_df)
         profile = self._derive_profile(
@@ -174,30 +190,33 @@ class ExpenseEstimator:
             profile_source=result.get("profile_source", "real_data"),
             is_outlier=result.get("was_noise", False),
         )
-        expense = self.estimate(profile)
+        expense = self.estimate(profile, holds_inventory=holds_inventory)
         expense["profile_source"]            = result.get("profile_source", "real_data")
         expense["cluster_id"]                = result["cluster_id"]
         expense["archetype"]                 = result.get(
             "archetype_description", result.get("archetype_label", "unknown"))
         expense["classification_confidence"] = result["confidence"]
+        expense["holds_inventory"]           = holds_inventory
         return expense
 
     # ── Full pipeline: intake form ────────────────────────────────────────────
 
     def estimate_from_intake(self, intake_dict: dict, classifier) -> dict:
         """For new businesses using intake form."""
+        holds_inventory = intake_dict.get("holds_physical_inventory", False)
         result  = classifier.classify_from_intake(intake_dict)
         profile = self._derive_profile(
             result["raw_features"],
             profile_source="intake_form",
             is_outlier=result.get("is_outlier", False),
         )
-        expense = self.estimate(profile)
+        expense = self.estimate(profile, holds_inventory=holds_inventory)
         expense["profile_source"]  = "intake_form"
         expense["confidence"]     *= 0.75   # additional intake penalty
         expense["confidence"]      = round(
             float(np.clip(expense["confidence"], 0.30, 0.95)), 4)
         expense["archetype"]       = result.get("archetype_description", "unknown")
+        expense["holds_inventory"] = holds_inventory
         return expense
 
 
@@ -217,28 +236,52 @@ if __name__ == "__main__":
     clf.load()
     estimator = ExpenseEstimator()
 
-    print("\n" + "=" * 60)
-    print("MODEL 2 vs HARDCODED -- comparison")
-    print("=" * 60)
-    print(f"{'Business':<14} {'Hardcoded':>10} {'AI-Derived':>10} "
-          f"{'Diff':>8} {'Confidence':>11} {'Source'}")
-    print("-" * 70)
-
     businesses = ["laundromat", "cafe", "minimarket",
                   "realestate", "cardealer", "motorbike"]
+
+    print("\n" + "=" * 60)
+    print("MODEL 2 FINAL -- AI-derived vs hardcoded comparison")
+    print("=" * 60)
+    print(f"{'Business':<14} {'Hardcoded':>10} {'AI-Derived':>10} "
+          f"{'Diff':>8} {'Inventory':>10} {'Conf':>6}")
+    print("-" * 65)
 
     for biz in businesses:
         tx = pd.read_csv(os.path.join(ROOT, "data", f"{biz}_transactions.csv"))
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
 
-        result   = estimator.estimate_from_classifier(tx, clf)
+        clf_result = clf.classify_from_data(tx)
+        profile    = estimator._derive_profile(clf_result["raw_features"])
+        ticket     = profile.get("ticket_size", "low")
+        velocity   = profile.get("transaction_velocity", "moderate")
+
+        # Active-days guard: brokerages / appointment businesses have sparse
+        # presence (< 75% of days with transactions). Inventory dealers stay
+        # open daily to receive stock and serve walk-in customers.
+        active_days = clf_result["raw_features"].get("active_days_ratio", 0.9)
+        holds_inv = (
+            ticket in ["high", "very_high"] and
+            velocity in ["low", "very_low", "moderate"] and
+            active_days >= 0.75
+        ) or (
+            ticket in ["mid"] and
+            velocity in ["very_low", "low"]
+        )
+
+        result   = estimator.estimate_from_classifier(tx, clf,
+                     holds_inventory=holds_inv)
         ai_ratio = result["total_expense_ratio"]
         hc_ratio = EXPENSE_RATIOS[biz]
         diff     = ai_ratio - hc_ratio
 
         print(f"{biz:<14} {hc_ratio:>10.3f} {ai_ratio:>10.3f} "
-              f"{diff:>+8.3f} {result['confidence']:>10.2f}  "
-              f"{result['archetype'][:25]}")
+              f"{diff:>+8.3f} {str(holds_inv):>10} {result['confidence']:>6.2f}")
+
+    print("\nExpected results:")
+    print("  cardealer : AI ~0.78-0.82 (was 0.260, inventory=True fixes it)")
+    print("  motorbike : AI ~0.72-0.78 (was 0.390, inventory=True fixes it)")
+    print("  realestate: AI ~0.33      (no inventory, unchanged)")
+    print("  cafe      : AI ~0.82      (no inventory, unchanged)")
 
     print("\n" + "=" * 60)
     print("FULL DSCR WITH MODEL 2 -- live run")

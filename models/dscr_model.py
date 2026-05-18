@@ -103,19 +103,37 @@ class DSCRModel:
 
     def compute_operating_expenses(self, tx, business_id):
         try:
+            # Classify business behavior to auto-detect inventory signal
+            clf_result = self.classifier.classify_from_data(tx)
+            profile    = self.estimator._derive_profile(clf_result["raw_features"])
+            ticket     = profile.get("ticket_size", "low")
+            velocity   = profile.get("transaction_velocity", "moderate")
+
+            # Inventory signal: high/very_high ticket + low/very_low velocity
+            # + high active-days (brokerages are sparse; dealers stay open daily)
+            active_days = clf_result["raw_features"].get("active_days_ratio", 0.9)
+            holds_inventory = (
+                ticket in ["high", "very_high"] and
+                velocity in ["low", "very_low", "moderate"] and
+                active_days >= 0.75
+            ) or (
+                ticket in ["mid"] and
+                velocity in ["very_low", "low"]
+            )
+
             expense_result    = self.estimator.estimate_from_classifier(
-                tx, self.classifier)
+                tx, self.classifier, holds_inventory=holds_inventory)
             expense_ratio     = expense_result["total_expense_ratio"]
-            source            = "ai_derived"
+            source            = f"ai_derived (inventory={holds_inventory})"
             breakdown         = expense_result["breakdown"]
             model2_confidence = expense_result["confidence"]
         except Exception as e:
             print(f"  [WARN] Model 2 fallback for {business_id}: {e}")
-            expense_ratio     = EXPENSE_RATIOS[business_id]
+            expense_ratio     = EXPENSE_RATIOS.get(business_id, 0.60)
             source            = "hardcoded_fallback"
             breakdown         = {
-                "cogs_ratio":     round(expense_ratio * 0.6, 4),
-                "labor_ratio":    round(expense_ratio * 0.3, 4),
+                "cogs_ratio":     expense_ratio * 0.6,
+                "labor_ratio":    expense_ratio * 0.3,
                 "overhead_ratio": 0.08,
                 "stability_adj":  0.0,
             }
