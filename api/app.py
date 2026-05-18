@@ -155,6 +155,8 @@ def shape_dscr(bid, r):
         "avg_energy_efficiency":     r["avg_energy_efficiency"],
         "green_days_count":          r["green_days_count"],
         "expense_ratio":             r["expense_ratio"],
+        "expense_breakdown":         r.get("expense_breakdown"),
+        "expense_source":            r.get("expense_source"),
         "revenue_metrics":           r["revenue_metrics"],
         "fraud_flag":                fr["approval_frozen"] or fr["fraud_score"] > 0,
         "fraud_reason":              first_reason,
