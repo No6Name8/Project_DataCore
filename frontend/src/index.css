@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-main: 'Inter', sans-serif;
+}
+
+[dir="rtl"] {
+  --font-main: 'Tajawal', sans-serif;
+}
+
+* {
+  font-family: var(--font-main);
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0F1923;
+  color: #E8EDF2;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #162030; }
+::-webkit-scrollbar-thumb { background: #1B3A6B; border-radius: 3px; }
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color, opacity;
+  transition-duration: 150ms;
+}
+
+/* Gold gradient text utility */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #C9A84C, #E8C96A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card glass effect */
+.glass-card {
+  background: rgba(22, 32, 48, 0.80);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 45, 66, 0.80);
+}
