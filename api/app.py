@@ -157,6 +157,7 @@ def shape_dscr(bid, r):
         "expense_ratio":             r["expense_ratio"],
         "expense_breakdown":         r.get("expense_breakdown"),
         "expense_source":            r.get("expense_source"),
+        "archetype_description":     r.get("archetype_description"),
         "revenue_metrics":           r["revenue_metrics"],
         "fraud_flag":                fr["approval_frozen"] or fr["fraud_score"] > 0,
         "fraud_reason":              first_reason,

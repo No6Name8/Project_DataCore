@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { useLang } from "../i18n/LanguageContext";
-import { LayoutDashboard, Sprout, Globe } from "lucide-react";
+import { LayoutDashboard, Sprout, Globe, Home } from "lucide-react";
 
 export default function Layout() {
   const { t, lang, toggleLang } = useLang();
@@ -9,6 +9,11 @@ export default function Layout() {
     { to: "/dashboard", icon: LayoutDashboard, label: t.navDashboard },
     { to: "/incubator",  icon: Sprout,          label: t.navIncubator  },
   ];
+
+  const activeClass =
+    "bg-brand-blue/20 text-white border-b-2 border-brand-gold";
+  const inactiveClass =
+    "text-gray-400 hover:text-white hover:bg-surface-hover";
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-dark">
@@ -41,11 +46,8 @@ export default function Layout() {
                 to={to}
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg text-sm
-                   font-medium transition-all duration-200
-                   ${isActive
-                     ? "bg-brand-blue text-white"
-                     : "text-gray-400 hover:text-white hover:bg-surface-hover"
-                   }`
+                   font-medium
+                   ${isActive ? activeClass : inactiveClass}`
                 }
               >
                 <Icon size={16} className="shrink-0" />
@@ -60,7 +62,8 @@ export default function Layout() {
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg shrink-0
                        border border-surface-border text-gray-400
                        hover:text-brand-gold hover:border-brand-gold
-                       text-sm font-medium transition-all"
+                       text-sm font-medium"
+            style={{ transition: "color 150ms var(--ease-out), border-color 150ms var(--ease-out)" }}
           >
             <Globe size={15} />
             <span>{lang === "en" ? "العربية" : "English"}</span>
@@ -70,15 +73,47 @@ export default function Layout() {
       </header>
 
       {/* Page content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <Outlet />
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-20 md:pb-6">
+        <div className="page-enter">
+          <Outlet />
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-surface-border py-4 text-center
-                          text-xs text-gray-600">
+      {/* Footer — hidden on mobile (bottom nav takes over) */}
+      <footer className="hidden md:block border-t border-surface-border py-4
+                          text-center text-xs text-gray-600">
         DataCore © 2025 — Alinma iz Business Hackathon
       </footer>
+
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-50
+                      glass-card border-t border-surface-border
+                      flex items-center justify-around h-16 px-4">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `flex flex-col items-center gap-0.5 text-xs font-medium
+             ${isActive ? "text-brand-gold" : "text-gray-500"}`
+          }
+        >
+          <Home size={20} />
+          <span>{lang === "en" ? "Home" : "الرئيسية"}</span>
+        </NavLink>
+
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-0.5 text-xs font-medium
+               ${isActive ? "text-brand-gold" : "text-gray-500"}`
+            }
+          >
+            <Icon size={20} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
 
     </div>
   );

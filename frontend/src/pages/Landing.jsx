@@ -93,11 +93,10 @@ export default function Landing() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center justify-center gap-2
+            className="btn-gold flex items-center justify-center gap-2
                        bg-brand-gold hover:bg-brand-goldLight
                        text-brand-blueDark font-semibold
-                       px-8 py-3 rounded-xl transition-all
-                       hover:scale-105 active:scale-95"
+                       px-8 py-3 rounded-xl"
           >
             {t.connectData}
             <Arrow size={18} />
@@ -108,7 +107,8 @@ export default function Landing() {
                        border border-surface-border
                        text-gray-300 hover:text-white
                        hover:border-brand-gold/50
-                       px-8 py-3 rounded-xl transition-all"
+                       px-8 py-3 rounded-xl"
+            style={{ transition: "color 150ms var(--ease-out), border-color 150ms var(--ease-out)" }}
           >
             {t.learnMore}
           </button>
@@ -155,7 +155,7 @@ export default function Landing() {
             <div
               key={title}
               className="glass-card rounded-xl p-5 space-y-3
-                         hover:border-brand-gold/30 transition-all
+                         hover:border-brand-gold/30
                          hover:-translate-y-1 cursor-default"
             >
               <div className={`w-10 h-10 rounded-lg ${bg}
@@ -180,7 +180,8 @@ export default function Landing() {
           {/* SME Pipeline */}
           <div className="glass-card rounded-xl p-6 space-y-4
                           border border-brand-blue/40
-                          hover:border-brand-blue/70 transition-all">
+                          hover:border-brand-blue/70"
+            style={{ transition: "border-color 180ms var(--ease-out)" }}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-brand-blue/20
                               flex items-center justify-center shrink-0">
@@ -214,10 +215,10 @@ export default function Landing() {
 
             <button
               onClick={() => navigate("/dashboard")}
-              className="w-full flex items-center justify-center gap-2
+              className="btn-blue w-full flex items-center justify-center gap-2
                          bg-brand-blue hover:bg-brand-blueLight
                          text-white text-sm font-medium
-                         py-2.5 rounded-lg transition-all"
+                         py-2.5 rounded-lg"
             >
               {isRTL ? "عرض اللوحة" : "View Dashboard"}
               <Arrow size={15} />
@@ -227,7 +228,8 @@ export default function Landing() {
           {/* Incubator Pipeline */}
           <div className="glass-card rounded-xl p-6 space-y-4
                           border border-brand-gold/20
-                          hover:border-brand-gold/50 transition-all">
+                          hover:border-brand-gold/50"
+            style={{ transition: "border-color 180ms var(--ease-out)" }}>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-brand-gold/10
                               flex items-center justify-center shrink-0">
@@ -261,10 +263,10 @@ export default function Landing() {
 
             <button
               onClick={() => navigate("/incubator")}
-              className="w-full flex items-center justify-center gap-2
+              className="btn-gold w-full flex items-center justify-center gap-2
                          bg-brand-gold hover:bg-brand-goldLight
                          text-brand-blueDark text-sm font-medium
-                         py-2.5 rounded-lg transition-all"
+                         py-2.5 rounded-lg"
             >
               {isRTL ? "استكشف الحاضنة" : "Explore Incubator"}
               <Arrow size={15} />
@@ -288,11 +290,10 @@ export default function Landing() {
         </p>
         <button
           onClick={() => navigate("/dashboard")}
-          className="inline-flex items-center gap-2
+          className="btn-gold inline-flex items-center gap-2
                      bg-brand-gold hover:bg-brand-goldLight
                      text-brand-blueDark font-semibold
-                     px-10 py-3 rounded-xl transition-all
-                     hover:scale-105 active:scale-95"
+                     px-10 py-3 rounded-xl"
         >
           {t.connectData}
           <Arrow size={18} />

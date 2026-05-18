@@ -127,6 +127,7 @@ class DSCRModel:
             source            = f"ai_derived (inventory={holds_inventory})"
             breakdown         = expense_result["breakdown"]
             model2_confidence = expense_result["confidence"]
+            archetype         = expense_result.get("archetype", "unknown")
         except Exception as e:
             print(f"  [WARN] Model 2 fallback for {business_id}: {e}")
             expense_ratio     = EXPENSE_RATIOS.get(business_id, 0.60)
@@ -138,6 +139,7 @@ class DSCRModel:
                 "stability_adj":  0.0,
             }
             model2_confidence = 0.5
+            archetype         = "unknown"
 
         total_revenue = float(tx["amount_sar"].sum())
         expenses      = total_revenue * expense_ratio
@@ -150,6 +152,7 @@ class DSCRModel:
             "expense_source":             source,
             "expense_breakdown":          breakdown,
             "model2_confidence":          model2_confidence,
+            "archetype_description":      archetype,
         }
 
     # ── DSCR calculation ──────────────────────────────────────────────────────
@@ -336,6 +339,7 @@ class DSCRModel:
             "expense_source":        exp["expense_source"],
             "expense_breakdown":     exp["expense_breakdown"],
             "model2_confidence":     exp["model2_confidence"],
+            "archetype_description": exp.get("archetype_description", "unknown"),
             "net_operating_income":  exp["net_operating_income"],
             "dscr_score":            dscr["dscr_score"],
             "risk_tier":             dscr["risk_tier"],

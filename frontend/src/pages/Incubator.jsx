@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useLang } from "../i18n/LanguageContext";
 import { assessDBR, getBusinessProfile } from "../services/api";
 import {
@@ -23,7 +24,8 @@ function Field({ label, value, onChange, type = "number", min, max, step, hint }
         className="w-full bg-surface-dark border border-surface-border
                    rounded-lg px-3 py-2 text-sm text-white
                    focus:outline-none focus:border-brand-gold
-                   transition-colors placeholder-gray-600"
+                   placeholder-gray-600"
+        style={{ transition: "border-color 150ms var(--ease-out)" }}
       />
       {hint && <p className="text-xs text-gray-600">{hint}</p>}
     </div>
@@ -40,7 +42,8 @@ function SelectField({ label, value, onChange, options }) {
         onChange={e => onChange(e.target.value)}
         className="w-full bg-surface-dark border border-surface-border
                    rounded-lg px-3 py-2 text-sm text-white
-                   focus:outline-none focus:border-brand-gold transition-colors"
+                   focus:outline-none focus:border-brand-gold"
+        style={{ transition: "border-color 150ms var(--ease-out)" }}
       >
         {options.map(o => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -60,12 +63,15 @@ function ToggleField({ label, value, onChange, hint }) {
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`w-11 h-6 rounded-full transition-all relative shrink-0
+        style={{ transition: "background-color 150ms var(--ease-out)" }}
+        className={`w-11 h-6 rounded-full relative shrink-0
                     ${value ? "bg-brand-gold" : "bg-surface-border"}`}
       >
-        <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white
-                         shadow transition-all
-                         ${value ? "left-5" : "left-0.5"}`} />
+        <div
+          style={{ transition: "left 150ms var(--ease-out)" }}
+          className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow
+                      ${value ? "left-5" : "left-0.5"}`}
+        />
       </button>
     </div>
   );
@@ -82,9 +88,11 @@ function DBRGauge({ ratio }) {
   return (
     <div className="space-y-1">
       <div className="relative h-3 bg-surface-border rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${barColor}`}
-          style={{ width: `${pct}%` }}
+        <motion.div
+          className={`h-full rounded-full ${barColor}`}
+          initial={{ width: "0%" }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
         />
         <div
           className="absolute top-0 h-full w-0.5 bg-white/60"
@@ -178,11 +186,11 @@ function DBRCalculator({ t, isRTL }) {
       <button
         onClick={calculate}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2
+        className="btn-gold w-full flex items-center justify-center gap-2
                    bg-brand-gold hover:bg-brand-goldLight
                    disabled:opacity-50 disabled:cursor-not-allowed
                    text-brand-blueDark font-semibold text-sm
-                   py-3 rounded-xl transition-all"
+                   py-3 rounded-xl"
       >
         {loading ? <Loader2 size={16} className="animate-spin" /> : <Calculator size={16} />}
         {t.calculateDBR}
@@ -384,11 +392,11 @@ function BusinessIntake({ t, isRTL }) {
       <button
         onClick={assess}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2
+        className="btn-blue w-full flex items-center justify-center gap-2
                    bg-brand-blue hover:bg-brand-blueLight
                    disabled:opacity-50 disabled:cursor-not-allowed
                    text-white font-semibold text-sm
-                   py-3 rounded-xl transition-all"
+                   py-3 rounded-xl"
       >
         {loading ? <Loader2 size={16} className="animate-spin" /> : <Sprout size={16} />}
         {isRTL ? "تحليل المشروع" : "Analyse Business"}
@@ -421,8 +429,8 @@ function BusinessIntake({ t, isRTL }) {
 
           <div className="h-1.5 bg-surface-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-brand-gold rounded-full transition-all duration-700"
-              style={{ width: `${(result.confidence ?? 0) * 100}%` }}
+              style={{ width: `${(result.confidence ?? 0) * 100}%`, transition: "width 700ms var(--ease-out)" }}
+              className="h-full bg-brand-gold rounded-full"
             />
           </div>
 
@@ -517,8 +525,8 @@ function PipelineExplainer({ isRTL }) {
               <div className="text-xs text-gray-500">{s.sub}</div>
               <div className="h-1 bg-surface-border rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-brand-gold/60 rounded-full transition-all duration-700"
-                  style={{ width: `${s.conf}%` }}
+                  style={{ width: `${s.conf}%`, transition: "width 700ms var(--ease-out)" }}
+                  className="h-full bg-brand-gold/60 rounded-full"
                 />
               </div>
               <div className="text-xs text-gray-500">{s.conf}% conf.</div>
