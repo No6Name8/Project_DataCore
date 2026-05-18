@@ -10,15 +10,14 @@ from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 import pandas as pd
 
-# Allow importing models/ from project root
 ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 sys.path.insert(0, ROOT)
 
-from models.dscr_model         import DSCRModel
-from models.dbr_model          import DBRModel
-from models.fraud_detector     import FraudDetector
-from models.revenue_forecaster import RevenueForecaster
+from models.dscr_model          import DSCRModel
+from models.dbr_model           import DBRModel
+from models.fraud_detector      import FraudDetector
+from models.revenue_forecaster  import RevenueForecaster
 from models.business_classifier import BusinessClassifier
 from models.expense_estimator   import ExpenseEstimator
 
@@ -34,52 +33,77 @@ BUSINESSES = {
     "cardealer":  {"id":"cardealer", "name":"Rawabi Auto Gallery",       "type":"cardealer", "sector":"automotive",   "loan_pipeline":"sme"},
     "motorbike":  {"id":"motorbike", "name":"Saqr Motorbikes",           "type":"motorbike", "sector":"automotive",   "loan_pipeline":"sme"},
 }
+VALID_BUSINESSES = list(BUSINESSES.keys())
 
-# ── Model instances ───────────────────────────────────────────────────────────
-_dscr_model     = DSCRModel()
-_dbr_model      = DBRModel()
-_fraud_detector = FraudDetector()
-_fraud_detector.load(os.path.join(ROOT, "models", "saved", "fraud_detector.pkl"))
-_forecaster = RevenueForecaster()
-_forecaster.load(os.path.join(ROOT, "models", "saved", "revenue_forecaster.pkl"))
-_classifier = BusinessClassifier()
-_classifier.load(os.path.join(ROOT, "models", "saved", "business_classifier.pkl"))
-_estimator  = ExpenseEstimator()
+# ── Global model registry ─────────────────────────────────────────────────────
+_dscr      = None
+_dbr       = None
+_detector  = None
+_forecaster = None
+_classifier = None
+_estimator  = None
+_models_loaded = False
+
+
+def load_models():
+    global _dscr, _dbr, _detector, _forecaster, _classifier, _estimator, _models_loaded
+    if _models_loaded:
+        return
+
+    saved = os.path.join(ROOT, "models", "saved")
+    print("[startup] Loading AI models...")
+
+    _dscr       = DSCRModel()
+    _dbr        = DBRModel()
+
+    _detector   = FraudDetector()
+    _detector.load(os.path.join(saved, "fraud_detector.pkl"))
+
+    _forecaster = RevenueForecaster()
+    _forecaster.load(os.path.join(saved, "revenue_forecaster.pkl"))
+
+    _classifier = BusinessClassifier()
+    _classifier.load(os.path.join(saved, "business_classifier.pkl"))
+
+    _estimator  = ExpenseEstimator()
+
+    _models_loaded = True
+    print("[startup] All models ready.")
+
 
 # ── Model result cache (computed once per business per process lifetime) ──────
-_MODEL_CACHE  = {}
-_FRAUD_CACHE  = {}
+_MODEL_CACHE = {}
+_FRAUD_CACHE = {}
+
 
 def get_model_result(bid):
     if bid not in _MODEL_CACHE:
-        _MODEL_CACHE[bid] = _dscr_model.run(bid)
+        _MODEL_CACHE[bid] = _dscr.run(bid)
     return _MODEL_CACHE[bid]
+
 
 def get_fraud_result(bid):
     if bid not in _FRAUD_CACHE:
-        _FRAUD_CACHE[bid] = _fraud_detector.assess(bid)
+        _FRAUD_CACHE[bid] = _detector.assess(bid)
     return _FRAUD_CACHE[bid]
+
 
 # ── Raw CSV cache ─────────────────────────────────────────────────────────────
 _TX = {}
 _EN = {}
 
-def csv_path(name):
-    return os.path.join(DATA_DIR, name)
 
 def load_tx(bid):
     if bid not in _TX:
-        _TX[bid] = pd.read_csv(csv_path(f"{bid}_transactions.csv"))
+        _TX[bid] = pd.read_csv(os.path.join(DATA_DIR, f"{bid}_transactions.csv"))
     return _TX[bid].copy()
+
 
 def load_en(bid):
     if bid not in _EN:
-        _EN[bid] = pd.read_csv(csv_path(f"{bid}_energy.csv"))
+        _EN[bid] = pd.read_csv(os.path.join(DATA_DIR, f"{bid}_energy.csv"))
     return _EN[bid].copy()
 
-def require(bid):
-    if bid not in BUSINESSES:
-        abort(404, description=f"Business '{bid}' not found. Valid IDs: {list(BUSINESSES)}")
 
 # ── Summary helper ────────────────────────────────────────────────────────────
 def build_summary(bid):
@@ -108,38 +132,34 @@ def build_summary(bid):
         "payment_method_breakdown": pay_split,
     }
 
+
 # ── DSCR response shaper ──────────────────────────────────────────────────────
 def shape_dscr(bid, r):
     fr = r["fraud_assessment"]
     first_reason = fr["anomalies"][0]["description"] if fr["anomalies"] else None
     dynamic = _forecaster.compute_dynamic_credit_limit(bid, r["credit_limit_sar"])
     return {
-        "business_id":              bid,
-        "computed_at":              r["computed_at"],
-        "dscr_score":               r["dscr_score"],
-        "net_operating_income_sar": r["net_operating_income"],
-        "annual_debt_service_sar":  r["annual_debt_service_sar"],
-        "loan_requested_sar":       r["loan_requested_sar"],
-        "risk_tier":                r["risk_tier"],
+        "business_id":               bid,
+        "computed_at":               r["computed_at"],
+        "dscr_score":                r["dscr_score"],
+        "net_operating_income_sar":  r["net_operating_income"],
+        "annual_debt_service_sar":   r["annual_debt_service_sar"],
+        "loan_requested_sar":        r["loan_requested_sar"],
+        "risk_tier":                 r["risk_tier"],
         "approved_credit_limit_sar": r["credit_limit_sar"],
-        "dynamic_credit_limit":     dynamic,
-        "interest_rate_base":       r["interest_rate_base"],
-        "sustainability_discount":  r["sustainability_discount"],
-        "final_interest_rate":      r["final_interest_rate"],
-        "sustainability_eligible":  r["sustainability_eligible"],
-        "avg_energy_efficiency":    r["avg_energy_efficiency"],
-        "green_days_count":         r["green_days_count"],
-        "expense_ratio":            r["expense_ratio"],
-        "revenue_metrics":          r["revenue_metrics"],
-        "fraud_flag":               fr["approval_frozen"] or fr["fraud_score"] > 0,
-        "fraud_reason":             first_reason,
-        "assessment_date":          r["computed_at"],
+        "dynamic_credit_limit":      dynamic,
+        "interest_rate_base":        r["interest_rate_base"],
+        "sustainability_discount":   r["sustainability_discount"],
+        "final_interest_rate":       r["final_interest_rate"],
+        "sustainability_eligible":   r["sustainability_eligible"],
+        "avg_energy_efficiency":     r["avg_energy_efficiency"],
+        "green_days_count":          r["green_days_count"],
+        "expense_ratio":             r["expense_ratio"],
+        "revenue_metrics":           r["revenue_metrics"],
+        "fraud_flag":                fr["approval_frozen"] or fr["fraud_score"] > 0,
+        "fraud_reason":              first_reason,
+        "assessment_date":           r["computed_at"],
     }
-
-# ── Fraud response shaper ─────────────────────────────────────────────────────
-def shape_fraud(bid, r):
-    fr = r["fraud_assessment"]
-    return {"business_id": bid, **fr}
 
 # =============================================================================
 # ROUTES -- Core data
@@ -147,98 +167,130 @@ def shape_fraud(bid, r):
 
 @app.route("/api/businesses")
 def get_businesses():
-    return jsonify({"businesses": list(BUSINESSES.values())})
+    try:
+        return jsonify({"businesses": list(BUSINESSES.values())})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/<bid>/transactions")
-def get_transactions(bid):
-    require(bid)
-    df    = load_tx(bid)
-    start = request.args.get("start")
-    end   = request.args.get("end")
-    limit = request.args.get("limit", type=int)
+@app.route("/api/<business_id>/transactions")
+def get_transactions(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        df    = load_tx(business_id)
+        start = request.args.get("start")
+        end   = request.args.get("end")
+        limit = request.args.get("limit", type=int)
 
-    if start:
-        df = df[df["timestamp"] >= start]
-    if end:
-        df = df[df["timestamp"] <= end + " 23:59:59"]
+        if start:
+            df = df[df["timestamp"] >= start]
+        if end:
+            df = df[df["timestamp"] <= end + " 23:59:59"]
 
-    df = df.sort_values("timestamp", ascending=False)
-    if limit:
-        df = df.head(limit)
+        df = df.sort_values("timestamp", ascending=False)
+        if limit:
+            df = df.head(limit)
 
-    return jsonify(df.to_dict(orient="records"))
-
-
-@app.route("/api/<bid>/energy")
-def get_energy(bid):
-    require(bid)
-    return jsonify(load_en(bid).to_dict(orient="records"))
+        return jsonify(df.to_dict(orient="records"))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 
-@app.route("/api/<bid>/summary")
-def get_summary(bid):
-    require(bid)
-    return jsonify(build_summary(bid))
+@app.route("/api/<business_id>/energy")
+def get_energy(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        return jsonify(load_en(business_id).to_dict(orient="records"))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
+
+
+@app.route("/api/<business_id>/summary")
+def get_summary(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        return jsonify(build_summary(business_id))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 # =============================================================================
 # ROUTES -- AI engine (live model output)
 # =============================================================================
 
-@app.route("/api/<bid>/dscr")
-def get_dscr(bid):
-    require(bid)
-    return jsonify(shape_dscr(bid, get_model_result(bid)))
+@app.route("/api/<business_id>/dscr")
+def get_dscr(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        return jsonify(shape_dscr(business_id, get_model_result(business_id)))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 
-@app.route("/api/<bid>/fraud-check")
-def get_fraud(bid):
-    require(bid)
-    return jsonify(get_fraud_result(bid))
+@app.route("/api/<business_id>/fraud-check")
+def get_fraud(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        return jsonify(get_fraud_result(business_id))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 
-@app.route("/api/<bid>/forecast")
-def get_forecast(bid):
-    require(bid)
-    base_limit = get_model_result(bid)["credit_limit_sar"]
-    return jsonify({
-        "business_id":  bid,
-        "summary":      _forecaster.summaries[bid],
-        "series":       _forecaster.get_forecast_series(bid),
-        "dynamic_credit": _forecaster.compute_dynamic_credit_limit(bid, base_limit),
-    })
+@app.route("/api/<business_id>/forecast")
+def get_forecast(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        base_limit = get_model_result(business_id)["credit_limit_sar"]
+        return jsonify({
+            "business_id":    business_id,
+            "summary":        _forecaster.summaries[business_id],
+            "series":         _forecaster.get_forecast_series(business_id),
+            "dynamic_credit": _forecaster.compute_dynamic_credit_limit(business_id, base_limit),
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 # =============================================================================
 # ROUTES -- Dashboard feed
 # =============================================================================
 
-@app.route("/api/dashboard/<bid>")
-def get_dashboard(bid):
-    require(bid)
-    tx  = load_tx(bid)
-    en  = load_en(bid)
-    r   = get_model_result(bid)
+@app.route("/api/dashboard/<business_id>")
+def get_dashboard(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
 
-    recent_tx    = (tx.sort_values("timestamp", ascending=False)
-                      .head(10)
-                      .to_dict(orient="records"))
-    energy_trend = en.tail(7).to_dict(orient="records")
+        tx  = load_tx(business_id)
+        en  = load_en(business_id)
+        r   = get_model_result(business_id)
 
-    fc_summary = _forecaster.summaries[bid]
-    fc_series  = _forecaster.get_forecast_series(bid)[:7]
+        recent_tx    = (tx.sort_values("timestamp", ascending=False)
+                          .head(10)
+                          .to_dict(orient="records"))
+        energy_trend = en.tail(7).to_dict(orient="records")
 
-    return jsonify({
-        "business":             BUSINESSES[bid],
-        "summary":              build_summary(bid),
-        "dscr":                 shape_dscr(bid, r),
-        "fraud":                get_fraud_result(bid),
-        "forecast": {
-            "summary": fc_summary,
-            "series":  fc_series,
-        },
-        "recent_transactions":  recent_tx,
-        "energy_trend":         energy_trend,
-    })
+        fc_summary = _forecaster.summaries[business_id]
+        fc_series  = _forecaster.get_forecast_series(business_id)[:7]
+
+        return jsonify({
+            "business":            BUSINESSES[business_id],
+            "summary":             build_summary(business_id),
+            "dscr":                shape_dscr(business_id, r),
+            "fraud":               get_fraud_result(business_id),
+            "forecast": {
+                "summary": fc_summary,
+                "series":  fc_series,
+            },
+            "recent_transactions": recent_tx,
+            "energy_trend":        energy_trend,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 # =============================================================================
 # ROUTES -- Incubator
@@ -246,20 +298,23 @@ def get_dashboard(bid):
 
 @app.route("/api/incubator/dbr-assessment")
 def dbr_assessment():
-    salary          = request.args.get("monthly_salary",       type=float)
-    existing        = request.args.get("existing_obligations",  type=float, default=0.0)
-    loan_amt        = request.args.get("requested_loan",        type=float)
-    term            = request.args.get("loan_term_months",      type=int,   default=24)
-    holds_inventory = request.args.get("holds_inventory", "false").lower() == "true"
+    try:
+        salary          = request.args.get("monthly_salary",       type=float)
+        existing        = request.args.get("existing_obligations",  type=float, default=0.0)
+        loan_amt        = request.args.get("requested_loan",        type=float)
+        term            = request.args.get("loan_term_months",      type=int,   default=24)
+        holds_inventory = request.args.get("holds_inventory", "false").lower() == "true"
 
-    if not salary or not loan_amt:
-        return jsonify({"error": "monthly_salary and requested_loan are required"}), 400
-    if salary <= 0:
-        return jsonify({"error": "monthly_salary must be positive"}), 400
+        if not salary or not loan_amt:
+            return jsonify({"error": "monthly_salary and requested_loan are required"}), 400
+        if salary <= 0:
+            return jsonify({"error": "monthly_salary must be positive"}), 400
 
-    result = _dbr_model.assess(salary, existing, loan_amt, term)
-    result["holds_inventory_flag"] = holds_inventory
-    return jsonify(result)
+        result = _dbr.assess(salary, existing, loan_amt, term)
+        result["holds_inventory_flag"] = holds_inventory
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/incubator/business-profile")
@@ -295,8 +350,8 @@ def intake_business_profile():
         clf_result = _classifier.classify_from_intake(intake)
         expense    = _estimator.estimate_from_intake(intake, _classifier)
 
-        net_margin   = expense["net_margin_estimate"]
-        stab_tag     = expense["tags_used"].get("revenue_stability", "moderate")
+        net_margin = expense["net_margin_estimate"]
+        stab_tag   = expense["tags_used"].get("revenue_stability", "moderate")
         if net_margin > 0.35 and stab_tag in ("stable", "very_stable"):
             risk_ind = "low"
         elif net_margin > 0.20:
@@ -305,11 +360,11 @@ def intake_business_profile():
             risk_ind = "high"
 
         return jsonify({
-            "cluster_id":           int(clf_result["cluster_id"]),
+            "cluster_id":            int(clf_result["cluster_id"]),
             "archetype_description": clf_result.get("archetype_description", "unknown"),
-            "confidence":           float(clf_result["confidence"]),
-            "refinement_status":    "predicted",
-            "behavioral_profile":   expense["tags_used"],
+            "confidence":            float(clf_result["confidence"]),
+            "refinement_status":     "predicted",
+            "behavioral_profile":    expense["tags_used"],
             "expense_estimate": {
                 "total_expense_ratio": expense["total_expense_ratio"],
                 "breakdown":           expense["breakdown"],
@@ -326,10 +381,14 @@ def intake_business_profile():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/incubator/transition-check/<bid>")
-def transition_check(bid):
-    require(bid)
-    return jsonify(_dbr_model.transition_readiness(bid))
+@app.route("/api/incubator/transition-check/<business_id>")
+def transition_check(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        return jsonify(_dbr.transition_readiness(business_id))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
 
 # =============================================================================
 # Error handlers
@@ -345,4 +404,5 @@ def server_error(e):
 
 
 if __name__ == "__main__":
+    load_models()
     app.run(host="0.0.0.0", port=5000, debug=False)

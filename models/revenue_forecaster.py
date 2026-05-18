@@ -181,7 +181,8 @@ class RevenueForecaster:
             "forecast_avg_daily": s["forecast_avg_daily"],
             "limit_change_sar":   final - int(base_dscr_limit),
             "limit_change_pct":   round(
-                (final - base_dscr_limit) / base_dscr_limit * 100, 2),
+                (final - base_dscr_limit) / base_dscr_limit * 100, 2)
+                if base_dscr_limit > 0 else 0.0,
         }
 
     # ── Fit all ───────────────────────────────────────────────────────────────
