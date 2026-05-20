@@ -1,13 +1,20 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { useLang } from "../i18n/LanguageContext";
-import { LayoutDashboard, Sprout, Globe, Home } from "lucide-react";
+import { LayoutDashboard, GitBranch, Brain, Globe } from "lucide-react";
 
 export default function Layout() {
   const { t, lang, toggleLang } = useLang();
 
   const navItems = [
-    { to: "/dashboard", icon: LayoutDashboard, label: t.navDashboard },
-    { to: "/incubator",  icon: Sprout,          label: t.navIncubator  },
+    { to: "/demo",         icon: LayoutDashboard, labelEn: "Demo",         labelAr: "العرض التجريبي" },
+    { to: "/how-it-works", icon: GitBranch,        labelEn: "How It Works", labelAr: "كيف يعمل" },
+    { to: "/ai-engine",    icon: Brain,            labelEn: "AI Engine",    labelAr: "محرك الذكاء" },
+  ];
+
+  const mobileItems = [
+    { to: "/demo",         icon: LayoutDashboard, labelEn: "Demo",     labelAr: "العرض" },
+    { to: "/how-it-works", icon: GitBranch,        labelEn: "How It",   labelAr: "كيف" },
+    { to: "/ai-engine",    icon: Brain,            labelEn: "AI",       labelAr: "الذكاء" },
   ];
 
   const activeClass =
@@ -23,7 +30,7 @@ export default function Layout() {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-3 shrink-0">
+          <NavLink to="/demo" className="flex items-center gap-3 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-brand-gold flex items-center
                             justify-center text-brand-blueDark font-bold text-sm shrink-0">
               DC
@@ -40,7 +47,7 @@ export default function Layout() {
 
           {/* Nav links */}
           <nav className="flex items-center gap-1">
-            {navItems.map(({ to, icon: Icon, label }) => (
+            {navItems.map(({ to, icon: Icon, labelEn, labelAr }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -51,7 +58,9 @@ export default function Layout() {
                 }
               >
                 <Icon size={16} className="shrink-0" />
-                <span className="hidden sm:inline">{label}</span>
+                <span className="hidden sm:inline">
+                  {lang === "ar" ? labelAr : labelEn}
+                </span>
               </NavLink>
             ))}
           </nav>
@@ -89,18 +98,7 @@ export default function Layout() {
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-50
                       glass-card border-t border-surface-border
                       flex items-center justify-around h-16 px-4">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-0.5 text-xs font-medium
-             ${isActive ? "text-brand-gold" : "text-gray-500"}`
-          }
-        >
-          <Home size={20} />
-          <span>{lang === "en" ? "Home" : "الرئيسية"}</span>
-        </NavLink>
-
-        {navItems.map(({ to, icon: Icon, label }) => (
+        {mobileItems.map(({ to, icon: Icon, labelEn, labelAr }) => (
           <NavLink
             key={to}
             to={to}
@@ -110,7 +108,7 @@ export default function Layout() {
             }
           >
             <Icon size={20} />
-            <span>{label}</span>
+            <span>{lang === "ar" ? labelAr : labelEn}</span>
           </NavLink>
         ))}
       </nav>

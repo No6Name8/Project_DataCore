@@ -10,6 +10,9 @@ const translations = {
     navIncubator:   "Incubator",
     navBusinesses:  "Businesses",
     navSettings:    "Settings",
+    navDemo:        "Demo",
+    navHowItWorks:  "How It Works",
+    navAIEngine:    "AI Engine",
 
     // Landing
     landingTitle:   "Intelligent Lending for Real Businesses",
@@ -97,6 +100,9 @@ const translations = {
     navIncubator:   "الحاضنة",
     navBusinesses:  "المنشآت",
     navSettings:    "الإعدادات",
+    navDemo:        "العرض التجريبي",
+    navHowItWorks:  "كيف يعمل",
+    navAIEngine:    "محرك الذكاء الاصطناعي",
 
     // Landing
     landingTitle:   "إقراض ذكي للمنشآت الحقيقية",
