@@ -62,7 +62,30 @@ POS + Energy CSVs  →  AI Engine (4 models)  →  Flask REST API  →  React Da
 | `GET /api/incubator/business-profile` | Intake form → archetype + expense estimate |
 | `GET /api/incubator/transition-check/<id>` | SME graduation readiness check |
 
-## Running Locally
+## Frontend Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Demo | `/demo` | Live AI lending dashboard — existing + new businesses |
+| How It Works | `/how-it-works` | Visual two-track pipeline explainer |
+| Benefits | `/benefits` | Three stakeholder benefit columns with expandable cards |
+| AI Engine | `/ai-engine` | Technical proof — models, behavioral fingerprints, live data |
+
+## Quick Start
+
+```bash
+# 1. Start the AI backend
+cd Project_DataCore
+python models/pipeline.py     # Run all 4 AI models once
+python api/app.py              # Start API on :5000
+
+# 2. Start the frontend
+cd frontend
+npm install
+npm run dev                    # Opens on :5173
+```
+
+## Running Locally (full)
 
 ### Backend
 

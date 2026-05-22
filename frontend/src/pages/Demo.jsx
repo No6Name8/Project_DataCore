@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLang } from "../i18n/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { getDashboard, getForecast, assessDBR, getBusinessProfile } from "../services/api";
@@ -64,22 +64,32 @@ function Track1({ isRTL }) {
   const [forecast, setForecast] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
+  const cache = useRef({});
 
   const load = useCallback((id) => {
+    if (cache.current[id]) {
+      setData(cache.current[id].dash);
+      setForecast(cache.current[id].fore);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     Promise.all([
       getDashboard(id),
       getForecast(id),
     ]).then(([dashRes, foreRes]) => {
-      setData(dashRes.data);
+      const dash = dashRes.data;
       const series = foreRes.data.series || [];
-      setForecast(series.map(d => ({
+      const fore = series.map(d => ({
         date:  d.date.slice(5),
         value: Math.round(d.predicted_revenue),
         upper: Math.round(d.upper_bound),
         lower: Math.round(d.lower_bound),
-      })));
+      }));
+      cache.current[id] = { dash, fore };
+      setData(dash);
+      setForecast(fore);
     }).catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -103,7 +113,7 @@ function Track1({ isRTL }) {
         {BUSINESSES.map(biz => (
           <button
             key={biz.id}
-            onClick={() => { setSelected(biz.id); setData(null); }}
+            onClick={() => { setSelected(biz.id); if (!cache.current[biz.id]) setData(null); }}
             className={`relative flex-shrink-0 px-4 py-2 rounded-lg
                         text-sm font-medium whitespace-nowrap
                         ${selected === biz.id ? "text-white" : "text-gray-400 hover:text-white"}`}
@@ -503,7 +513,7 @@ function Track1({ isRTL }) {
 function Track2({ isRTL }) {
   const [dbr, setDbr] = useState({
     salary: 15000, obligations: 2000,
-    loan: 50000, term: 24,
+    loan: 35000, term: 24,
   });
   const [dbrResult,  setDbrResult]  = useState(null);
   const [dbrLoading, setDbrLoading] = useState(false);
