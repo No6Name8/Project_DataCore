@@ -12,6 +12,7 @@ const translations = {
     navSettings:    "Settings",
     navDemo:        "Demo",
     navHowItWorks:  "How It Works",
+    navBenefits:    "Benefits",
     navAIEngine:    "AI Engine",
 
     // Landing
@@ -100,9 +101,10 @@ const translations = {
     navIncubator:   "الحاضنة",
     navBusinesses:  "المنشآت",
     navSettings:    "الإعدادات",
-    navDemo:        "العرض التجريبي",
+    navDemo:        "العرض",
     navHowItWorks:  "كيف يعمل",
-    navAIEngine:    "محرك الذكاء الاصطناعي",
+    navBenefits:    "الفوائد",
+    navAIEngine:    "محرك الذكاء",
 
     // Landing
     landingTitle:   "إقراض ذكي للمنشآت الحقيقية",
