@@ -7,7 +7,7 @@ import os, sys
 import pandas as pd
 
 ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(ROOT, "data")
+DATA_DIR = os.path.join(ROOT, "data", "processed")
 sys.path.insert(0, ROOT)
 
 ALL_DATES = pd.date_range("2025-06-01", "2025-06-30").strftime("%Y-%m-%d").tolist()

@@ -11,7 +11,7 @@ from flask_cors import CORS
 import pandas as pd
 
 ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(ROOT, "data")
+DATA_DIR = os.path.join(ROOT, "data", "processed")
 sys.path.insert(0, ROOT)
 
 from models.dscr_model          import DSCRModel

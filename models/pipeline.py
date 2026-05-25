@@ -69,7 +69,7 @@ def run():
         print(f"  {NAMES[bid].upper()}  ({bid})")
         print(f"{'-'*W}")
 
-        data_dir = os.path.join(ROOT, "data")
+        data_dir = os.path.join(ROOT, "data", "processed")
         tx = pd.read_csv(os.path.join(data_dir, f"{bid}_transactions.csv"))
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
 

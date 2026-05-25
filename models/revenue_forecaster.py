@@ -10,7 +10,7 @@ import joblib
 from contextlib import contextmanager
 
 ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR  = os.path.join(ROOT, "data")
+DATA_DIR  = os.path.join(ROOT, "data", "processed")
 SAVED_DIR = os.path.join(ROOT, "models", "saved")
 sys.path.insert(0, ROOT)
 
