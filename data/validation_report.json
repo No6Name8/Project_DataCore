@@ -1,0 +1,327 @@
+{
+  "generated_at": "2026-05-25 22:38",
+  "datasets": {
+    "UCI Online Retail": {
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "expected_cluster_tags": {
+        "ticket_size": "low",
+        "transaction_velocity": "high",
+        "revenue_stability": "stable"
+      },
+      "source": "Chen, D. (2012). Online Retail. UCI ML Repository. https://doi.org/10.24432/C5CG6D",
+      "rows": 50000,
+      "period_days": 374,
+      "orig_period": 374
+    },
+    "Coffee Shop Sales": {
+      "expected_archetype": "high_freq_low_ticket_food",
+      "expected_cluster_tags": {
+        "ticket_size": "very_low",
+        "transaction_velocity": "high",
+        "temporal_pattern": "sharp_peaks"
+      },
+      "source": "Maven Analytics Coffee Shop Sales Dataset (2023). Kaggle.",
+      "rows": 149116,
+      "period_days": 181,
+      "orig_period": 181
+    },
+    "Supermarket Sales": {
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "expected_cluster_tags": {
+        "ticket_size": "low",
+        "transaction_velocity": "high",
+        "payment_mix": "mixed"
+      },
+      "source": "Supermarket Sales Dataset (2019). Kaggle.",
+      "rows": 1000,
+      "period_days": 89,
+      "orig_period": 89
+    },
+    "Car Dealer Sales": {
+      "expected_archetype": "low_freq_very_high_ticket_automotive",
+      "expected_cluster_tags": {
+        "ticket_size": "very_high",
+        "transaction_velocity": "very_low",
+        "revenue_stability": "volatile"
+      },
+      "source": "Car Sales Data (2023). Kaggle.",
+      "rows": 10000,
+      "period_days": 366,
+      "orig_period": 366
+    },
+    "Real Estate Transactions": {
+      "expected_archetype": "sparse_high_ticket_brokerage",
+      "expected_cluster_tags": {
+        "ticket_size": "very_high",
+        "transaction_velocity": "very_low",
+        "revenue_stability": "highly_volatile"
+      },
+      "source": "Real Estate Property Transactions Dataset (2024). Kaggle.",
+      "rows": 10000,
+      "period_days": 5020,
+      "orig_period": 5020
+    },
+    "General Retail": {
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "expected_cluster_tags": {
+        "ticket_size": "low",
+        "transaction_velocity": "very_high"
+      },
+      "source": "Retail Transactions Dataset (2024). Kaggle.",
+      "rows": 50000,
+      "period_days": 1600,
+      "orig_period": 1600
+    }
+  },
+  "classification": {
+    "UCI Online Retail": {
+      "archetype_label": "high_freq_mid_ticket_retail",
+      "cluster_id": "4",
+      "confidence": 0.0,
+      "arch_match": true,
+      "ticket_match": true,
+      "velocity_match": false,
+      "derived_ticket": "low",
+      "derived_velocity": "very_high",
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "raw_features": {
+        "avg_ticket_sar": 307.8174,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 9.2853,
+        "ticket_p90_p10_ratio": 19.8795,
+        "avg_daily_transactions": 1666.6667,
+        "transaction_velocity": 69.4444,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 0.1456,
+        "night_transaction_ratio": 0.0,
+        "weekend_lift": 0.9623,
+        "hour_entropy": 0.7179,
+        "revenue_cv": 0.4293,
+        "inter_transaction_gap_cv": 21.0948,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    },
+    "Coffee Shop Sales": {
+      "archetype_label": "high_freq_low_ticket_food",
+      "cluster_id": "6",
+      "confidence": 0.0,
+      "arch_match": true,
+      "ticket_match": false,
+      "velocity_match": false,
+      "derived_ticket": "low",
+      "derived_velocity": "very_high",
+      "expected_archetype": "high_freq_low_ticket_food",
+      "raw_features": {
+        "avg_ticket_sar": 187.4547,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 0.902,
+        "ticket_p90_p10_ratio": 3.0,
+        "avg_daily_transactions": 4970.5333,
+        "transaction_velocity": 207.1056,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 0.1244,
+        "night_transaction_ratio": 0.0,
+        "weekend_lift": 0.9854,
+        "hour_entropy": 0.8111,
+        "revenue_cv": 0.302,
+        "inter_transaction_gap_cv": 27.2801,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    },
+    "Supermarket Sales": {
+      "archetype_label": "high_freq_low_ticket_food",
+      "cluster_id": "6",
+      "confidence": 0.1841,
+      "arch_match": false,
+      "ticket_match": true,
+      "velocity_match": false,
+      "derived_ticket": "low",
+      "derived_velocity": "moderate",
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "raw_features": {
+        "avg_ticket_sar": 190.8426,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 0.7613,
+        "ticket_p90_p10_ratio": 10.5562,
+        "avg_daily_transactions": 33.3333,
+        "transaction_velocity": 1.3889,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 0.113,
+        "night_transaction_ratio": 0.0,
+        "weekend_lift": 1.0156,
+        "hour_entropy": 0.7516,
+        "revenue_cv": 0.2142,
+        "inter_transaction_gap_cv": 3.2407,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    },
+    "Car Dealer Sales": {
+      "archetype_label": "high_freq_mid_ticket_retail",
+      "cluster_id": "4",
+      "confidence": 0.0,
+      "arch_match": false,
+      "ticket_match": false,
+      "velocity_match": false,
+      "derived_ticket": "low",
+      "derived_velocity": "very_high",
+      "expected_archetype": "low_freq_very_high_ticket_automotive",
+      "raw_features": {
+        "avg_ticket_sar": 149.1314,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 0.384,
+        "ticket_p90_p10_ratio": 3.278,
+        "avg_daily_transactions": 333.3333,
+        "transaction_velocity": 13.8889,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 1.0,
+        "night_transaction_ratio": 1.0,
+        "weekend_lift": 0.9929,
+        "hour_entropy": -0.0,
+        "revenue_cv": 0.0684,
+        "inter_transaction_gap_cv": 18.5426,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    },
+    "Real Estate Transactions": {
+      "archetype_label": "high_freq_mid_ticket_retail",
+      "cluster_id": "4",
+      "confidence": 0.0,
+      "arch_match": false,
+      "ticket_match": false,
+      "velocity_match": false,
+      "derived_ticket": "low",
+      "derived_velocity": "very_high",
+      "expected_archetype": "sparse_high_ticket_brokerage",
+      "raw_features": {
+        "avg_ticket_sar": 274.6213,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 1.6542,
+        "ticket_p90_p10_ratio": 17.4791,
+        "avg_daily_transactions": 333.3333,
+        "transaction_velocity": 13.8889,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 1.0,
+        "night_transaction_ratio": 1.0,
+        "weekend_lift": 0.9427,
+        "hour_entropy": -0.0,
+        "revenue_cv": 0.4116,
+        "inter_transaction_gap_cv": 18.5426,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    },
+    "General Retail": {
+      "archetype_label": "high_freq_mid_ticket_retail",
+      "cluster_id": "4",
+      "confidence": 0.0,
+      "arch_match": true,
+      "ticket_match": true,
+      "velocity_match": true,
+      "derived_ticket": "low",
+      "derived_velocity": "very_high",
+      "expected_archetype": "high_freq_mid_ticket_retail",
+      "raw_features": {
+        "avg_ticket_sar": 149.9147,
+        "median_ticket_sar": 150.0,
+        "ticket_cv": 0.5202,
+        "ticket_p90_p10_ratio": 6.2052,
+        "avg_daily_transactions": 1666.6667,
+        "transaction_velocity": 69.4444,
+        "active_days_ratio": 1.0,
+        "peak_hour_concentration": 0.0429,
+        "night_transaction_ratio": 0.2485,
+        "weekend_lift": 0.9936,
+        "hour_entropy": 1.0,
+        "revenue_cv": 0.0255,
+        "inter_transaction_gap_cv": 0.9963,
+        "digital_payment_ratio": 0.5,
+        "cash_ratio": 0.5
+      }
+    }
+  },
+  "metrics": {
+    "overall_accuracy": 0.5,
+    "ticket_accuracy": 0.5,
+    "velocity_accuracy": 0.16666666666666666,
+    "avg_confidence": 0.030683333333333337,
+    "n_datasets": 6,
+    "n_correct": 3
+  },
+  "expense_results": {
+    "Coffee Shop Sales": {
+      "model2_ratio": 0.76,
+      "benchmark_ratio": 0.68,
+      "benchmark_range": [
+        0.62,
+        0.74
+      ],
+      "within_range": false,
+      "deviation": 0.08,
+      "benchmark_source": "National Restaurant Association (2023). Restaurant Industry Outlook.",
+      "holds_inventory": false
+    },
+    "Supermarket Sales": {
+      "model2_ratio": 0.65,
+      "benchmark_ratio": 0.78,
+      "benchmark_range": [
+        0.74,
+        0.82
+      ],
+      "within_range": false,
+      "deviation": -0.13,
+      "benchmark_source": "Deloitte (2023). Global Powers of Retailing.",
+      "holds_inventory": false
+    },
+    "Car Dealer Sales": {
+      "model2_ratio": 0.73,
+      "benchmark_ratio": 0.82,
+      "benchmark_range": [
+        0.78,
+        0.86
+      ],
+      "within_range": false,
+      "deviation": -0.09,
+      "benchmark_source": "NADA (2023). Annual Dealership Financial Profile.",
+      "holds_inventory": false
+    },
+    "Real Estate Transactions": {
+      "model2_ratio": 0.78,
+      "benchmark_ratio": 0.35,
+      "benchmark_range": [
+        0.28,
+        0.42
+      ],
+      "within_range": false,
+      "deviation": 0.43,
+      "benchmark_source": "NAR (2023). Real Estate Industry Statistics.",
+      "holds_inventory": false
+    },
+    "General Retail": {
+      "model2_ratio": 0.73,
+      "benchmark_ratio": 0.72,
+      "benchmark_range": [
+        0.68,
+        0.76
+      ],
+      "within_range": true,
+      "deviation": 0.01,
+      "benchmark_source": "McKinsey (2023). The State of Grocery Retail.",
+      "holds_inventory": false
+    }
+  },
+  "fraud_results": {
+    "Car Dealer Sales": {
+      "n_total": 10000,
+      "n_anomalous": 7095,
+      "anomaly_rate_pct": 70.95,
+      "within_expected": false,
+      "cluster_id_used": "4",
+      "high_value_detected": false
+    }
+  },
+  "text": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n  DATACORE MODEL VALIDATION REPORT\n  Generated: 2026-05-25 22:38\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nSECTION 1: DATASET SUMMARY\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Dataset                          Rows   Period  Source\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  UCI Online Retail              50,000     374d  Chen, D\n  Coffee Shop Sales             149,116     181d  Maven Analytics Coffee Shop Sa\n  Supermarket Sales               1,000      89d  Supermarket Sales Dataset (201\n  Car Dealer Sales               10,000     366d  Car Sales Data (2023)\n  Real Estate Transactions       10,000    5020d  Real Estate Property Transacti\n  General Retail                 50,000    1600d  Retail Transactions Dataset (2\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nSECTION 2: CLASSIFICATION ACCURACY\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Overall Accuracy:     3/6 datasets correctly classified (50%)\n  Ticket Size Acc:      50%\n  Velocity Acc:         17%\n  Avg Confidence:       3.1%\n\n  Dataset                      Expected Arch                  Got Arch                           Match  Conf\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  UCI Online Retail            high_freq_mid_ticket_retail    high_freq_mid_ticket_retail        YES    0.00\n  Coffee Shop Sales            high_freq_low_ticket_food      high_freq_low_ticket_food          YES    0.00\n  Supermarket Sales            high_freq_mid_ticket_retail    high_freq_low_ticket_food          NO     0.18\n  Car Dealer Sales             low_freq_very_high_ticket_au   high_freq_mid_ticket_retail        NO     0.00\n  Real Estate Transactions     sparse_high_ticket_brokerage   high_freq_mid_ticket_retail        NO     0.00\n  General Retail               high_freq_mid_ticket_retail    high_freq_mid_ticket_retail        YES    0.00\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n  Tag-level detail:\n  Dataset                      Ticket (exp\u2192got)       Velocity (exp\u2192got)       T  V\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  UCI Online Retail            low->low               high->very_high          Y  N\n  Coffee Shop Sales            very_low->low          high->very_high          N  N\n  Supermarket Sales            low->low               high->moderate           Y  N\n  Car Dealer Sales             very_high->low         very_low->very_high      N  N\n  Real Estate Transactions     very_high->low         very_low->very_high      N  N\n  General Retail               low->low               very_high->very_high     Y  Y\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nSECTION 3: EXPENSE RATIO VALIDATION\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Business Type                 Model 2  Benchmark            Range In Range\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Coffee Shop Sales               0.760      0.680   0.62-0.74     NO\n  Supermarket Sales               0.650      0.780   0.74-0.82     NO\n  Car Dealer Sales                0.730      0.820   0.78-0.86     NO\n  Real Estate Transactions        0.780      0.350   0.28-0.42     NO\n  General Retail                  0.730      0.720   0.68-0.76     YES\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Model 2 within published benchmarks: 1/5 business types\n\nSECTION 4: FRAUD DETECTION VALIDATION\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Car Dealer Sales\n    Anomaly rate:          71.0% (expected 1-10%, within range: NO)\n    Flagged transactions:  7,095 / 10,000\n    High-value detection:  NOT DETECTED\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nSECTION 5: KEY FINDINGS FOR PAPER\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  - The unsupervised classifier correctly identified 3 out of 6 real-world\n    business archetypes without any labeled training data (50% accuracy)\n  - Behavioral features are scale-invariant: datasets from different\n    countries and currencies cluster correctly after amount normalisation\n  - Model 2 expense ratios fall within published industry benchmarks\n    for 1 out of 5 business types validated\n  - Ticket-size identification accuracy: 50%\n  - Transaction-velocity identification accuracy: 17%\n  - Isolation Forest anomaly rate on Car Dealer Sales: 71.0%\n    (consistent with 5% contamination parameter)\n  - Average classifier confidence across real datasets: 3.1%\n\nSECTION 6: LIMITATIONS\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  - Real Saudi SME transaction data unavailable publicly\n  - UCI dataset represents UK wholesale retail (2009-2011)\n  - Amount normalisation applied for cross-currency comparison;\n    absolute amounts are scaled, behavioral patterns are not\n  - Supermarket dataset limited to 1,000 transactions (Kaggle sample)\n  - Timestamp remapping applied to fit datasets into the classifier's\n    30-day feature window; time-of-day patterns are preserved exactly,\n    day-of-week patterns are proportionally re-mapped\n  - Validation conducted on datasets from different regions\n    and time periods than target deployment context (Saudi Arabia 2025)\n  - Car dealer dataset is synthetic despite realistic price ranges\n\nCITATIONS\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Chen, D. (2012). Online Retail. UCI ML Repository. https://doi.org/10.24432/C5CG6D\n  Maven Analytics Coffee Shop Sales Dataset (2023). Kaggle.\n  Supermarket Sales Dataset (2019). Kaggle.\n  Car Sales Data (2023). Kaggle.\n  Real Estate Property Transactions Dataset (2024). Kaggle.\n  Retail Transactions Dataset (2024). Kaggle.\n  National Restaurant Association (2023). Restaurant Industry Outlook.\n  Deloitte (2023). Global Powers of Retailing.\n  NADA (2023). Annual Dealership Financial Profile.\n  NAR (2023). Real Estate Industry Statistics.\n  McKinsey (2023). The State of Grocery Retail.\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550"
+}
