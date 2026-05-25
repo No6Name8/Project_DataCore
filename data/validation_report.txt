@@ -105,3 +105,105 @@ CITATIONS
   NAR (2023). Real Estate Industry Statistics.
   McKinsey (2023). The State of Grocery Retail.
 ══════════════════════════════════════════════════════════════════════
+
+=================================================================
+DATACORE MODEL 4 -- PROPHET FORECAST VALIDATION
+=================================================================
+
+PRIMARY VALIDATION -- UCI Online Retail II (Real Data)
+Source: Chen (2012), CC BY 4.0
+--------------------------------------------------
+Train/Test Split:  70% / 30% (chronological)
+Test Period:       78 days
+Mean Actual Rev:   45,862.90
+Mean Predicted:    12,273.15
+
+ACCURACY METRICS:
+  MAE:             34,006.95
+  MAPE:            68.15%
+  RMSE:            42,379.96
+  R2:              -3.4984
+  80% CI Coverage: 21.8%
+
+  Interpretation:  POOR -- forecast useful for direction only
+
+SECONDARY VALIDATION -- Synthetic SME Businesses
+--------------------------------------------------
+Business           MAPE       R2   Coverage      Quality
+-------------------------------------------------------
+laundromat        76.2%  -10.610        11%         Poor
+cafe              43.7%   -2.735        33%         Poor
+minimarket        85.4%  -17.956         0%         Poor
+realestate        71.3%   -8.123        25%         Poor
+cardealer        328.9%  -34.511         0%         Poor
+motorbike         91.7%   -1.688         0%         Poor
+
+KEY FINDINGS FOR PAPER:
+--------------------------------------------------
+1. Prophet achieves 68.2% MAPE on real retail data (UCI Online Retail II)
+2. 80% confidence intervals capture 22% of actual values (expected: ~80%)
+3. Average MAPE across synthetic SME businesses: 116.2%
+4. Dynamic credit limits adjust by +-25% based on forecast trend direction
+5. Saudi Thu/Fri weekend seasonality incorporated
+
+LIMITATIONS:
+- UCI dataset is UK wholesale retail (2009-2011)
+- 30-day synthetic window is short for seasonal detection
+- Prophet requires minimum 2 seasonal cycles for
+  optimal yearly seasonality -- 30 days insufficient
+  for full seasonal modeling
+
+CITATION:
+Prophet: Taylor SJ, Letham B. (2018). Forecasting at scale.
+The American Statistician, 72(1), 37-45.
+
+=================================================================
+DATACORE MODEL 4 -- PROPHET FORECAST VALIDATION
+=================================================================
+
+PRIMARY VALIDATION -- UCI Online Retail I (Real Data)
+Source: Chen (2012), CC BY 4.0
+--------------------------------------------------
+Train/Test Split:  70% / 30% (chronological)
+Test Period:       78 days
+Mean Actual Rev:   45,862.90
+Mean Predicted:    12,273.15
+
+ACCURACY METRICS:
+  MAE:             34,006.95
+  MAPE:            68.15%
+  RMSE:            42,379.96
+  R2:              -3.4984
+  80% CI Coverage: 23.1%
+
+  Interpretation:  POOR -- forecast useful for direction only
+
+SECONDARY VALIDATION -- Synthetic SME Businesses
+--------------------------------------------------
+Business           MAPE       R2   Coverage      Quality
+-------------------------------------------------------
+laundromat        76.2%  -10.610        11%         Poor
+cafe              43.7%   -2.735        22%         Poor
+minimarket        85.4%  -17.956         0%         Poor
+realestate        71.3%   -8.123        25%         Poor
+cardealer        328.9%  -34.511         0%         Poor
+motorbike         91.7%   -1.688         0%         Poor
+
+KEY FINDINGS FOR PAPER:
+--------------------------------------------------
+1. Prophet achieves 68.2% MAPE on real retail data (UCI Online Retail I)
+2. 80% confidence intervals capture 23% of actual values (expected: ~80%)
+3. Average MAPE across synthetic SME businesses: 116.2%
+4. Dynamic credit limits adjust by +-25% based on forecast trend direction
+5. Saudi Thu/Fri weekend seasonality incorporated
+
+LIMITATIONS:
+- UCI dataset is UK wholesale retail (2009-2011)
+- 30-day synthetic window is short for seasonal detection
+- Prophet requires minimum 2 seasonal cycles for
+  optimal yearly seasonality -- 30 days insufficient
+  for full seasonal modeling
+
+CITATION:
+Prophet: Taylor SJ, Letham B. (2018). Forecasting at scale.
+The American Statistician, 72(1), 37-45.
