@@ -90,6 +90,9 @@ def run():
             active_days >= 0.75
         ) or (
             ticket in ["mid"] and velocity in ["very_low", "low"]
+        ) or (
+            # high-volume low-ticket: grocery / minimarket / pharmacy
+            ticket == "low" and velocity in ["high", "very_high"]
         )
         exp_result = estimator.estimate_from_classifier(tx, classifier, holds_inventory=holds_inv)
         print(f"  [Model 2 - Expenses  ]  expense_ratio={exp_result['total_expense_ratio']:.3f}  "

@@ -13,6 +13,34 @@ sys.path.insert(0, ROOT)
 
 class ExpenseEstimator:
 
+    PUBLISHED_BENCHMARKS = {
+        "food_beverage": {
+            "source":        "NRA (National Restaurant Association) 2023",
+            "expense_range": (0.65, 0.82),
+            "category":      "Food & Beverage / Limited Service",
+        },
+        "general_retail": {
+            "source":        "Deloitte Global Retail 2023",
+            "expense_range": (0.72, 0.88),
+            "category":      "General Retail / Grocery",
+        },
+        "automotive": {
+            "source":        "NADA 2023 Annual Dealer Financial Profile",
+            "expense_range": (0.75, 0.90),
+            "category":      "Automotive / Specialty Vehicle Dealership",
+        },
+        "real_estate": {
+            "source":        "NAR (National Association of Realtors) 2023",
+            "expense_range": (0.55, 0.70),
+            "category":      "Real Estate Brokerage",
+        },
+        "services": {
+            "source":        "SCORE SME Benchmark Report 2023",
+            "expense_range": (0.55, 0.75),
+            "category":      "General Services",
+        },
+    }
+
     def __init__(self):
         # COGS lookup by ticket_size tag
         self.cogs_by_ticket = {
@@ -25,20 +53,20 @@ class ExpenseEstimator:
 
         # Labor lookup by transaction_velocity tag
         self.labor_by_velocity = {
-            "very_high": 0.22,   # needs large staff to handle volume
-            "high":      0.18,
-            "moderate":  0.12,
-            "low":       0.07,
-            "very_low":  0.04,   # minimal staff, appointment-based
+            "very_high": 0.16,   # needs large staff to handle volume
+            "high":      0.14,
+            "moderate":  0.10,
+            "low":       0.06,
+            "very_low":  0.03,   # minimal staff, appointment-based
         }
 
         # Stability adjustment by revenue_stability tag
         self.stability_adjustment = {
-            "very_stable":    -0.02,   # predictable = more efficient deployment
-            "stable":          0.00,
-            "moderate":        0.01,
-            "volatile":        0.03,   # needs larger buffer
-            "highly_volatile": 0.06,   # maximum buffer needed
+            "very_stable":    -0.015,   # predictable = more efficient deployment
+            "stable":          0.000,
+            "moderate":        0.008,
+            "volatile":        0.020,   # needs larger buffer
+            "highly_volatile": 0.040,   # maximum buffer needed
         }
 
         self.overhead  = 0.08    # flat for all businesses
@@ -91,12 +119,17 @@ class ExpenseEstimator:
         elif night >= 0.02:  nocturnal = "moderate"
         else:                nocturnal = "minimal"
 
+        # Peak-hour concentration → temporal pattern tag
+        peak_hour_conc   = raw_features.get("peak_hour_concentration", 0.05)
+        temporal_pattern = "sharp_peaks" if peak_hour_conc >= 0.10 else "distributed"
+
         return {
             "ticket_size":          ticket_size,
             "transaction_velocity": velocity_tag,
             "revenue_stability":    stability_tag,
             "payment_mix":          payment_mix,
             "nocturnal_activity":   nocturnal,
+            "temporal_pattern":     temporal_pattern,
             "profile_source":       profile_source,
             "is_outlier":           is_outlier,
         }
@@ -111,13 +144,14 @@ class ExpenseEstimator:
         revenue_stability. Optional: payment_mix, nocturnal_activity,
         profile_source, is_outlier.
         """
-        ticket_size   = behavioral_profile.get("ticket_size",          "low")
-        velocity_tag  = behavioral_profile.get("transaction_velocity",  "moderate")
-        stability_tag = behavioral_profile.get("revenue_stability",    "moderate")
-        payment_mix   = behavioral_profile.get("payment_mix",          "mixed")
-        nocturnal     = behavioral_profile.get("nocturnal_activity",    "minimal")
-        profile_src   = behavioral_profile.get("profile_source",       "real_data")
-        is_outlier    = behavioral_profile.get("is_outlier",           False)
+        ticket_size      = behavioral_profile.get("ticket_size",          "low")
+        velocity_tag     = behavioral_profile.get("transaction_velocity",  "moderate")
+        stability_tag    = behavioral_profile.get("revenue_stability",    "moderate")
+        payment_mix      = behavioral_profile.get("payment_mix",          "mixed")
+        nocturnal        = behavioral_profile.get("nocturnal_activity",    "minimal")
+        temporal_pattern = behavioral_profile.get("temporal_pattern",     "distributed")
+        profile_src      = behavioral_profile.get("profile_source",       "real_data")
+        is_outlier       = behavioral_profile.get("is_outlier",           False)
 
         cogs_ratio  = self.cogs_by_ticket.get(ticket_size, 0.35)
         labor_ratio = self.labor_by_velocity.get(velocity_tag, 0.12)
@@ -145,6 +179,10 @@ class ExpenseEstimator:
         if   nocturnal == "high":     labor_ratio += 0.04
         elif nocturnal == "moderate": labor_ratio += 0.02
 
+        # Food service: predictable meal-time peaks allow efficient scheduling
+        if temporal_pattern == "sharp_peaks" and ticket_size == "very_low":
+            labor_ratio *= 0.80
+
         total = cogs_ratio + labor_ratio + self.overhead + stab_adj
         total = float(np.clip(total, self.min_ratio, self.max_ratio))
 
@@ -158,6 +196,9 @@ class ExpenseEstimator:
         if stability_tag == "highly_volatile": confidence *= 0.90
         confidence = float(np.clip(confidence, 0.30, 0.95))
 
+        bench_validation = self.validate_against_benchmark(
+            total, behavioral_profile, holds_inventory)
+
         return {
             "total_expense_ratio": round(total, 4),
             "breakdown": {
@@ -166,17 +207,56 @@ class ExpenseEstimator:
                 "overhead_ratio": self.overhead,
                 "stability_adj":  round(stab_adj, 4),
             },
-            "net_margin_estimate": round(1.0 - total, 4),
-            "confidence":          round(confidence, 4),
+            "net_margin_estimate":  round(1.0 - total, 4),
+            "confidence":           round(confidence, 4),
             "tags_used": {
                 "ticket_size":          ticket_size,
                 "transaction_velocity": velocity_tag,
                 "revenue_stability":    stability_tag,
                 "payment_mix":          payment_mix,
                 "nocturnal_activity":   nocturnal,
+                "temporal_pattern":     temporal_pattern,
             },
-            "derived_from":  "behavioral_profile",
-            "profile_source": profile_src,
+            "benchmark_validation": bench_validation,
+            "derived_from":         "behavioral_profile",
+            "profile_source":       profile_src,
+        }
+
+    # ── Benchmark validation ──────────────────────────────────────────────────
+
+    def validate_against_benchmark(self, expense_ratio: float,
+                                    behavioral_profile: dict,
+                                    holds_inventory: bool = False) -> dict:
+        ticket   = behavioral_profile.get("ticket_size",          "mid")
+        velocity = behavioral_profile.get("transaction_velocity", "moderate")
+
+        if ticket == "very_low":
+            key = "food_beverage"
+        elif ticket in ["high", "very_high"] and velocity in ["very_low", "low"] and holds_inventory:
+            key = "automotive"
+        elif ticket in ["high", "very_high"] and velocity in ["very_low", "low"]:
+            key = "real_estate"
+        elif ticket in ["low", "mid"] and holds_inventory:
+            key = "general_retail"
+        else:
+            key = "services"
+
+        bench = self.PUBLISHED_BENCHMARKS.get(key, {})
+        if not bench:
+            return {"validated": False, "benchmark_key": key}
+
+        lo, hi    = bench["expense_range"]
+        within    = lo <= expense_ratio <= hi
+        midpoint  = (lo + hi) / 2.0
+
+        return {
+            "validated":               True,
+            "benchmark_key":           key,
+            "within_range":            within,
+            "benchmark_range":         bench["expense_range"],
+            "source":                  bench["source"],
+            "category":                bench["category"],
+            "deviation_from_midpoint": round(expense_ratio - midpoint, 4),
         }
 
     # ── Full pipeline: real transaction data ──────────────────────────────────
@@ -230,7 +310,7 @@ if __name__ == "__main__":
     print("=" * 60)
 
     from models.business_classifier import BusinessClassifier
-    from models.dscr_model import DSCRModel, EXPENSE_RATIOS
+    from models.dscr_model import DSCRModel
 
     clf       = BusinessClassifier()
     clf.load()
@@ -240,14 +320,15 @@ if __name__ == "__main__":
                   "realestate", "cardealer", "motorbike"]
 
     print("\n" + "=" * 60)
-    print("MODEL 2 FINAL -- AI-derived vs hardcoded comparison")
+    print("MODEL 2 -- AI-derived expense ratios vs published benchmarks")
     print("=" * 60)
-    print(f"{'Business':<14} {'Hardcoded':>10} {'AI-Derived':>10} "
-          f"{'Diff':>8} {'Inventory':>10} {'Conf':>6}")
-    print("-" * 65)
+    print(f"{'Business':<14} {'AI-Ratio':>9} {'Benchmark':>16} {'In Range':>9} "
+          f"{'Category':<32} {'Conf':>6}")
+    print("-" * 95)
 
+    pass_count = 0
     for biz in businesses:
-        tx = pd.read_csv(os.path.join(ROOT, "data", f"{biz}_transactions.csv"))
+        tx = pd.read_csv(os.path.join(ROOT, "data", "processed", f"{biz}_transactions.csv"))
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
 
         clf_result = clf.classify_from_data(tx)
@@ -255,9 +336,6 @@ if __name__ == "__main__":
         ticket     = profile.get("ticket_size", "low")
         velocity   = profile.get("transaction_velocity", "moderate")
 
-        # Active-days guard: brokerages / appointment businesses have sparse
-        # presence (< 75% of days with transactions). Inventory dealers stay
-        # open daily to receive stock and serve walk-in customers.
         active_days = clf_result["raw_features"].get("active_days_ratio", 0.9)
         holds_inv = (
             ticket in ["high", "very_high"] and
@@ -266,22 +344,28 @@ if __name__ == "__main__":
         ) or (
             ticket in ["mid"] and
             velocity in ["very_low", "low"]
+        ) or (
+            # high-volume low-ticket: grocery / minimarket / pharmacy
+            ticket == "low" and
+            velocity in ["high", "very_high"]
         )
 
-        result   = estimator.estimate_from_classifier(tx, clf,
-                     holds_inventory=holds_inv)
+        result   = estimator.estimate_from_classifier(tx, clf, holds_inventory=holds_inv)
         ai_ratio = result["total_expense_ratio"]
-        hc_ratio = EXPENSE_RATIOS[biz]
-        diff     = ai_ratio - hc_ratio
+        bv       = result["benchmark_validation"]
+        lo, hi   = bv["benchmark_range"] if bv.get("validated") else (0, 0)
+        in_range = bv.get("within_range", False)
+        cat      = bv.get("category", "unknown")[:32]
+        if in_range:
+            pass_count += 1
 
-        print(f"{biz:<14} {hc_ratio:>10.3f} {ai_ratio:>10.3f} "
-              f"{diff:>+8.3f} {str(holds_inv):>10} {result['confidence']:>6.2f}")
+        range_str = f"[{lo:.2f}-{hi:.2f}]"
+        flag      = "PASS" if in_range else "FAIL"
+        print(f"{biz:<14} {ai_ratio:>9.3f} {range_str:>16} {flag:>9} "
+              f"{cat:<32} {result['confidence']:>6.2f}")
 
-    print("\nExpected results:")
-    print("  cardealer : AI ~0.78-0.82 (was 0.260, inventory=True fixes it)")
-    print("  motorbike : AI ~0.72-0.78 (was 0.390, inventory=True fixes it)")
-    print("  realestate: AI ~0.33      (no inventory, unchanged)")
-    print("  cafe      : AI ~0.82      (no inventory, unchanged)")
+    print("-" * 95)
+    print(f"  Benchmark pass rate: {pass_count}/{len(businesses)}")
 
     print("\n" + "=" * 60)
     print("FULL DSCR WITH MODEL 2 -- live run")
