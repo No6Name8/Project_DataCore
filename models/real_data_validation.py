@@ -90,12 +90,12 @@ def normalize_amounts(df, target_median=150):
 
 # ── Timestamp remapping ───────────────────────────────────────────────────────
 
-def remap_to_june2025(df, period_days=30):
+def remap_to_june2025(df, period_days=90):
     """
-    Remap timestamps into a June 2025 window while preserving time-of-day.
+    Remap timestamps into the April-June 2025 window while preserving time-of-day.
 
     The classifier's feature extractor reindexes daily revenue against
-    ALL_DATES (2025-06-01 to 2025-06-30). Without remapping, real datasets
+    ALL_DATES (2025-04-01 to 2025-06-30). Without remapping, real datasets
     from different time periods produce incorrect revenue_cv features.
 
     Time-of-day (hour/minute/second) is preserved exactly so that
@@ -103,7 +103,7 @@ def remap_to_june2025(df, period_days=30):
     reflect the actual business behaviour from the original dataset.
     """
     df = df.copy()
-    start = pd.Timestamp("2025-06-01")
+    start = pd.Timestamp("2025-04-01")
 
     t_min = df["timestamp"].min()
     t_max = df["timestamp"].max()
@@ -648,7 +648,7 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     L("    absolute amounts are scaled, behavioral patterns are not")
     L("  - Supermarket dataset limited to 1,000 transactions (Kaggle sample)")
     L("  - Timestamp remapping applied to fit datasets into the classifier's")
-    L("    30-day feature window; time-of-day patterns are preserved exactly,")
+    L("    90-day feature window; time-of-day patterns are preserved exactly,")
     L("    day-of-week patterns are proportionally re-mapped")
     L("  - Validation conducted on datasets from different regions")
     L("    and time periods than target deployment context (Saudi Arabia 2025)")
@@ -716,7 +716,7 @@ if __name__ == "__main__":
 
     print("\n[2b] Remapping timestamps into June 2025 window...")
     for name, d in datasets.items():
-        d["df"] = remap_to_june2025(d["df"].copy(), period_days=30)
+        d["df"] = remap_to_june2025(d["df"].copy(), period_days=90)
         t_min = d["df"]["timestamp"].min().strftime("%Y-%m-%d")
         t_max = d["df"]["timestamp"].max().strftime("%Y-%m-%d")
         print(f"  {name}: {t_min} -> {t_max}")
@@ -728,7 +728,7 @@ if __name__ == "__main__":
     for name, d in datasets.items():
         print(f"  Classifying {name}...")
         try:
-            result = clf.classify_from_data(d["df"], period_days=30)
+            result = clf.classify_from_data(d["df"], period_days=90)
             results[name] = {
                 "classification":    result,
                 "expected_archetype": d["expected_archetype"],

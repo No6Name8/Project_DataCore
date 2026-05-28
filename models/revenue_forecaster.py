@@ -14,7 +14,7 @@ DATA_DIR  = os.path.join(ROOT, "data", "processed")
 SAVED_DIR = os.path.join(ROOT, "models", "saved")
 sys.path.insert(0, ROOT)
 
-ALL_HIST_DATES = pd.date_range("2025-06-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
+ALL_HIST_DATES = pd.date_range("2025-04-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
 FORECAST_START = "2025-07-01"
 FORECAST_END   = "2025-07-30"
 

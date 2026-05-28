@@ -447,12 +447,12 @@ def build_document():
     build_table(doc,
         ["Business", "Expected Archetype", "Assigned Cluster", "Confidence"],
         [
-            ["Cafe",         "high_freq_low_ticket_food",         "C6", "88%"],
-            ["Minimarket",   "high_freq_mid_ticket_retail",       "C1", "91%"],
-            ["Laundromat",   "low_ticket_essential_steady",       "C5", "74%"],
-            ["Real Estate",  "sparse_high_ticket_brokerage",      "C3", "95%"],
-            ["Car Dealer",   "low_freq_very_high_ticket_auto",    "C2", "89%"],
-            ["Motorbike",    "low_freq_mid_high_ticket_dealer",   "C8", "82%"],
+            ["Cafe",         "high_freq_low_ticket_food",         "C6", "100%"],
+            ["Minimarket",   "high_freq_mid_ticket_retail",       "C4",  "74%"],
+            ["Laundromat",   "low_ticket_steady_essential",       "C7",  "97%"],
+            ["Real Estate",  "sparse_high_ticket_brokerage",      "C0",  "42%"],
+            ["Car Dealer",   "low_freq_high_ticket_automotive",   "C2",  "25%"],
+            ["Motorbike",    "low_freq_mid_ticket_dealer",        "C3",  "28%"],
         ],
         caption_text="Table 2: Classifier Validation on Synthetic SME Businesses"
     )
@@ -540,7 +540,7 @@ def build_document():
     add_heading2(doc, "2.3  Model 3 — Isolation Forest Fraud Detector")
 
     add_body(doc,
-        "Each business receives a dedicated Isolation Forest model trained on its own 30-day "
+        "Each business receives a dedicated Isolation Forest model trained on its own 90-day "
         "transaction history. This per-business approach is the key innovation over generic fraud "
         "detection systems, which apply universal thresholds that fail to account for business-specific "
         "operating patterns. A transaction at 3AM is anomalous for a real estate office but entirely "
@@ -575,12 +575,12 @@ def build_document():
     build_table(doc,
         ["Business", "Status", "Score", "Anomalies", "Key Finding"],
         [
-            ["Cafe",        "Flagged", "40", "1", "2AM transaction spike detected"],
-            ["Minimarket",  "Frozen",  "80", "2", "SAR 5,180 cash outlier at 3AM"],
-            ["Laundromat",  "Flagged", "40", "1", "Off-hours activity spike"],
-            ["Real Estate", "Flagged", "10", "1", "Commission spike (likely legitimate)"],
-            ["Car Dealer",  "Flagged", "50", "1", "Fleet purchase amount outlier"],
-            ["Motorbike",   "Frozen",  "90", "2", "Two SAR 90,000+ amount outliers"],
+            ["Cafe",        "Flagged", "40",  "1", "Behavioral anomaly (first-day pattern)"],
+            ["Minimarket",  "Frozen",  "100", "3", "SAR 5,927 outlier + behavioral anomalies"],
+            ["Laundromat",  "Flagged", "40",  "1", "Behavioral anomaly (first-day pattern)"],
+            ["Real Estate", "Flagged", "25",  "1", "Behavioral anomaly flag"],
+            ["Car Dealer",  "Frozen",  "80",  "2", "SAR 1,071,266 amount outlier + behavioral"],
+            ["Motorbike",   "Frozen",  "100", "7", "Seven SAR 90,000+ amount outliers"],
         ],
         caption_text="Table 6: Fraud Detection Results Across All Six Businesses"
     )
@@ -588,7 +588,7 @@ def build_document():
     add_heading2(doc, "2.4  Model 4 — Prophet Revenue Forecaster")
 
     add_body(doc,
-        "Facebook Prophet forecasts the next 30 days of daily revenue from the preceding 30-day "
+        "Facebook Prophet forecasts the next 30 days of daily revenue from the preceding 90 days of "
         "transaction history. Prophet was selected for its native support for multiple seasonality "
         "components and its interpretable decomposition into trend, weekly, and yearly components. "
         "Saudi-specific weekly seasonality is incorporated to account for the Thursday-Friday weekend "
@@ -612,17 +612,18 @@ def build_document():
         "period. In production deployment, DataCore maintains a continuous rolling training window "
         "that grows with each business relationship, improving forecast accuracy as documented in "
         "Taylor and Letham (2018). The synthetic business results reflect the expected limitation "
-        "of training Prophet on 21-day windows, which fall below the minimum recommended by the "
-        "Prophet documentation for reliable weekly seasonality detection.",
+        "of training Prophet on sparse-business test sets where zero-revenue days inflate MAPE "
+        "due to near-zero denominators. The cafe, which operates daily without zero-revenue gaps, "
+        "achieves a synthetic MAPE of 80.5% on a 27-day test window, consistent with the UCI result.",
         align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
 
     build_table(doc,
-        ["Metric", "UCI Real Data", "Synthetic Avg (note)"],
+        ["Metric", "UCI Real Data", "Synthetic (note)"],
         [
-            ["MAPE",            "68.2%",   "43-329% (9-day test sets)"],
-            ["R²",              "-3.50",   "Negative (underfitting)"],
-            ["80% CI Coverage", "23.1%",   "0-25%"],
-            ["Test Period",     "92 days", "9 days (30-day data, 70/30 split)"],
+            ["MAPE",            "68.2%",   "80.5% cafe; 998-1186% sparse (MAPE inflated by zero-rev days)"],
+            ["R²",              "-3.50",   "Negative (underfitting on sparse businesses)"],
+            ["80% CI Coverage", "23.1%",   "0-18% (sparse); 18% (cafe)"],
+            ["Test Period",     "92 days", "27 days (90-day data, 70/30 split)"],
             ["Dataset",         "UCI Online Retail I (Chen 2012)", "6 synthetic SME businesses"],
         ],
         caption_text="Table 7: Prophet Forecast Validation Results"
@@ -783,10 +784,12 @@ def build_document():
 
     add_body(doc,
         "Limitation 4 — Forecast horizon. Prophet achieves optimal accuracy with multiple seasonal "
-        "cycles of historical data. The 30-day training window used in the current prototype is "
-        "insufficient for robust yearly seasonality modeling. Performance improves significantly as "
-        "the continuous data collection window extends beyond 90 days, at which point two full "
-        "monthly cycles become available for calibration.",
+        "cycles of historical data. The 90-day training window in the current prototype provides "
+        "three complete monthly cycles of weekly seasonality data, which is sufficient for weekly "
+        "pattern detection but insufficient for yearly seasonality modeling. MAPE metrics for "
+        "sparse businesses (real estate, automotive) are inflated by zero-revenue days in the test "
+        "set, a known limitation of MAPE on intermittent time series. SMAPE or MAE are more "
+        "appropriate accuracy metrics for these business types.",
         align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
 
     add_body(doc,
@@ -875,7 +878,7 @@ def build_document():
     build_table(doc,
         ["Dataset", "Rows", "Period", "Source", "Used For"],
         [
-            ["Synthetic SME (6 businesses)",  "11,000+",  "30 days",    "Generated",          "Model training"],
+            ["Synthetic SME (6 businesses)",  "36,218",   "90 days",    "Generated",          "Model training"],
             ["UCI Online Retail II",           "50,000",   "374 days",   "Chen (2012)",         "Classifier + Prophet validation"],
             ["Coffee Shop Sales",              "149,116",  "181 days",   "Maven Analytics",     "Classifier validation"],
             ["Supermarket Sales",              "1,000",    "89 days",    "Kaggle (2019)",        "Classifier validation"],

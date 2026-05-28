@@ -23,18 +23,18 @@ SECONDARY VALIDATION -- Synthetic SME Businesses
 --------------------------------------------------
 Business           MAPE       R2   Coverage      Quality
 -------------------------------------------------------
-laundromat        76.2%  -10.610        11%         Poor
-cafe              43.7%   -2.735        22%         Poor
-minimarket        85.4%  -17.956         0%         Poor
-realestate        71.3%   -8.123        25%         Poor
-cardealer        328.9%  -34.511         0%         Poor
-motorbike         91.7%   -1.688         0%         Poor
+laundromat      1186.5% -1583.688         0%         Poor
+cafe              80.5%  -37.723        18%         Poor
+minimarket      1172.4% -3953.551         0%         Poor
+realestate      1118.0%   -2.018         0%         Poor
+cardealer       1169.1% -256.496         4%         Poor
+motorbike        998.7%  -70.811         4%         Poor
 
 KEY FINDINGS FOR PAPER:
 --------------------------------------------------
 1. Prophet achieves 68.2% MAPE on real retail data (UCI Online Retail I)
 2. 80% confidence intervals capture 23% of actual values (expected: ~80%)
-3. Average MAPE across synthetic SME businesses: 116.2%
+3. Average MAPE across synthetic SME businesses: 954.2%
 4. Dynamic credit limits adjust by +-25% based on forecast trend direction
 5. Saudi Thu/Fri weekend seasonality incorporated
 

@@ -26,7 +26,7 @@ DATA_DIR  = os.path.join(ROOT, "data", "processed")
 SAVED_DIR = os.path.join(ROOT, "models", "saved")
 sys.path.insert(0, ROOT)
 
-ALL_DATES = pd.date_range("2025-06-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
+ALL_DATES = pd.date_range("2025-04-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
 
 # ── Stage 1: Feature extractor ────────────────────────────────────────────────
 
@@ -54,9 +54,10 @@ class BusinessFeatureExtractor:
 
         # Transaction volume features
         days_active          = tx["date"].nunique()
-        avg_daily_tx         = n / 30.0
+        n_hist_days          = float(len(ALL_DATES))
+        avg_daily_tx         = n / n_hist_days
         transaction_velocity = float(avg_daily_tx / 24.0)
-        active_days_ratio    = days_active / 30.0
+        active_days_ratio    = days_active / n_hist_days
 
         # Temporal pattern features
         hour_counts = tx["hour"].value_counts()

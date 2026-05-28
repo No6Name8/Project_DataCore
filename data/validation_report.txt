@@ -1,6 +1,6 @@
 ══════════════════════════════════════════════════════════════════════
   DATACORE MODEL VALIDATION REPORT
-  Generated: 2026-05-25 22:38
+  Generated: 2026-05-28 19:13
 ══════════════════════════════════════════════════════════════════════
 
 SECTION 1: DATASET SUMMARY
@@ -20,13 +20,13 @@ SECTION 2: CLASSIFICATION ACCURACY
   Overall Accuracy:     3/6 datasets correctly classified (50%)
   Ticket Size Acc:      50%
   Velocity Acc:         17%
-  Avg Confidence:       3.1%
+  Avg Confidence:       4.3%
 
   Dataset                      Expected Arch                  Got Arch                           Match  Conf
 ──────────────────────────────────────────────────────────────────────
   UCI Online Retail            high_freq_mid_ticket_retail    high_freq_mid_ticket_retail        YES    0.00
   Coffee Shop Sales            high_freq_low_ticket_food      high_freq_low_ticket_food          YES    0.00
-  Supermarket Sales            high_freq_mid_ticket_retail    high_freq_low_ticket_food          NO     0.18
+  Supermarket Sales            high_freq_mid_ticket_retail    mid_freq_low_ticket_personal_ser   NO     0.26
   Car Dealer Sales             low_freq_very_high_ticket_au   high_freq_mid_ticket_retail        NO     0.00
   Real Estate Transactions     sparse_high_ticket_brokerage   high_freq_mid_ticket_retail        NO     0.00
   General Retail               high_freq_mid_ticket_retail    high_freq_mid_ticket_retail        YES    0.00
@@ -38,8 +38,8 @@ SECTION 2: CLASSIFICATION ACCURACY
   UCI Online Retail            low->low               high->very_high          Y  N
   Coffee Shop Sales            very_low->low          high->very_high          N  N
   Supermarket Sales            low->low               high->moderate           Y  N
-  Car Dealer Sales             very_high->low         very_low->very_high      N  N
-  Real Estate Transactions     very_high->low         very_low->very_high      N  N
+  Car Dealer Sales             very_high->low         very_low->high           N  N
+  Real Estate Transactions     very_high->low         very_low->high           N  N
   General Retail               low->low               very_high->very_high     Y  Y
 ──────────────────────────────────────────────────────────────────────
 
@@ -47,19 +47,19 @@ SECTION 3: EXPENSE RATIO VALIDATION
 ──────────────────────────────────────────────────────────────────────
   Business Type                 Model 2  Benchmark            Range In Range
 ──────────────────────────────────────────────────────────────────────
-  Coffee Shop Sales               0.760      0.680   0.62-0.74     NO
+  Coffee Shop Sales               0.698      0.680   0.62-0.74     YES
   Supermarket Sales               0.650      0.780   0.74-0.82     NO
-  Car Dealer Sales                0.730      0.820   0.78-0.86     NO
-  Real Estate Transactions        0.780      0.350   0.28-0.42     NO
-  General Retail                  0.730      0.720   0.68-0.76     YES
+  Car Dealer Sales                0.670      0.820   0.78-0.86     NO
+  Real Estate Transactions        0.690      0.350   0.28-0.42     NO
+  General Retail                  0.675      0.720   0.68-0.76     NO
 ──────────────────────────────────────────────────────────────────────
   Model 2 within published benchmarks: 1/5 business types
 
 SECTION 4: FRAUD DETECTION VALIDATION
 ──────────────────────────────────────────────────────────────────────
   Car Dealer Sales
-    Anomaly rate:          71.0% (expected 1-10%, within range: NO)
-    Flagged transactions:  7,095 / 10,000
+    Anomaly rate:          91.0% (expected 1-10%, within range: NO)
+    Flagged transactions:  9,103 / 10,000
     High-value detection:  NOT DETECTED
 ──────────────────────────────────────────────────────────────────────
 
@@ -73,9 +73,9 @@ SECTION 5: KEY FINDINGS FOR PAPER
     for 1 out of 5 business types validated
   - Ticket-size identification accuracy: 50%
   - Transaction-velocity identification accuracy: 17%
-  - Isolation Forest anomaly rate on Car Dealer Sales: 71.0%
+  - Isolation Forest anomaly rate on Car Dealer Sales: 91.0%
     (consistent with 5% contamination parameter)
-  - Average classifier confidence across real datasets: 3.1%
+  - Average classifier confidence across real datasets: 4.3%
 
 SECTION 6: LIMITATIONS
 ──────────────────────────────────────────────────────────────────────
@@ -105,105 +105,3 @@ CITATIONS
   NAR (2023). Real Estate Industry Statistics.
   McKinsey (2023). The State of Grocery Retail.
 ══════════════════════════════════════════════════════════════════════
-
-=================================================================
-DATACORE MODEL 4 -- PROPHET FORECAST VALIDATION
-=================================================================
-
-PRIMARY VALIDATION -- UCI Online Retail II (Real Data)
-Source: Chen (2012), CC BY 4.0
---------------------------------------------------
-Train/Test Split:  70% / 30% (chronological)
-Test Period:       78 days
-Mean Actual Rev:   45,862.90
-Mean Predicted:    12,273.15
-
-ACCURACY METRICS:
-  MAE:             34,006.95
-  MAPE:            68.15%
-  RMSE:            42,379.96
-  R2:              -3.4984
-  80% CI Coverage: 21.8%
-
-  Interpretation:  POOR -- forecast useful for direction only
-
-SECONDARY VALIDATION -- Synthetic SME Businesses
---------------------------------------------------
-Business           MAPE       R2   Coverage      Quality
--------------------------------------------------------
-laundromat        76.2%  -10.610        11%         Poor
-cafe              43.7%   -2.735        33%         Poor
-minimarket        85.4%  -17.956         0%         Poor
-realestate        71.3%   -8.123        25%         Poor
-cardealer        328.9%  -34.511         0%         Poor
-motorbike         91.7%   -1.688         0%         Poor
-
-KEY FINDINGS FOR PAPER:
---------------------------------------------------
-1. Prophet achieves 68.2% MAPE on real retail data (UCI Online Retail II)
-2. 80% confidence intervals capture 22% of actual values (expected: ~80%)
-3. Average MAPE across synthetic SME businesses: 116.2%
-4. Dynamic credit limits adjust by +-25% based on forecast trend direction
-5. Saudi Thu/Fri weekend seasonality incorporated
-
-LIMITATIONS:
-- UCI dataset is UK wholesale retail (2009-2011)
-- 30-day synthetic window is short for seasonal detection
-- Prophet requires minimum 2 seasonal cycles for
-  optimal yearly seasonality -- 30 days insufficient
-  for full seasonal modeling
-
-CITATION:
-Prophet: Taylor SJ, Letham B. (2018). Forecasting at scale.
-The American Statistician, 72(1), 37-45.
-
-=================================================================
-DATACORE MODEL 4 -- PROPHET FORECAST VALIDATION
-=================================================================
-
-PRIMARY VALIDATION -- UCI Online Retail I (Real Data)
-Source: Chen (2012), CC BY 4.0
---------------------------------------------------
-Train/Test Split:  70% / 30% (chronological)
-Test Period:       78 days
-Mean Actual Rev:   45,862.90
-Mean Predicted:    12,273.15
-
-ACCURACY METRICS:
-  MAE:             34,006.95
-  MAPE:            68.15%
-  RMSE:            42,379.96
-  R2:              -3.4984
-  80% CI Coverage: 23.1%
-
-  Interpretation:  POOR -- forecast useful for direction only
-
-SECONDARY VALIDATION -- Synthetic SME Businesses
---------------------------------------------------
-Business           MAPE       R2   Coverage      Quality
--------------------------------------------------------
-laundromat        76.2%  -10.610        11%         Poor
-cafe              43.7%   -2.735        22%         Poor
-minimarket        85.4%  -17.956         0%         Poor
-realestate        71.3%   -8.123        25%         Poor
-cardealer        328.9%  -34.511         0%         Poor
-motorbike         91.7%   -1.688         0%         Poor
-
-KEY FINDINGS FOR PAPER:
---------------------------------------------------
-1. Prophet achieves 68.2% MAPE on real retail data (UCI Online Retail I)
-2. 80% confidence intervals capture 23% of actual values (expected: ~80%)
-3. Average MAPE across synthetic SME businesses: 116.2%
-4. Dynamic credit limits adjust by +-25% based on forecast trend direction
-5. Saudi Thu/Fri weekend seasonality incorporated
-
-LIMITATIONS:
-- UCI dataset is UK wholesale retail (2009-2011)
-- 30-day synthetic window is short for seasonal detection
-- Prophet requires minimum 2 seasonal cycles for
-  optimal yearly seasonality -- 30 days insufficient
-  for full seasonal modeling
-
-CITATION:
-Prophet: Taylor SJ, Letham B. (2018). Forecasting at scale.
-The American Statistician, 72(1), 37-45.
