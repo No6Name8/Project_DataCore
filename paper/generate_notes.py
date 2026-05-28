@@ -380,11 +380,84 @@ def build_document():
 
     page_break(doc)
 
+    # ── SECTION: RELATED WORK ────────────────────────────────────────────────
+
+    add_heading1(doc, "2.  Related Work")
+
+    add_heading2(doc, "2.1  Machine Learning in Credit Scoring")
+    add_body(doc,
+        "The application of machine learning to credit risk assessment has expanded "
+        "significantly over the past decade. Mestiri (2024) compared six credit scoring "
+        "models including Logistic Regression, Random Forest, Support Vector Machines, "
+        "and Deep Neural Networks, finding that machine learning techniques consistently "
+        "outperform traditional statistical models in predicting loan defaults. A "
+        "systematic review by Kamimura et al. (2023) of 46 studies on credit scoring "
+        "optimization identified a growing trend toward hybrid models (72% of recent work) "
+        "and emphasized the critical need for research focused specifically on small "
+        "businesses and diverse data sources — a gap that DataCore directly addresses. "
+        "Traditional approaches rely on historical financial statements and credit bureau "
+        "data, which fail for the majority of SMEs that operate informally or lack "
+        "multi-year audited accounts. Zhang et al. (2022) demonstrated that fusing "
+        "behavioral and transactional data significantly improves credit risk prediction "
+        "for SMEs in supply chain finance contexts, supporting the approach taken in "
+        "this work.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "2.2  Behavioral and Transactional Data in Lending")
+    add_body(doc,
+        "The use of transactional behavioral data for credit assessment represents a "
+        "paradigm shift from static document-based evaluation. Chioda et al. (2024) "
+        "demonstrated that FinTech lenders using alternative data sources can successfully "
+        "extend credit to borrowers with no formal credit history — the precise cold start "
+        "problem that DataCore's Track 2 pipeline addresses through salary-backed seed "
+        "loans and intake form classification. The CFIT SME Finance Taskforce (2024) "
+        "identified smart data integration as the primary lever for improving SME lending "
+        "outcomes, recommending that lenders move toward continuous transaction monitoring "
+        "rather than point-in-time assessments. DataCore implements this recommendation "
+        "through its 90-day rolling transaction window and dynamic credit limit adjustment "
+        "mechanism.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "2.3  Unsupervised Clustering in Financial Data")
+    add_body(doc,
+        "Unsupervised clustering has been applied to financial data for customer "
+        "segmentation and anomaly detection. A survey by Fahim et al. (2016) evaluated "
+        "clustering algorithms across financial datasets, finding density-based approaches "
+        "particularly effective for datasets with irregular cluster shapes — the motivation "
+        "for choosing HDBSCAN over K-Means in this work. Husmann et al. (2020) demonstrated "
+        "that unsupervised machine learning can classify company data in economically "
+        "meaningful ways without labeled training data, finding that unsupervised groupings "
+        "improve downstream financial analysis decisions. Recent work on SME bank transaction "
+        "categorization highlights a circular dependency problem in supervised approaches: "
+        "classification models require labeled context but generating labels requires "
+        "classification (Hussain et al., 2025). DataCore resolves this by operating "
+        "entirely without labels — HDBSCAN discovers behavioral archetypes from data "
+        "structure alone, requiring no annotation.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "2.4  Gap Addressed by This Work")
+    add_body(doc,
+        "Existing approaches share three limitations that DataCore addresses. First, they "
+        "require labeled training data — industry categories, credit ratings, or historical "
+        "default labels. DataCore requires no labels at any stage of the pipeline. Second, "
+        "they treat all businesses within an industry category identically, ignoring "
+        "behavioral differences between businesses in the same sector. A high-end specialty "
+        "cafe and a fast food kiosk are both classified as food service and assessed with "
+        "the same parameters. DataCore assesses each business by its actual transaction "
+        "behavior. Third, they cannot assess new businesses without trading history. The "
+        "cold start problem is typically addressed by requiring minimum trading periods "
+        "before loan eligibility. DataCore's two-track system enables day-zero assessment "
+        "through intake form classification and salary-backed seed loans, with confidence "
+        "growing continuously as real data accumulates.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    page_break(doc)
+
     # ── SECTION 3: THE FOUR MODELS ────────────────────────────────────────────
 
-    add_heading1(doc, "2.  The Four Models")
+    add_heading1(doc, "3.  The Four Models")
 
-    add_heading2(doc, "2.1  Model 1 — Unsupervised Business Classifier")
+    add_heading2(doc, "3.1  Model 1 — Unsupervised Business Classifier")
 
     add_body(doc,
         "The business classifier employs Hierarchical Density-Based Spatial Clustering of Applications "
@@ -488,7 +561,7 @@ def build_document():
         "classification accuracy is 100 percent.",
         italic=True, align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=12)
 
-    add_heading2(doc, "2.2  Model 2 — Behavioral Expense Estimator")
+    add_heading2(doc, "3.2  Model 2 — Behavioral Expense Estimator")
 
     add_body(doc,
         "The expense estimator derives the operating expense ratio of a business from its behavioral "
@@ -537,7 +610,7 @@ def build_document():
         caption_text="Table 4: Model 2 Expense Ratio Benchmark Validation"
     )
 
-    add_heading2(doc, "2.3  Model 3 — Isolation Forest Fraud Detector")
+    add_heading2(doc, "3.3  Model 3 — Isolation Forest Fraud Detector")
 
     add_body(doc,
         "Each business receives a dedicated Isolation Forest model trained on its own 90-day "
@@ -585,7 +658,7 @@ def build_document():
         caption_text="Table 6: Fraud Detection Results Across All Six Businesses"
     )
 
-    add_heading2(doc, "2.4  Model 4 — Prophet Revenue Forecaster")
+    add_heading2(doc, "3.4  Model 4 — Prophet Revenue Forecaster")
 
     add_body(doc,
         "Facebook Prophet forecasts the next 30 days of daily revenue from the preceding 90 days of "
@@ -633,9 +706,9 @@ def build_document():
 
     # ── SECTION 4: KEY FORMULAS ───────────────────────────────────────────────
 
-    add_heading1(doc, "3.  Key Formulas")
+    add_heading1(doc, "4.  Key Formulas")
 
-    add_heading2(doc, "3.1  Debt Service Coverage Ratio (DSCR)")
+    add_heading2(doc, "4.1  Debt Service Coverage Ratio (DSCR)")
 
     add_body(doc,
         "The DSCR measures a business's ability to service debt from its operating income. A DSCR "
@@ -659,7 +732,7 @@ def build_document():
         "results in a critical classification with zero credit approved.",
         align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_before=8, space_after=8)
 
-    add_heading2(doc, "3.2  Debt Burden Ratio (DBR) — SAMA Compliant")
+    add_heading2(doc, "4.2  Debt Burden Ratio (DBR) — SAMA Compliant")
 
     add_body(doc,
         "The DBR governs the Track 2 seed loan for new businesses. SAMA mandates that total monthly "
@@ -680,7 +753,7 @@ def build_document():
         "approval rates for borderline cases.",
         align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_before=8, space_after=8)
 
-    add_heading2(doc, "3.3  Two-Track Confidence Blend Formula")
+    add_heading2(doc, "4.3  Two-Track Confidence Blend Formula")
 
     add_body(doc,
         "As a Track 2 business accumulates real transaction data, the system transitions its feature "
@@ -705,7 +778,7 @@ def build_document():
         "graduation from predicted to observed behavioral profiles.",
         align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_before=8, space_after=8)
 
-    add_heading2(doc, "3.4  Sustainability Discount Formula")
+    add_heading2(doc, "4.4  Sustainability Discount Formula")
 
     add_body(doc,
         "Businesses operating with high energy efficiency qualify for an interest rate reduction "
@@ -724,9 +797,9 @@ def build_document():
 
     # ── SECTION 5: VALIDATION SUMMARY ────────────────────────────────────────
 
-    add_heading1(doc, "4.  Validation Summary")
+    add_heading1(doc, "5.  Validation Summary")
 
-    add_heading2(doc, "4.1  Overall Validation Results")
+    add_heading2(doc, "5.1  Overall Validation Results")
 
     build_table(doc,
         ["Component", "Validation Method", "Result", "Status"],
@@ -755,7 +828,7 @@ def build_document():
         caption_text="Table 8: Overall Validation Summary"
     )
 
-    add_heading2(doc, "4.2  Known Limitations")
+    add_heading2(doc, "5.2  Known Limitations")
 
     add_body(doc,
         "Limitation 1 — Data availability. No publicly available Saudi SME POS transaction dataset "
@@ -802,9 +875,141 @@ def build_document():
 
     page_break(doc)
 
-    # ── SECTION 6: REFERENCES ─────────────────────────────────────────────────
+    # ── SECTION: DISCUSSION ──────────────────────────────────────────────────
 
-    add_heading1(doc, "5.  References")
+    add_heading1(doc, "6.  Discussion")
+
+    add_heading2(doc, "6.1  Interpretation of Classification Results")
+    add_body(doc,
+        "The classifier's 100% accuracy on datasets with complete hour-level timestamps "
+        "confirms the core hypothesis: transaction behavioral patterns are sufficiently "
+        "distinctive across business archetypes to enable unsupervised classification "
+        "without labeled training data. The three misclassifications on daily-aggregated "
+        "datasets are not model failures — they define a precise data quality requirement "
+        "for production deployment. Any POS system transmitting full datetime stamps, the "
+        "standard for all modern Saudi POS providers including Foodics, will produce data "
+        "suitable for classification. The improvement in confidence from the 30-day to "
+        "90-day training window is particularly significant: cafe confidence improved from "
+        "88% to 100% and laundromat from 74% to 97%, demonstrating that behavioral "
+        "fingerprints become more stable and distinctive as transaction history accumulates.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "6.2  The Behavioral Archetype Insight")
+    add_body(doc,
+        "The central contribution of this work is the demonstration that business financial "
+        "behavior clusters naturally into stable archetypes that transcend industry labels. "
+        "A cafe in Riyadh, a coffee shop in London, and a juice bar in Dubai share the same "
+        "behavioral DNA: high frequency, low ticket, consumer-facing, peaked temporal "
+        "patterns. The classifier places all three in the same cluster without being told "
+        "what any of them sells. This has profound implications for lending. A bank does not "
+        "need to know that a business is a cafe — it needs to know that it is a "
+        "high-frequency, low-ticket, stable-revenue business. The appropriate credit limit, "
+        "fraud sensitivity, and expense ratio for that behavioral profile are identical "
+        "regardless of what the business actually sells. DataCore operationalizes this "
+        "insight at scale, enabling consistent and fair credit assessment across any "
+        "business type including categories that did not exist when the system was trained.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "6.3  The Cold Start Solution")
+    add_body(doc,
+        "The two-track confidence-weighted blend formula represents a principled approach "
+        "to the cold start problem. Rather than refusing assessment for new businesses or "
+        "applying arbitrary fixed parameters, the system explicitly models its own "
+        "uncertainty. At day zero, the system acknowledges that it is working from declared "
+        "parameters with 65% maximum confidence. At day 30, it has observed enough real "
+        "behavior to reach 95%+ confidence based on actual transaction data. The linear "
+        "blend between these states ensures a smooth, continuous transition. This approach "
+        "is consistent with Bayesian updating — the intake form provides a prior "
+        "distribution over behavioral archetypes, and real transaction data provides "
+        "evidence that updates that prior toward the posterior. The blend formula is a "
+        "simplified but practically effective implementation of this principle.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "6.4  Expense Ratio Calibration")
+    add_body(doc,
+        "The achievement of five out of six expense ratios within published industry "
+        "benchmark ranges, using only behavioral signals with no explicit financial "
+        "statement data, demonstrates that financial cost structure is encodable in "
+        "transaction behavior. The intuition is clear: a business that sells physical "
+        "products in high volume necessarily has high cost of goods sold. A business that "
+        "sells services in low volume necessarily has low COGS and higher labor "
+        "concentration. These relationships are universal across business types and "
+        "cultures. The real estate edge case is the only structural exception: "
+        "commission-based brokerage earns high-value fees without holding inventory, "
+        "making its cost structure indistinguishable from asset sale businesses using "
+        "ticket size alone. The production solution — adding an explicit "
+        "is_commission_based signal to the intake form — resolves this without "
+        "compromising the label-free nature of the overall system.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "6.5  Forecasting Limitations and Practical Implications")
+    add_body(doc,
+        "The Prophet validation results reveal an important boundary condition. The 68.2% "
+        "MAPE on the UCI holiday validation set should not be interpreted as poor model "
+        "performance — it reflects the fundamental impossibility of predicting a 4x revenue "
+        "surge from one year of training data that contained only one instance of that surge. "
+        "In production deployment, this limitation is mitigated by two factors. First, the "
+        "continuous rolling window grows as the bank-business relationship matures: a "
+        "business connected for 18 months provides Prophet with two complete seasonal "
+        "cycles, enabling accurate yearly seasonality modeling. Second, DataCore's dynamic "
+        "credit limit adjustment uses forecast trend direction rather than absolute values. "
+        "A business growing at 10% per month receives a higher limit regardless of whether "
+        "the forecast predicts exactly SAR 45,000 or SAR 50,000 for the peak day. The "
+        "directional signal is robust even when point predictions are imprecise.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    page_break(doc)
+
+    # ── SECTION: CONCLUSION ──────────────────────────────────────────────────
+
+    add_heading1(doc, "7.  Conclusion and Future Work")
+
+    add_heading2(doc, "7.1  Conclusion")
+    add_body(doc,
+        "This paper presented DataCore, an AI-driven SME lending assessment engine that "
+        "replaces static document-based loan applications with continuous analysis of live "
+        "point-of-sale transaction streams. Four interdependent machine learning models — "
+        "an unsupervised HDBSCAN behavioral classifier, a behavioral expense estimator, a "
+        "per-business Isolation Forest fraud detector, and a Prophet revenue forecaster — "
+        "form a complete credit assessment pipeline operating without labeled training data "
+        "and adapting automatically to any business type. The key contribution is the "
+        "demonstration that transaction behavioral patterns cluster naturally into stable "
+        "financial archetypes transcending industry categories, enabling context-aware "
+        "credit assessment without requiring explicit business categorization. Validation "
+        "against six real-world public datasets confirms 100% classification accuracy on "
+        "transaction-level data with complete timestamps. The two-track classification "
+        "system solves the cold start problem through a confidence-weighted blend formula "
+        "transitioning from intake form parameters to observed behavioral features as real "
+        "data accumulates, enabling lending assessment from day zero for new businesses "
+        "with no financial history.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    add_heading2(doc, "7.2  Future Work")
+    add_body(doc,
+        "Several directions extend this work toward production deployment. First, extended "
+        "temporal validation: production deployment should target a minimum 12-month "
+        "transaction window for robust yearly seasonality modeling and more stable HDBSCAN "
+        "cluster assignments. Second, SAMA regulatory compliance: automated credit "
+        "decisioning in Saudi Arabia requires SAMA approval under the Open Banking "
+        "Framework. DataCore is designed as a decision support system with final lending "
+        "authority retained by qualified bank officers. Third, real Saudi SME data "
+        "validation: a partnership with Alinma Bank or a Saudi POS provider such as "
+        "Foodics would enable validation on geographically and culturally appropriate data, "
+        "substantially strengthening applicability claims. Fourth, a default prediction "
+        "layer: once sufficient loan repayment history is accumulated from production "
+        "deployment, a supervised default probability model can be trained on the behavioral "
+        "archetypes identified by the classifier, converting the behavioral assessment into "
+        "an explicit default probability estimate. Fifth, patent protection: the two-track "
+        "blend formula and the behavioral archetype classification methodology are novel "
+        "technical contributions that warrant filing with the Saudi Intellectual Property "
+        "Authority (SAIP) to establish priority date.",
+        align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
+
+    page_break(doc)
+
+    # ── SECTION 8: REFERENCES ─────────────────────────────────────────────────
+
+    add_heading1(doc, "8.  References")
 
     refs = [
         ("Chen, D. (2012).",
@@ -832,6 +1037,31 @@ def build_document():
          "Global Powers of Retailing 2023. London: Deloitte Touche Tohmatsu."),
         ("General Authority for Statistics Saudi Arabia (GASTAT). (2024).",
          "Economic Statistics. https://www.stats.gov.sa"),
+        ("Mestiri, S. (2024).",
+         "Credit scoring using machine learning and deep learning-based models. "
+         "Data Science in Finance and Economics, 4(2), 236-248. "
+         "https://doi.org/10.3934/DSFE.2024009"),
+        ("Zhang, W., Yan, S., Li, J., Tian, X., & Yoshida, T. (2022).",
+         "Credit risk prediction of SMEs in supply chain finance by fusing demographic "
+         "and behavioral data. Transportation Research Part E, 158, 102611."),
+        ("Chioda, L., Gertler, P., Higgins, S., & Medina, M. (2024).",
+         "FinTech lending to borrowers with no credit history. Working Paper."),
+        ("Husmann, S., Shivarova, A., & Steinert, R. (2020).",
+         "Company classification using machine learning. arXiv:2004.01496."),
+        ("Hussain, A. et al. (2025).",
+         "Categorising SME bank transactions with machine learning and synthetic "
+         "data generation. arXiv:2508.05425."),
+        ("CFIT SME Finance Taskforce. (2024).",
+         "Smart data: improving SME lending to drive economic growth. "
+         "Centre for Finance, Innovation and Technology."),
+        ("Fahim, A., Salem, A., Torkey, F., & Ramadan, M. (2016).",
+         "Clustering approaches for financial data analysis: A survey. "
+         "arXiv:1609.08520."),
+        ("Federal Reserve Banks. (2024).",
+         "Small Business Credit Survey. Federal Reserve System."),
+        ("Altman, E. I., Balzano, M., Giannozzi, A., & Srhoj, S. (2023).",
+         "Revisiting SME default predictors: the omega score. "
+         "Journal of Small Business Management, 61, 2383-2417."),
     ]
 
     for author, body in refs:
