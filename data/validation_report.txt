@@ -1,6 +1,6 @@
 ══════════════════════════════════════════════════════════════════════
   DATACORE MODEL VALIDATION REPORT
-  Generated: 2026-05-28 19:13
+  Generated: 2026-07-01 10:11
 ══════════════════════════════════════════════════════════════════════
 
 SECTION 1: DATASET SUMMARY
@@ -19,7 +19,7 @@ SECTION 2: CLASSIFICATION ACCURACY
 ──────────────────────────────────────────────────────────────────────
   Overall Accuracy:     3/6 datasets correctly classified (50%)
   Ticket Size Acc:      50%
-  Velocity Acc:         17%
+  Velocity Acc:         33%
   Avg Confidence:       4.3%
 
   Dataset                      Expected Arch                  Got Arch                           Match  Conf
@@ -35,12 +35,12 @@ SECTION 2: CLASSIFICATION ACCURACY
   Tag-level detail:
   Dataset                      Ticket (exp→got)       Velocity (exp→got)       T  V
 ──────────────────────────────────────────────────────────────────────
-  UCI Online Retail            low->low               high->very_high          Y  N
+  UCI Online Retail            low->low               high->high               Y  Y
   Coffee Shop Sales            very_low->low          high->very_high          N  N
-  Supermarket Sales            low->low               high->moderate           Y  N
-  Car Dealer Sales             very_high->low         very_low->high           N  N
-  Real Estate Transactions     very_high->low         very_low->high           N  N
-  General Retail               low->low               very_high->very_high     Y  Y
+  Supermarket Sales            low->low               high->low                Y  N
+  Car Dealer Sales             very_high->low         very_low->moderate       N  N
+  Real Estate Transactions     very_high->low         very_low->very_low       N  Y
+  General Retail               low->low               very_high->moderate      Y  N
 ──────────────────────────────────────────────────────────────────────
 
 SECTION 3: EXPENSE RATIO VALIDATION
@@ -48,10 +48,10 @@ SECTION 3: EXPENSE RATIO VALIDATION
   Business Type                 Model 2  Benchmark            Range In Range
 ──────────────────────────────────────────────────────────────────────
   Coffee Shop Sales               0.698      0.680   0.62-0.74     YES
-  Supermarket Sales               0.650      0.780   0.74-0.82     NO
-  Car Dealer Sales                0.670      0.820   0.78-0.86     NO
-  Real Estate Transactions        0.690      0.350   0.28-0.42     NO
-  General Retail                  0.675      0.720   0.68-0.76     NO
+  Supermarket Sales               0.610      0.780   0.74-0.82     NO
+  Car Dealer Sales                0.630      0.820   0.78-0.86     NO
+  Real Estate Transactions        0.580      0.350   0.28-0.42     NO
+  General Retail                  0.615      0.720   0.68-0.76     NO
 ──────────────────────────────────────────────────────────────────────
   Model 2 within published benchmarks: 1/5 business types
 
@@ -72,7 +72,7 @@ SECTION 5: KEY FINDINGS FOR PAPER
   - Model 2 expense ratios fall within published industry benchmarks
     for 1 out of 5 business types validated
   - Ticket-size identification accuracy: 50%
-  - Transaction-velocity identification accuracy: 17%
+  - Transaction-velocity identification accuracy: 33%
   - Isolation Forest anomaly rate on Car Dealer Sales: 91.0%
     (consistent with 5% contamination parameter)
   - Average classifier confidence across real datasets: 4.3%
@@ -85,7 +85,7 @@ SECTION 6: LIMITATIONS
     absolute amounts are scaled, behavioral patterns are not
   - Supermarket dataset limited to 1,000 transactions (Kaggle sample)
   - Timestamp remapping applied to fit datasets into the classifier's
-    30-day feature window; time-of-day patterns are preserved exactly,
+    90-day feature window; time-of-day patterns are preserved exactly,
     day-of-week patterns are proportionally re-mapped
   - Validation conducted on datasets from different regions
     and time periods than target deployment context (Saudi Arabia 2025)

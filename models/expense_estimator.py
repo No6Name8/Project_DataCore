@@ -97,9 +97,9 @@ class ExpenseEstimator:
 
         # Daily transactions → labor demand proxy
         if   daily_tx >= 150:  velocity_tag = "very_high"
-        elif daily_tx >= 50:   velocity_tag = "high"
-        elif daily_tx >= 10:   velocity_tag = "moderate"
-        elif daily_tx >= 3:    velocity_tag = "low"
+        elif daily_tx >= 60:   velocity_tag = "high"
+        elif daily_tx >= 20:   velocity_tag = "moderate"
+        elif daily_tx >= 5:    velocity_tag = "low"
         else:                  velocity_tag = "very_low"
 
         # Revenue CV → stability tag

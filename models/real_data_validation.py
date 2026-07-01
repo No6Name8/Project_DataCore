@@ -351,9 +351,9 @@ def derive_tags(raw_features):
     else:                      ticket = "very_high"
 
     if   daily_tx >= 150: velocity = "very_high"
-    elif daily_tx >= 50:  velocity = "high"
-    elif daily_tx >= 10:  velocity = "moderate"
-    elif daily_tx >= 3:   velocity = "low"
+    elif daily_tx >= 60:  velocity = "high"
+    elif daily_tx >= 20:  velocity = "moderate"
+    elif daily_tx >= 5:   velocity = "low"
     else:                 velocity = "very_low"
 
     if   rev_cv < 0.15: stability = "very_stable"
@@ -714,7 +714,12 @@ if __name__ == "__main__":
         sf = d["df"]["_scale_factor"].iloc[0]
         print(f"  {name}: scale factor {sf:.4f}")
 
-    print("\n[2b] Remapping timestamps into June 2025 window...")
+    print("\n[2b] Recording pre-remap active days (for velocity correction)...")
+    for name, d in datasets.items():
+        d["_active_days_pre"] = int(d["df"]["timestamp"].dt.strftime("%Y-%m-%d").nunique())
+        print(f"  {name}: {d['_active_days_pre']} active days over {d['orig_period']} calendar days")
+
+    print("\n[2c] Remapping timestamps into June 2025 window...")
     for name, d in datasets.items():
         d["df"] = remap_to_june2025(d["df"].copy(), period_days=90)
         t_min = d["df"]["timestamp"].min().strftime("%Y-%m-%d")
@@ -740,6 +745,21 @@ if __name__ == "__main__":
                   f"{label}")
         except Exception as e:
             print(f"    ERROR: {e}")
+
+    # Correct density features using original-period values before metrics/expense
+    # estimation. remap_to_june2025() compresses all spans to 90 days, which inflates
+    # avg_daily_transactions for long-span sparse datasets (e.g. Real Estate: 1.99 tx/day
+    # genuine density → inflated to ~111/day after remapping). We restore the true
+    # density and active_days_ratio so that velocity tags and holds_inventory checks
+    # use the actual historical business behaviour, not the remapped-window artefact.
+    for name, d in datasets.items():
+        if name not in results:
+            continue
+        raw         = results[name]["classification"]["raw_features"]
+        orig_period = d.get("orig_period", 90)
+        active_pre  = d.get("_active_days_pre", 90)
+        raw["avg_daily_transactions"] = d["rows"] / max(float(orig_period), 1.0)
+        raw["active_days_ratio"]      = active_pre / max(float(orig_period), 1.0)
 
     print("\n[4/6] Computing validation metrics...")
     metrics = compute_metrics(results)

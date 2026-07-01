@@ -55,7 +55,7 @@ class BusinessFeatureExtractor:
         # Transaction volume features
         days_active          = tx["date"].nunique()
         n_hist_days          = float(len(ALL_DATES))
-        avg_daily_tx         = n / n_hist_days
+        avg_daily_tx         = n / float(max(days_active, 1))
         transaction_velocity = float(avg_daily_tx / 24.0)
         active_days_ratio    = days_active / n_hist_days
 
