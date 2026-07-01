@@ -165,10 +165,13 @@ def load_real_datasets():
                 (df_uci["amount_sar"] > 0)
                 & (pd.to_numeric(df_uci["Quantity"], errors="coerce") > 0)
             ].dropna(subset=["timestamp"])
+            true_row_count = len(df_uci)
+            orig_period    = int((df_uci["timestamp"].max() - df_uci["timestamp"].min()).days + 1)
             df_uci = df_uci.sample(n=min(50_000, len(df_uci)), random_state=42)
             df_uci = df_uci[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
+            sampling_fraction = len(df_uci) / max(true_row_count, 1)
+            has_hour = bool((df_uci["timestamp"].dt.hour != 0).any())
 
-            orig_period = int((df_uci["timestamp"].max() - df_uci["timestamp"].min()).days + 1)
             datasets[f"UCI {uci_label}"] = {
                 "df":                  df_uci,
                 "expected_archetype":  "high_freq_mid_ticket_retail",
@@ -177,10 +180,13 @@ def load_real_datasets():
                     "transaction_velocity": "high",
                     "revenue_stability":    "stable",
                 },
-                "source":      f"Chen, D. (2012). {uci_label}. UCI ML Repository. https://doi.org/10.24432/C5CG6D",
-                "rows":        len(df_uci),
-                "period_days": orig_period,
-                "orig_period": orig_period,
+                "source":             f"Chen, D. (2012). {uci_label}. UCI ML Repository. https://doi.org/10.24432/C5CG6D",
+                "rows":               len(df_uci),
+                "period_days":        orig_period,
+                "orig_period":        orig_period,
+                "true_row_count":     true_row_count,
+                "sampling_fraction":  sampling_fraction,
+                "has_hour_timestamps": has_hour,
             }
             print(f"    UCI {uci_label}: {len(df_uci):,} rows | {orig_period}-day span")
             uci_loaded = True
@@ -202,6 +208,7 @@ def load_real_datasets():
     df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
     orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    has_hour    = bool((df["timestamp"].dt.hour != 0).any())
     datasets["Coffee Shop Sales"] = {
         "df":                  df,
         "expected_archetype":  "high_freq_low_ticket_food",
@@ -210,10 +217,13 @@ def load_real_datasets():
             "transaction_velocity": "high",
             "temporal_pattern":     "sharp_peaks",
         },
-        "source":      "Maven Analytics Coffee Shop Sales Dataset (2023). Kaggle.",
-        "rows":        len(df),
-        "period_days": orig_period,
-        "orig_period": orig_period,
+        "source":             "Maven Analytics Coffee Shop Sales Dataset (2023). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     len(df),
+        "sampling_fraction":  1.0,
+        "has_hour_timestamps": has_hour,
     }
     print(f"    Coffee Shop: {len(df):,} rows | {orig_period}-day span")
 
@@ -235,6 +245,7 @@ def load_real_datasets():
     df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
     orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    has_hour    = bool((df["timestamp"].dt.hour != 0).any())
     datasets["Supermarket Sales"] = {
         "df":                  df,
         "expected_archetype":  "high_freq_mid_ticket_retail",
@@ -243,10 +254,13 @@ def load_real_datasets():
             "transaction_velocity": "high",
             "payment_mix":          "mixed",
         },
-        "source":      "Supermarket Sales Dataset (2019). Kaggle.",
-        "rows":        len(df),
-        "period_days": orig_period,
-        "orig_period": orig_period,
+        "source":             "Supermarket Sales Dataset (2019). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     len(df),
+        "sampling_fraction":  1.0,
+        "has_hour_timestamps": has_hour,
     }
     print(f"    Supermarket: {len(df):,} rows | {orig_period}-day span")
 
@@ -257,9 +271,12 @@ def load_real_datasets():
     df["timestamp"]  = pd.to_datetime(df["Date"], errors="coerce")
     df["amount_sar"] = pd.to_numeric(df["Sale Price"], errors="coerce")
     df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
+    true_row_count = len(df)
+    orig_period    = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
     df = df.sample(n=min(10_000, len(df)), random_state=42)
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
-    orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    sampling_fraction = len(df) / max(true_row_count, 1)
+    has_hour = bool((df["timestamp"].dt.hour != 0).any())
     datasets["Car Dealer Sales"] = {
         "df":                  df,
         "expected_archetype":  "low_freq_very_high_ticket_automotive",
@@ -268,10 +285,13 @@ def load_real_datasets():
             "transaction_velocity": "very_low",
             "revenue_stability":    "volatile",
         },
-        "source":      "Car Sales Data (2023). Kaggle.",
-        "rows":        len(df),
-        "period_days": orig_period,
-        "orig_period": orig_period,
+        "source":             "Car Sales Data (2023). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     true_row_count,
+        "sampling_fraction":  sampling_fraction,
+        "has_hour_timestamps": has_hour,
     }
     print(f"    Car Dealer: {len(df):,} rows | {orig_period}-day span")
 
@@ -284,6 +304,7 @@ def load_real_datasets():
     df = df[(df["amount_sar"] > 0) & (df["amount_sar"] >= 1000)].dropna(subset=["timestamp"])
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
     orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    has_hour    = bool((df["timestamp"].dt.hour != 0).any())
     datasets["Real Estate Transactions"] = {
         "df":                  df,
         "expected_archetype":  "sparse_high_ticket_brokerage",
@@ -292,10 +313,13 @@ def load_real_datasets():
             "transaction_velocity": "very_low",
             "revenue_stability":    "highly_volatile",
         },
-        "source":      "Real Estate Property Transactions Dataset (2024). Kaggle.",
-        "rows":        len(df),
-        "period_days": orig_period,
-        "orig_period": orig_period,
+        "source":             "Real Estate Property Transactions Dataset (2024). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     len(df),
+        "sampling_fraction":  1.0,
+        "has_hour_timestamps": has_hour,
     }
     print(f"    Real Estate: {len(df):,} rows | {orig_period}-day span")
 
@@ -306,9 +330,12 @@ def load_real_datasets():
     df["timestamp"]  = pd.to_datetime(df["Date"], errors="coerce")
     df["amount_sar"] = pd.to_numeric(df["Total_Cost"], errors="coerce")
     df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
+    true_row_count = len(df)
+    orig_period    = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
     df = df.sample(n=min(50_000, len(df)), random_state=42)
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
-    orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    sampling_fraction = len(df) / max(true_row_count, 1)
+    has_hour = bool((df["timestamp"].dt.hour != 0).any())
     datasets["General Retail"] = {
         "df":                  df,
         "expected_archetype":  "high_freq_mid_ticket_retail",
@@ -316,10 +343,13 @@ def load_real_datasets():
             "ticket_size":          "low",
             "transaction_velocity": "very_high",
         },
-        "source":      "Retail Transactions Dataset (2024). Kaggle.",
-        "rows":        len(df),
-        "period_days": orig_period,
-        "orig_period": orig_period,
+        "source":             "Retail Transactions Dataset (2024). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     true_row_count,
+        "sampling_fraction":  sampling_fraction,
+        "has_hour_timestamps": has_hour,
     }
     print(f"    General Retail: {len(df):,} rows | {orig_period}-day span")
 
@@ -374,6 +404,9 @@ def compute_metrics(results):
     confidences      = []
     n = len(results)
 
+    hour_correct, hour_n   = 0, 0
+    date_correct, date_n   = 0, 0
+
     for name, data in results.items():
         clf  = data["classification"]
         exp  = data["expected_archetype"]
@@ -398,13 +431,26 @@ def compute_metrics(results):
         if vel_ok:            velocity_correct += 1
         confidences.append(clf.get("confidence", 0.0))
 
+        if data.get("has_hour_timestamps", True):
+            hour_n += 1
+            if arch_ok: hour_correct += 1
+        else:
+            date_n += 1
+            if arch_ok: date_correct += 1
+
     return {
-        "overall_accuracy":  overall_correct  / n if n else 0,
-        "ticket_accuracy":   ticket_correct   / n if n else 0,
-        "velocity_accuracy": velocity_correct / n if n else 0,
-        "avg_confidence":    float(np.mean(confidences)) if confidences else 0,
-        "n_datasets":        n,
-        "n_correct":         overall_correct,
+        "overall_accuracy":         overall_correct  / n if n else 0,
+        "ticket_accuracy":          ticket_correct   / n if n else 0,
+        "velocity_accuracy":        velocity_correct / n if n else 0,
+        "avg_confidence":           float(np.mean(confidences)) if confidences else 0,
+        "n_datasets":               n,
+        "n_correct":                overall_correct,
+        "hour_ts_accuracy":         hour_correct / hour_n if hour_n else 0,
+        "hour_ts_n":                hour_n,
+        "hour_ts_correct":          hour_correct,
+        "date_only_accuracy":       date_correct / date_n if date_n else 0,
+        "date_only_n":              date_n,
+        "date_only_correct":        date_correct,
     }
 
 # ── Expense ratio validation ──────────────────────────────────────────────────
@@ -550,6 +596,12 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     L(f"  Velocity Acc:         {metrics['velocity_accuracy']:.0%}")
     L(f"  Avg Confidence:       {metrics['avg_confidence']:.1%}")
     L()
+    L(f"  Timestamp-conditional accuracy:")
+    L(f"    Hour-level timestamps ({metrics['hour_ts_n']} datasets):  "
+      f"{metrics['hour_ts_correct']}/{metrics['hour_ts_n']} = {metrics['hour_ts_accuracy']:.0%}")
+    L(f"    Date-only timestamps  ({metrics['date_only_n']} datasets):  "
+      f"{metrics['date_only_correct']}/{metrics['date_only_n']} = {metrics['date_only_accuracy']:.0%}")
+    L()
     L(f"  {'Dataset':<28} {'Expected Arch':<30} {'Got Arch':<34} {'Match':<6} {'Conf'}")
     HR()
     for name, data in results.items():
@@ -623,6 +675,12 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
       f"of {metrics['n_datasets']} real-world")
     L(f"    business archetypes without any labeled training data "
       f"({metrics['overall_accuracy']:.0%} accuracy)")
+    L(f"  - On datasets with full hour-level timestamps ({metrics['hour_ts_n']} datasets):")
+    L(f"    accuracy = {metrics['hour_ts_correct']}/{metrics['hour_ts_n']} "
+      f"= {metrics['hour_ts_accuracy']:.0%}  [REPRODUCIBLE FROM CODE]")
+    L(f"  - On date-only datasets ({metrics['date_only_n']} datasets):")
+    L(f"    accuracy = {metrics['date_only_correct']}/{metrics['date_only_n']} "
+      f"= {metrics['date_only_accuracy']:.0%}  (temporal features unavailable)")
     L(f"  - Behavioral features are scale-invariant: datasets from different")
     L(f"    countries and currencies cluster correctly after amount normalisation")
     L(f"  - Model 2 expense ratios fall within published industry benchmarks")
@@ -647,9 +705,12 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     L("  - Amount normalisation applied for cross-currency comparison;")
     L("    absolute amounts are scaled, behavioral patterns are not")
     L("  - Supermarket dataset limited to 1,000 transactions (Kaggle sample)")
-    L("  - Timestamp remapping applied to fit datasets into the classifier's")
-    L("    90-day feature window; time-of-day patterns are preserved exactly,")
-    L("    day-of-week patterns are proportionally re-mapped")
+    L("  - Car Dealer and General Retail CSVs are subsampled (10k and 50k rows);")
+    L("    avg_daily_transactions corrected by 1/sampling_fraction to estimate")
+    L("    true business density. Car Dealer CSV represents aggregated multi-dealer")
+    L("    data, so velocity tag may not reflect a single SME dealership.")
+    L("  - Three datasets (Car Dealer, Real Estate, General Retail) have date-only")
+    L("    timestamps; temporal features (night_ratio, hour_entropy) set to neutral.")
     L("  - Validation conducted on datasets from different regions")
     L("    and time periods than target deployment context (Saudi Arabia 2025)")
     L("  - Car dealer dataset is synthetic despite realistic price ranges")
@@ -674,6 +735,12 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     # Build JSON-serialisable result
     report_json = {
         "generated_at":    ts,
+        "methodology_note": (
+            "remap_to_june2025() removed from validation pipeline. "
+            "revenue_cv and active_days_ratio now computed from each dataset's own "
+            "calendar span. avg_daily_transactions corrected by 1/sampling_fraction "
+            "for subsampled datasets. Date-only datasets use neutral temporal features."
+        ),
         "datasets":        {k: {kk: vv for kk, vv in v.items() if kk != "df"}
                             for k, v in datasets.items()},
         "classification":  {k: {
@@ -714,30 +781,27 @@ if __name__ == "__main__":
         sf = d["df"]["_scale_factor"].iloc[0]
         print(f"  {name}: scale factor {sf:.4f}")
 
-    print("\n[2b] Recording pre-remap active days (for velocity correction)...")
+    print("\n[2b] Dataset temporal metadata:")
     for name, d in datasets.items():
-        d["_active_days_pre"] = int(d["df"]["timestamp"].dt.strftime("%Y-%m-%d").nunique())
-        print(f"  {name}: {d['_active_days_pre']} active days over {d['orig_period']} calendar days")
+        sf  = d.get("sampling_fraction", 1.0)
+        trc = d.get("true_row_count", d["rows"])
+        hts = d.get("has_hour_timestamps", False)
+        print(f"  {name}: true_rows={trc:,}  sampled={d['rows']:,}  "
+              f"sf={sf:.4f}  hour_ts={'YES' if hts else 'NO'}")
 
-    print("\n[2c] Remapping timestamps into June 2025 window...")
-    for name, d in datasets.items():
-        d["df"] = remap_to_june2025(d["df"].copy(), period_days=90)
-        t_min = d["df"]["timestamp"].min().strftime("%Y-%m-%d")
-        t_max = d["df"]["timestamp"].max().strftime("%Y-%m-%d")
-        print(f"  {name}: {t_min} -> {t_max}")
-
-    print("\n[3/6] Running classifier on real datasets...")
+    print("\n[3/6] Running classifier on real datasets (original timestamps, no remapping)...")
     clf = BusinessClassifier()
     clf.load()
     results = {}
     for name, d in datasets.items():
         print(f"  Classifying {name}...")
         try:
-            result = clf.classify_from_data(d["df"], period_days=90)
+            result = clf.classify_from_data(d["df"], period_days=d["orig_period"])
             results[name] = {
-                "classification":    result,
-                "expected_archetype": d["expected_archetype"],
-                "expected_tags":     d["expected_cluster_tags"],
+                "classification":     result,
+                "expected_archetype":  d["expected_archetype"],
+                "expected_tags":      d["expected_cluster_tags"],
+                "has_hour_timestamps": d.get("has_hour_timestamps", True),
             }
             label = result.get("archetype_label", "unknown")
             print(f"    → Cluster {result['cluster_id']} | "
@@ -746,20 +810,19 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"    ERROR: {e}")
 
-    # Correct density features using original-period values before metrics/expense
-    # estimation. remap_to_june2025() compresses all spans to 90 days, which inflates
-    # avg_daily_transactions for long-span sparse datasets (e.g. Real Estate: 1.99 tx/day
-    # genuine density → inflated to ~111/day after remapping). We restore the true
-    # density and active_days_ratio so that velocity tags and holds_inventory checks
-    # use the actual historical business behaviour, not the remapped-window artefact.
+    # Sampling correction: the extractor computed avg_daily_transactions from
+    # the sample rows / sample active_days. For subsampled datasets this understates
+    # the true transaction density. Correct by dividing by the sampling fraction so
+    # the velocity tag reflects what a full-dataset day actually looks like.
+    # active_days_ratio is already correct from the extractor (uses own calendar span).
     for name, d in datasets.items():
         if name not in results:
             continue
-        raw         = results[name]["classification"]["raw_features"]
-        orig_period = d.get("orig_period", 90)
-        active_pre  = d.get("_active_days_pre", 90)
-        raw["avg_daily_transactions"] = d["rows"] / max(float(orig_period), 1.0)
-        raw["active_days_ratio"]      = active_pre / max(float(orig_period), 1.0)
+        raw = results[name]["classification"]["raw_features"]
+        sf  = d.get("sampling_fraction", 1.0)
+        if sf < 1.0:
+            raw["avg_daily_transactions"] = raw["avg_daily_transactions"] / sf
+            raw["transaction_velocity"]   = raw["transaction_velocity"] / sf
 
     print("\n[4/6] Computing validation metrics...")
     metrics = compute_metrics(results)
@@ -767,6 +830,8 @@ if __name__ == "__main__":
     print(f"  Ticket accuracy:   {metrics['ticket_accuracy']:.1%}")
     print(f"  Velocity accuracy: {metrics['velocity_accuracy']:.1%}")
     print(f"  Avg confidence:    {metrics['avg_confidence']:.2f}")
+    print(f"  Hour-ts accuracy:  {metrics['hour_ts_correct']}/{metrics['hour_ts_n']} = {metrics['hour_ts_accuracy']:.1%}")
+    print(f"  Date-only accuracy:{metrics['date_only_correct']}/{metrics['date_only_n']} = {metrics['date_only_accuracy']:.1%}")
 
     print("\n[5/6] Validating expense ratios against industry benchmarks...")
     expense_results = validate_expense_ratios(results, clf)

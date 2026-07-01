@@ -54,17 +54,23 @@ class BusinessFeatureExtractor:
 
         # Transaction volume features
         days_active          = tx["date"].nunique()
-        n_hist_days          = float(len(ALL_DATES))
+        calendar_span        = int((tx["timestamp"].max() - tx["timestamp"].min()).days) + 1
         avg_daily_tx         = n / float(max(days_active, 1))
         transaction_velocity = float(avg_daily_tx / 24.0)
-        active_days_ratio    = days_active / n_hist_days
+        active_days_ratio    = days_active / max(float(calendar_span), 1.0)
 
         # Temporal pattern features
+        # For date-only datasets (all timestamps at midnight) the hour distribution is
+        # meaningless — treat as neutral rather than all-night-zero-entropy artefacts.
+        has_time_component = bool((tx["hour"] != 0).any())
         hour_counts = tx["hour"].value_counts()
-        peak_hour_share = float(hour_counts.max() / n) if n > 0 else 0.0
-
-        night_mask  = tx["hour"].isin([23, 0, 1, 2, 3, 4])
-        night_ratio = float(night_mask.sum() / n) if n > 0 else 0.0
+        if has_time_component:
+            peak_hour_share = float(hour_counts.max() / n) if n > 0 else 0.0
+            night_mask  = tx["hour"].isin([23, 0, 1, 2, 3, 4])
+            night_ratio = float(night_mask.sum() / n) if n > 0 else 0.0
+        else:
+            peak_hour_share = 1.0 / 24        # uniform distribution (neutral)
+            night_ratio     = 6.0 / 24        # 6 night hours out of 24 (neutral)
 
         # Weekend lift: Saudi consumer weekend is Thu(3)/Fri(4)
         wknd_mask = tx["wday"].isin([3, 4])
@@ -77,14 +83,20 @@ class BusinessFeatureExtractor:
         weekend_lift = (wknd_avg / wkdy_avg) if wkdy_avg > 0 else 1.0
 
         # Shannon entropy over hourly distribution (normalized 0-1)
-        probs = (hour_counts / n).values
-        raw_entropy  = -float(np.sum(probs * np.log2(probs + 1e-12)))
-        hour_entropy = raw_entropy / np.log2(24)
+        if has_time_component:
+            probs = (hour_counts / n).values
+            raw_entropy  = -float(np.sum(probs * np.log2(probs + 1e-12)))
+            hour_entropy = raw_entropy / np.log2(24)
+        else:
+            hour_entropy = 1.0  # maximum entropy (neutral — no time signal available)
 
-        # Revenue variability
-        daily_rev  = tx.groupby("date")["amount_sar"].sum().reindex(ALL_DATES, fill_value=0.0)
-        rev_mean   = float(daily_rev.mean())
-        revenue_cv = float(daily_rev.std() / rev_mean) if rev_mean > 0 else 0.0
+        # Revenue variability — computed over active trading days only (days with ≥1 transaction).
+        # This matches the synthetic training distribution where businesses trade nearly every day,
+        # and captures genuine within-period volatility without zero-revenue gap artefacts.
+        # active_days_ratio (above) already encodes the sparseness / gap signal separately.
+        active_daily_rev = tx.groupby("date")["amount_sar"].sum()
+        rev_mean         = float(active_daily_rev.mean())
+        revenue_cv       = float(active_daily_rev.std() / rev_mean) if rev_mean > 0 else 0.0
 
         # Inter-transaction gap variability (minutes between consecutive transactions)
         if n > 1:
