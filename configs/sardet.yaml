@@ -1,0 +1,13 @@
+path: /home/user/sar/datasets/SARDet_100K
+train: images/train
+val: images/val
+test: images/test
+
+nc: 6
+names:
+  0: ship
+  1: aircraft
+  2: car
+  3: tank
+  4: bridge
+  5: harbor
