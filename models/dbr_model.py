@@ -134,15 +134,43 @@ class DBRModel:
                 "recommended_pipeline": "continue_incubator",
             }
 
-        # Rule 4: no critical fraud flags
-        from models.dscr_model import DSCRModel
-        fraud    = DSCRModel().detect_fraud(tx)
-        critical = [a for a in fraud["anomalies"] if a["severity"] == "critical"]
-        if critical:
+        # Rule 4: fraud gate — use the trained Isolation Forest model (FraudDetector).
+        # The old DSCRModel.detect_fraud() missed high-value outliers that survived the
+        # p99*2 filter and never ran behavioral_anomaly checks. FROZEN businesses
+        # (approval_frozen=True) and FLAGGED businesses with any critical-severity
+        # anomaly or fraud_score >= 60 are all blocked from SME transition.
+        from models.fraud_detector import FraudDetector
+        _saved_pkl = os.path.join(ROOT, "models", "saved", "fraud_detector.pkl")
+        _detector  = FraudDetector()
+        _detector.load(_saved_pkl)
+        fraud = _detector.assess(business_id)
+
+        if fraud["approval_frozen"]:
             return {
                 "business_id":          business_id,
                 "ready":                False,
-                "reason":               (f"{len(critical)} critical fraud flag(s) detected -- "
+                "reason":               (f"Approval frozen: fraud score {fraud['fraud_score']} with "
+                                         f"{fraud['anomalies_detected']} anomaly(ies) detected -- "
+                                         f"manual review required before pipeline transition."),
+                "recommended_pipeline": "continue_incubator",
+            }
+
+        critical = [a for a in fraud["anomalies"] if a["severity"] == "critical"]
+        if fraud["overall_status"] == "flagged" and critical:
+            return {
+                "business_id":          business_id,
+                "ready":                False,
+                "reason":               (f"{len(critical)} critical fraud flag(s) detected "
+                                         f"(score {fraud['fraud_score']}) -- "
+                                         f"manual review required before pipeline transition."),
+                "recommended_pipeline": "continue_incubator",
+            }
+
+        if fraud["overall_status"] == "flagged" and fraud["fraud_score"] >= 60:
+            return {
+                "business_id":          business_id,
+                "ready":                False,
+                "reason":               (f"High fraud risk score {fraud['fraud_score']} -- "
                                          f"manual review required before pipeline transition."),
                 "recommended_pipeline": "continue_incubator",
             }
