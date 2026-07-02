@@ -32,3 +32,7 @@ nohup.out
 
 # OS
 desktop.ini
+
+# Raw datasets — large files (two exceed GitHub's 100 MB hard limit).
+# Re-download with: bash scripts/download_real_datasets.sh
+data/real/
