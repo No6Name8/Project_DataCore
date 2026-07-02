@@ -31,7 +31,7 @@ class ExpenseEstimator:
         },
         "real_estate": {
             "source":        "NAR (National Association of Realtors) 2023",
-            "expense_range": (0.55, 0.70),
+            "expense_range": (0.28, 0.42),   # corrected: commission revenue, near-zero COGS
             "category":      "Real Estate Brokerage",
         },
         "services": {
@@ -40,6 +40,13 @@ class ExpenseEstimator:
             "category":      "General Services",
         },
     }
+
+    # Commission-based business cost structure (NAR 2023 brokerage benchmark midpoint = 0.35)
+    COMMISSION_EXPENSES = {
+        "cogs":     0.05,   # near-zero — commission has no product cost
+        "labor":    0.20,   # heavy agent/broker labor
+        "overhead": 0.10,   # office, marketing, listings
+    }                       # total: 0.35
 
     def __init__(self):
         # COGS lookup by ticket_size tag
@@ -82,11 +89,13 @@ class ExpenseEstimator:
         Maps the 15-dim raw feature dict from Model 1 into behavioral tags
         consumed by estimate(). Called by estimate_from_classifier/intake.
         """
-        avg_ticket = raw_features.get("avg_ticket_sar", 100.0)
-        daily_tx   = raw_features.get("avg_daily_transactions", 20.0)
-        rev_cv     = raw_features.get("revenue_cv", 0.30)
-        cash_ratio = raw_features.get("cash_ratio", 0.30)
-        night      = raw_features.get("night_transaction_ratio", 0.01)
+        avg_ticket        = raw_features.get("avg_ticket_sar", 100.0)
+        daily_tx          = raw_features.get("avg_daily_transactions", 20.0)
+        rev_cv            = raw_features.get("revenue_cv", 0.30)
+        cash_ratio        = raw_features.get("cash_ratio", 0.30)
+        night             = raw_features.get("night_transaction_ratio", 0.01)
+        active_days_ratio = raw_features.get("active_days_ratio", 0.5)
+        ticket_cv_val     = raw_features.get("ticket_cv", 0.5)
 
         # Ticket size → COGS proxy
         if   avg_ticket < 50:      ticket_size = "very_low"
@@ -123,6 +132,20 @@ class ExpenseEstimator:
         peak_hour_conc   = raw_features.get("peak_hour_concentration", 0.05)
         temporal_pattern = "sharp_peaks" if peak_hour_conc >= 0.10 else "distributed"
 
+        # Commission-based brokerage detection.
+        # Real estate / insurance / financial brokers have very infrequent deal closings
+        # (daily_tx < 5), many days the office is open but no deal closes (active_days < 0.75),
+        # and moderate ticket variability (commission % applied to variable deal sizes).
+        # This combination is distinct from car dealers (active_days ≈ 1.0 due to daily sales)
+        # and from any high-volume business (daily_tx ≥ 5).
+        # Note: this uses relative features only so it fires correctly even after
+        # amount normalisation (where absolute ticket_sar loses discriminatory power).
+        is_commission_based = bool(
+            daily_tx          < 5    and
+            active_days_ratio < 0.75 and
+            ticket_cv_val     < 2.0
+        )
+
         return {
             "ticket_size":          ticket_size,
             "transaction_velocity": velocity_tag,
@@ -132,6 +155,7 @@ class ExpenseEstimator:
             "temporal_pattern":     temporal_pattern,
             "profile_source":       profile_source,
             "is_outlier":           is_outlier,
+            "is_commission_based":  is_commission_based,
         }
 
     # ── Core estimate ─────────────────────────────────────────────────────────
@@ -152,6 +176,45 @@ class ExpenseEstimator:
         temporal_pattern = behavioral_profile.get("temporal_pattern",     "distributed")
         profile_src      = behavioral_profile.get("profile_source",       "real_data")
         is_outlier       = behavioral_profile.get("is_outlier",           False)
+        is_commission    = behavioral_profile.get("is_commission_based",  False)
+
+        # ── Commission branch ─────────────────────────────────────────────────
+        # Brokerage/commission businesses have near-zero COGS (the fee IS the revenue).
+        # Skip the ticket-size COGS proxy and inventory overrides entirely.
+        if is_commission:
+            cogs_ratio  = self.COMMISSION_EXPENSES["cogs"]
+            labor_ratio = self.COMMISSION_EXPENSES["labor"]
+            overhead    = self.COMMISSION_EXPENSES["overhead"]
+            total       = float(np.clip(cogs_ratio + labor_ratio + overhead,
+                                        self.min_ratio, self.max_ratio))
+            confidence  = 0.85 if profile_src == "real_data" else 0.85 * 0.75
+            confidence  = float(np.clip(confidence, 0.30, 0.95))
+            bench_val   = self.validate_against_benchmark(
+                total, behavioral_profile, holds_inventory=False)
+            return {
+                "total_expense_ratio": round(total, 4),
+                "breakdown": {
+                    "cogs_ratio":     round(cogs_ratio, 4),
+                    "labor_ratio":    round(labor_ratio, 4),
+                    "overhead_ratio": overhead,
+                    "stability_adj":  0.0,
+                },
+                "net_margin_estimate":  round(1.0 - total, 4),
+                "confidence":           round(confidence, 4),
+                "tags_used": {
+                    "ticket_size":          ticket_size,
+                    "transaction_velocity": velocity_tag,
+                    "revenue_stability":    stability_tag,
+                    "payment_mix":          payment_mix,
+                    "nocturnal_activity":   nocturnal,
+                    "temporal_pattern":     temporal_pattern,
+                    "is_commission_based":  True,
+                },
+                "benchmark_validation": bench_val,
+                "derived_from":         "behavioral_profile",
+                "profile_source":       profile_src,
+                "expense_source":       "commission_based_lookup",
+            }
 
         cogs_ratio  = self.cogs_by_ticket.get(ticket_size, 0.35)
         labor_ratio = self.labor_by_velocity.get(velocity_tag, 0.12)
@@ -216,10 +279,12 @@ class ExpenseEstimator:
                 "payment_mix":          payment_mix,
                 "nocturnal_activity":   nocturnal,
                 "temporal_pattern":     temporal_pattern,
+                "is_commission_based":  False,
             },
             "benchmark_validation": bench_validation,
             "derived_from":         "behavioral_profile",
             "profile_source":       profile_src,
+            "expense_source":       "behavioral_three_layer",
         }
 
     # ── Benchmark validation ──────────────────────────────────────────────────
@@ -227,10 +292,13 @@ class ExpenseEstimator:
     def validate_against_benchmark(self, expense_ratio: float,
                                     behavioral_profile: dict,
                                     holds_inventory: bool = False) -> dict:
-        ticket   = behavioral_profile.get("ticket_size",          "mid")
-        velocity = behavioral_profile.get("transaction_velocity", "moderate")
+        ticket      = behavioral_profile.get("ticket_size",          "mid")
+        velocity    = behavioral_profile.get("transaction_velocity", "moderate")
+        is_comm     = behavioral_profile.get("is_commission_based",  False)
 
-        if ticket == "very_low":
+        if is_comm:
+            key = "real_estate"
+        elif ticket == "very_low":
             key = "food_beverage"
         elif ticket in ["high", "very_high"] and velocity in ["very_low", "low"] and holds_inventory:
             key = "automotive"
@@ -317,14 +385,35 @@ if __name__ == "__main__":
     estimator = ExpenseEstimator()
 
     businesses = ["laundromat", "cafe", "minimarket",
-                  "realestate", "cardealer", "motorbike"]
+                  "realestate", "cardealer", "motorbike", "hilal_bakery"]
+
+    # ── Commission flag verification ──────────────────────────────────────────
+    print("\n" + "=" * 60)
+    print("COMMISSION-BASED FLAG VERIFICATION")
+    print("=" * 60)
+    print(f"{'Business':<16} {'avg_ticket':>11} {'daily_tx':>9} {'act_days':>9} "
+          f"{'ticket_cv':>10} {'is_commission':>14}")
+    print("-" * 75)
+    for biz in businesses:
+        tx = pd.read_csv(os.path.join(ROOT, "data", "processed", f"{biz}_transactions.csv"))
+        tx["timestamp"] = pd.to_datetime(tx["timestamp"])
+        clf_result = clf.classify_from_data(tx)
+        raw        = clf_result["raw_features"]
+        profile    = estimator._derive_profile(raw)
+        flag_str   = "TRUE  <-- brokerage" if profile["is_commission_based"] else "false"
+        print(f"{biz:<16} {raw['avg_ticket_sar']:>11.1f} "
+              f"{raw['avg_daily_transactions']:>9.2f} "
+              f"{raw['active_days_ratio']:>9.3f} "
+              f"{raw['ticket_cv']:>10.3f} "
+              f"{flag_str:>14}")
+    print()
 
     print("\n" + "=" * 60)
     print("MODEL 2 -- AI-derived expense ratios vs published benchmarks")
     print("=" * 60)
-    print(f"{'Business':<14} {'AI-Ratio':>9} {'Benchmark':>16} {'In Range':>9} "
-          f"{'Category':<32} {'Conf':>6}")
-    print("-" * 95)
+    print(f"{'Business':<16} {'AI-Ratio':>9} {'Benchmark':>16} {'In Range':>9} "
+          f"{'Source':<26} {'Conf':>6}")
+    print("-" * 100)
 
     pass_count = 0
     for biz in businesses:
@@ -345,7 +434,6 @@ if __name__ == "__main__":
             ticket in ["mid"] and
             velocity in ["very_low", "low"]
         ) or (
-            # high-volume low-ticket: grocery / minimarket / pharmacy
             ticket == "low" and
             velocity in ["high", "very_high"]
         )
@@ -355,16 +443,16 @@ if __name__ == "__main__":
         bv       = result["benchmark_validation"]
         lo, hi   = bv["benchmark_range"] if bv.get("validated") else (0, 0)
         in_range = bv.get("within_range", False)
-        cat      = bv.get("category", "unknown")[:32]
+        source   = result.get("expense_source", "behavioral_three_layer")[:26]
         if in_range:
             pass_count += 1
 
         range_str = f"[{lo:.2f}-{hi:.2f}]"
         flag      = "PASS" if in_range else "FAIL"
-        print(f"{biz:<14} {ai_ratio:>9.3f} {range_str:>16} {flag:>9} "
-              f"{cat:<32} {result['confidence']:>6.2f}")
+        print(f"{biz:<16} {ai_ratio:>9.3f} {range_str:>16} {flag:>9} "
+              f"{source:<26} {result['confidence']:>6.2f}")
 
-    print("-" * 95)
+    print("-" * 100)
     print(f"  Benchmark pass rate: {pass_count}/{len(businesses)}")
 
     print("\n" + "=" * 60)

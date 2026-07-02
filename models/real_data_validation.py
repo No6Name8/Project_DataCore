@@ -510,7 +510,11 @@ def validate_expense_ratios(results, clf):
         bm  = REAL_BENCHMARKS[bm_key]
         raw = data["classification"]["raw_features"]
 
-        tick, vel, _ = derive_tags(raw)
+        # Use _derive_profile() so is_commission_based is derived and included
+        profile = estimator._derive_profile(raw, profile_source="real_data", is_outlier=False)
+        tick    = profile["ticket_size"]
+        vel     = profile["transaction_velocity"]
+
         active_days = raw.get("active_days_ratio", 0.9)
         holds_inv = (
             tick in ["high", "very_high"]
@@ -520,32 +524,28 @@ def validate_expense_ratios(results, clf):
             tick in ["mid"] and vel in ["very_low", "low"]
         )
 
-        profile = {
-            "ticket_size":          tick,
-            "transaction_velocity": vel,
-            "revenue_stability":    derive_tags(raw)[2],
-            "payment_mix":          "mixed",
-            "nocturnal_activity":   "minimal",
-            "profile_source":       "real_data",
-            "is_outlier":           False,
-        }
         exp_result   = estimator.estimate(profile, holds_inventory=holds_inv)
         model2_ratio = exp_result["total_expense_ratio"]
         within_range = bm["range"][0] <= model2_ratio <= bm["range"][1]
         deviation    = model2_ratio - bm["expense_ratio"]
+        is_comm      = profile.get("is_commission_based", False)
+        expense_src  = exp_result.get("expense_source", "behavioral_three_layer")
 
         print(f"    {name:<28}: model={model2_ratio:.3f} | "
               f"benchmark={bm['expense_ratio']:.3f} | "
-              f"range={bm['range']} | within={'YES' if within_range else 'NO'}")
+              f"range={bm['range']} | within={'YES' if within_range else 'NO'}"
+              + (f" [commission]" if is_comm else ""))
 
         expense_results[name] = {
-            "model2_ratio":      model2_ratio,
-            "benchmark_ratio":   bm["expense_ratio"],
-            "benchmark_range":   list(bm["range"]),
-            "within_range":      within_range,
-            "deviation":         round(deviation, 4),
-            "benchmark_source":  bm["source"],
-            "holds_inventory":   holds_inv,
+            "model2_ratio":         model2_ratio,
+            "benchmark_ratio":      bm["expense_ratio"],
+            "benchmark_range":      list(bm["range"]),
+            "within_range":         within_range,
+            "deviation":            round(deviation, 4),
+            "benchmark_source":     bm["source"],
+            "holds_inventory":      holds_inv,
+            "is_commission_based":  is_comm,
+            "expense_source":       expense_src,
         }
 
     return expense_results
@@ -832,7 +832,15 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
                                 "raw_features":       v["classification"].get("raw_features"),
                             } for k, v in results.items()},
         "metrics":         metrics,
-        "expense_results": expense_results,
+        "expense_results":                expense_results,
+        "expense_ratio_pass_rate":        f"{sum(1 for v in expense_results.values() if v['within_range'])}/{len(expense_results)}",
+        "businesses_flagged_commission_based": [
+            k for k, v in expense_results.items() if v.get("is_commission_based")
+        ],
+        "expense_source_per_business": {
+            k: v.get("expense_source", "behavioral_three_layer")
+            for k, v in expense_results.items()
+        },
         "fraud_results":   fraud_results,
         "text":            report_text,
     }
