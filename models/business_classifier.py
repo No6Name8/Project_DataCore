@@ -98,7 +98,9 @@ class BusinessFeatureExtractor:
         rev_mean         = float(active_daily_rev.mean())
         revenue_cv       = float(active_daily_rev.std() / rev_mean) if rev_mean > 0 else 0.0
 
-        # Inter-transaction gap variability (minutes between consecutive transactions)
+        # Inter-transaction gap variability (minutes between consecutive transactions).
+        # Raw gaps are used without capping: overnight and weekend gaps are genuine
+        # operating-pattern signals that the archetype boundaries were calibrated to.
         if n > 1:
             sorted_ts = tx["timestamp"].sort_values().reset_index(drop=True)
             gaps_min  = sorted_ts.diff().dt.total_seconds().dropna() / 60.0
