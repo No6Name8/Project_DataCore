@@ -18,14 +18,16 @@ from models.revenue_forecaster  import RevenueForecaster
 from models.dscr_model          import DSCRModel
 from models.dbr_model           import DBRModel
 
-BUSINESS_IDS = ["laundromat", "cafe", "minimarket", "realestate", "cardealer", "motorbike"]
+BUSINESS_IDS = ["laundromat", "cafe", "minimarket", "realestate", "cardealer", "motorbike",
+                "hilal_bakery"]
 NAMES = {
-    "laundromat": "Al Noor Laundromat",
-    "cafe":       "Qahwa Corner Cafe",
-    "minimarket": "Baraka Minimarket",
-    "realestate": "Majd Real Estate",
-    "cardealer":  "Rawabi Auto Gallery",
-    "motorbike":  "Saqr Motorbikes",
+    "laundromat":    "Al Noor Laundromat",
+    "cafe":          "Qahwa Corner Cafe",
+    "minimarket":    "Baraka Minimarket",
+    "realestate":    "Majd Real Estate",
+    "cardealer":     "Rawabi Auto Gallery",
+    "motorbike":     "Saqr Motorbikes",
+    "hilal_bakery":  "Hilal Bakery",
 }
 
 W = 120

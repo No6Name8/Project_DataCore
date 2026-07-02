@@ -19,12 +19,13 @@ FORECAST_START = "2025-07-01"
 FORECAST_END   = "2025-07-30"
 
 CREDIT_CEILINGS = {
-    "laundromat":   500_000,
-    "cafe":         400_000,
-    "minimarket": 1_500_000,
-    "realestate": 2_000_000,
-    "cardealer":  5_000_000,
-    "motorbike":  1_000_000,
+    "laundromat":    500_000,
+    "cafe":          400_000,
+    "minimarket":  1_500_000,
+    "realestate":  2_000_000,
+    "cardealer":   5_000_000,
+    "motorbike":   1_000_000,
+    "hilal_bakery":  400_000,
 }
 
 
@@ -189,7 +190,8 @@ class RevenueForecaster:
 
     def fit_all(self):
         businesses = ["laundromat", "cafe", "minimarket",
-                      "realestate", "cardealer", "motorbike"]
+                      "realestate", "cardealer", "motorbike",
+                      "hilal_bakery"]
         print("Fitting Prophet models for all businesses...")
         for biz in businesses:
             tx = pd.read_csv(os.path.join(DATA_DIR, f"{biz}_transactions.csv"))

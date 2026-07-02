@@ -326,22 +326,24 @@ class FraudDetector:
         # ── Incident 3: Consolidated behavioral anomaly ───────────────────────
         behavioral = anomalies_df[anomalies_df["incident_type"] == "behavioral_anomaly"]
         if len(behavioral) > 0:
-            max_pct       = float(behavioral["anomaly_percentile"].max())
-            n_high_dates  = int(
-                (behavioral.groupby("date")["anomaly_percentile"].max() >= 97).sum())
-            n_crit_dates  = int(
-                (behavioral.groupby("date")["anomaly_percentile"].max() >= 99).sum())
-
-            if   n_crit_dates >= 3: severity = "critical"
-            elif n_crit_dates >= 1: severity = "high"
-            elif n_high_dates >= 3: severity = "high"
-            else:                   severity = "medium"
+            max_pct = float(behavioral["anomaly_percentile"].max())
+            total_tx = len(scored_df)
+            # Severity based on anomaly rate relative to expected 1% baseline.
+            # n_crit_dates is self-referential: flagged transactions are always
+            # the worst-scoring in their own batch, so anomaly_percentile ≈ 100
+            # for all of them regardless of true fraud severity. Rate-based
+            # assessment is calibration-independent and meaningful across both
+            # business-specific and cluster fallback models.
+            behavioral_rate = len(behavioral) / total_tx if total_tx > 0 else 0
+            if   behavioral_rate >= 0.02:  severity = "critical"
+            elif behavioral_rate >= 0.005: severity = "high"
+            else:                          severity = "medium"
 
             anomaly_list.append({
                 "date":               behavioral["date"].iloc[0],
                 "type":               "behavioral_anomaly",
                 "description":        (f"{len(behavioral)} transactions with unusual patterns "
-                                       f"({n_crit_dates} high-alert date(s), "
+                                       f"({behavioral_rate*100:.2f}% rate, "
                                        f"max percentile: {max_pct:.0f})"),
                 "severity":           severity,
                 "tx_count":           len(behavioral),
@@ -381,9 +383,27 @@ class FraudDetector:
         else:
             tx = transactions_df.copy()
 
-        stats  = self.business_models.get(business_id, {}).get("stats")
+        stats = self.business_models.get(business_id, {}).get("stats")
+
+        # For businesses without a dedicated model, auto-classify to get the
+        # cluster and use the cluster fallback model. This avoids the pathological
+        # case where a business-specific model trained on its own clean data always
+        # flags its own bottom 1% as anomalous (mathematical inevitability).
+        effective_cluster_id = cluster_id
+        if business_id not in self.business_models and cluster_id is None:
+            try:
+                from models.business_classifier import BusinessClassifier
+                _clf = BusinessClassifier()
+                _clf.load()
+                tx_tmp = tx.copy()
+                tx_tmp["timestamp"] = pd.to_datetime(tx_tmp["timestamp"])
+                result = _clf.classify_from_data(tx_tmp)
+                effective_cluster_id = result["cluster_id"]
+            except Exception:
+                pass  # score_transactions will raise ValueError below if still no model
+
         scored = self.score_transactions(tx, business_id=business_id,
-                                         cluster_id=cluster_id)
+                                         cluster_id=effective_cluster_id)
         return self.generate_fraud_report(scored, business_id, stats)
 
     # ── Persistence ───────────────────────────────────────────────────────────

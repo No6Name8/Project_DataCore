@@ -31,12 +31,13 @@ PERIOD_DAYS   = 30
 ALL_DATES     = pd.date_range("2025-06-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
 
 CREDIT_CEILINGS = {
-    "laundromat":   500_000,
-    "cafe":         400_000,
-    "minimarket": 1_500_000,
-    "realestate": 2_000_000,
-    "cardealer":  5_000_000,
-    "motorbike":  1_000_000,
+    "laundromat":    500_000,
+    "cafe":          400_000,
+    "minimarket":  1_500_000,
+    "realestate":  2_000_000,
+    "cardealer":   5_000_000,
+    "motorbike":   1_000_000,
+    "hilal_bakery":  400_000,
 }
 
 

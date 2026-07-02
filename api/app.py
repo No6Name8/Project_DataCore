@@ -26,12 +26,13 @@ CORS(app)
 
 # ── Business registry ─────────────────────────────────────────────────────────
 BUSINESSES = {
-    "laundromat": {"id":"laundromat","name":"Al Noor Laundromat",       "type":"laundromat","sector":"services",     "loan_pipeline":"sme"},
-    "cafe":       {"id":"cafe",      "name":"Qahwa Corner Cafe",         "type":"cafe",      "sector":"food_beverage","loan_pipeline":"sme"},
-    "minimarket": {"id":"minimarket","name":"Baraka Minimarket",         "type":"minimarket","sector":"retail",       "loan_pipeline":"sme"},
-    "realestate": {"id":"realestate","name":"Majd Real Estate Office",   "type":"realestate","sector":"real_estate",  "loan_pipeline":"sme"},
-    "cardealer":  {"id":"cardealer", "name":"Rawabi Auto Gallery",       "type":"cardealer", "sector":"automotive",   "loan_pipeline":"sme"},
-    "motorbike":  {"id":"motorbike", "name":"Saqr Motorbikes",           "type":"motorbike", "sector":"automotive",   "loan_pipeline":"sme"},
+    "laundromat":   {"id":"laundromat",  "name":"Al Noor Laundromat",     "type":"laundromat", "sector":"services",     "loan_pipeline":"sme"},
+    "cafe":         {"id":"cafe",        "name":"Qahwa Corner Cafe",       "type":"cafe",       "sector":"food_beverage","loan_pipeline":"sme"},
+    "minimarket":   {"id":"minimarket",  "name":"Baraka Minimarket",       "type":"minimarket", "sector":"retail",       "loan_pipeline":"sme"},
+    "realestate":   {"id":"realestate",  "name":"Majd Real Estate Office", "type":"realestate", "sector":"real_estate",  "loan_pipeline":"sme"},
+    "cardealer":    {"id":"cardealer",   "name":"Rawabi Auto Gallery",     "type":"cardealer",  "sector":"automotive",   "loan_pipeline":"sme"},
+    "motorbike":    {"id":"motorbike",   "name":"Saqr Motorbikes",         "type":"motorbike",  "sector":"automotive",   "loan_pipeline":"sme"},
+    "hilal_bakery": {"id":"hilal_bakery","name":"Hilal Bakery",            "type":"bakery",     "sector":"food_beverage","loan_pipeline":"sme"},
 }
 VALID_BUSINESSES = list(BUSINESSES.keys())
 
