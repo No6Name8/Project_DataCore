@@ -1,6 +1,6 @@
 ══════════════════════════════════════════════════════════════════════
   DATACORE MODEL VALIDATION REPORT
-  Generated: 2026-07-02 03:01
+  Generated: 2026-07-03 00:16
 ══════════════════════════════════════════════════════════════════════
 
 VALIDATION SCOPE
@@ -8,15 +8,18 @@ VALIDATION SCOPE
   The classifier targets Saudi SME retail behavioral archetypes.
   In-scope: single-location SME businesses with hour-level timestamp resolution.
 
-  In-scope datasets (3):
+  In-scope datasets (5):
     + Coffee Shop Sales
     + Supermarket Sales
     + General Retail
+    + Pharmacy Sales
+    + Bakery Sales
 
-  Out-of-scope datasets (3):
+  Out-of-scope datasets (4):
     - UCI Online Retail -- B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range
     - Car Dealer Sales -- Date-only timestamps; aggregated multi-dealer data
     - Real Estate Transactions -- Date-only timestamps; brokerage cost model differs from retail SME
+    - Restaurant Sales -- Date-only timestamps; multi-restaurant aggregated data
 ──────────────────────────────────────────────────────────────────────
 
 SECTION 1: DATASET SUMMARY
@@ -29,23 +32,26 @@ SECTION 1: DATASET SUMMARY
   Car Dealer Sales               10,000     366d  Car Sales Data (2023)
   Real Estate Transactions       10,000    5020d  Real Estate Property Transacti
   General Retail                 50,000    1600d  Retail Transactions Dataset (2
+  Pharmacy Sales                 50,000    2106d  Rounak Roy Chowdhury (2020)
+  Restaurant Sales                  232     366d  Restaurant Sales Dataset (2024
+  Bakery Sales                   20,507     693d  Bread Basket Dataset (2017)
 ──────────────────────────────────────────────────────────────────────
 
 SECTION 2: CLASSIFICATION ACCURACY
 ──────────────────────────────────────────────────────────────────────
-  In-scope Accuracy:    2/3 (67%)  <-- primary paper metric
-  Overall Accuracy:     2/6 datasets correctly classified (33%)
-  Ticket Size Acc:      50%
-  Velocity Acc:         33%
-  Avg Confidence:       4.2%
+  In-scope Accuracy:    3/5 (60%)  <-- primary paper metric
+  Overall Accuracy:     3/9 datasets correctly classified (33%)
+  Ticket Size Acc:      56%
+  Velocity Acc:         44%
+  Avg Confidence:       4.4%
 
   Scope-stratified accuracy:
-    In-scope  (3 datasets):         2/3 = 67%
-    Out-of-scope (3 datasets):  0/3 = 0%
+    In-scope  (5 datasets):         3/5 = 60%
+    Out-of-scope (4 datasets):  0/4 = 0%
 
   Timestamp-conditional accuracy:
-    Hour-level timestamps (4 datasets):  2/4 = 50%
-    Date-only timestamps  (2 datasets):  0/2 = 0%
+    Hour-level timestamps (6 datasets):  3/6 = 50%
+    Date-only timestamps  (3 datasets):  0/3 = 0%
 
   Dataset                      Expected Arch                  Got Arch                       Match  Conf Scope
 ──────────────────────────────────────────────────────────────────────
@@ -55,6 +61,9 @@ SECTION 2: CLASSIFICATION ACCURACY
   Car Dealer Sales             low_freq_very_high_ticket_au   high_freq_mid_ticket_retail    NO     0.00  OUT
   Real Estate Transactions     sparse_high_ticket_brokerage   high_freq_mid_ticket_retail    NO     0.00  OUT
   General Retail               high_freq_mid_ticket_retail    high_freq_mid_ticket_retail    YES    0.00  IN
+  Pharmacy Sales               high_freq_mid_ticket_retail    low_ticket_steady_essential    NO     0.14  IN
+  Restaurant Sales             high_freq_low_ticket_food      high_freq_mid_ticket_retail    NO     0.00  OUT
+  Bakery Sales                 high_freq_low_ticket_food      high_freq_low_ticket_food      YES    0.00  IN
 ──────────────────────────────────────────────────────────────────────
 
   Tag-level detail:
@@ -66,19 +75,25 @@ SECTION 2: CLASSIFICATION ACCURACY
   Car Dealer Sales             very_high->low         very_low->very_high      N  N
   Real Estate Transactions     very_high->low         very_low->very_low       N  Y
   General Retail               low->low               very_high->very_high     Y  Y
+  Pharmacy Sales               low->low               moderate->moderate       Y  Y
+  Restaurant Sales             low->low               low->very_low            Y  N
+  Bakery Sales                 very_low->low          high->high               N  Y
 ──────────────────────────────────────────────────────────────────────
 
 SECTION 3: EXPENSE RATIO VALIDATION
 ──────────────────────────────────────────────────────────────────────
   Business Type                 Model 2  Benchmark            Range In Range
 ──────────────────────────────────────────────────────────────────────
-  Coffee Shop Sales               0.698      0.680   0.62-0.74     YES
-  Supermarket Sales               0.610      0.780   0.74-0.82     NO
-  Car Dealer Sales                0.690      0.820   0.78-0.86     NO
-  Real Estate Transactions        0.600      0.350   0.28-0.42     NO
-  General Retail                  0.690      0.720   0.68-0.76     YES
+  Coffee Shop Sales               0.728      0.680   0.62-0.74     YES
+  Supermarket Sales               0.640      0.780   0.74-0.82     NO
+  Car Dealer Sales                0.760      0.820   0.78-0.86     NO
+  Real Estate Transactions        0.350      0.350   0.28-0.42     YES
+  General Retail                  0.760      0.720   0.68-0.76     YES
+  Pharmacy Sales                  0.668      0.750   0.70-0.80     NO
+  Restaurant Sales                0.350      0.650   0.60-0.70     NO
+  Bakery Sales                    0.708      0.720   0.67-0.77     YES
 ──────────────────────────────────────────────────────────────────────
-  Model 2 within published benchmarks: 2/5 business types
+  Model 2 within published benchmarks: 4/8 business types
 
 SECTION 4: FRAUD DETECTION VALIDATION
 ──────────────────────────────────────────────────────────────────────
@@ -90,24 +105,24 @@ SECTION 4: FRAUD DETECTION VALIDATION
 
 SECTION 5: KEY FINDINGS FOR PAPER
 ──────────────────────────────────────────────────────────────────────
-  - PRIMARY CLAIM (in-scope datasets, n=3):
-    In-scope accuracy = 2/3 = 67%  [REPRODUCIBLE FROM CODE]
-    In-scope datasets: Coffee Shop Sales, Supermarket Sales, General Retail
-  - The unsupervised classifier correctly identified 2 out of 6 real-world
+  - PRIMARY CLAIM (in-scope datasets, n=5):
+    In-scope accuracy = 3/5 = 60%  [REPRODUCIBLE FROM CODE]
+    In-scope datasets: Coffee Shop Sales, Supermarket Sales, General Retail, Pharmacy Sales, Bakery Sales
+  - The unsupervised classifier correctly identified 3 out of 9 real-world
     business archetypes without any labeled training data (33% overall across all 6 datasets)
-  - On datasets with full hour-level timestamps (4 datasets):
-    accuracy = 2/4 = 50%
-  - On date-only datasets (2 datasets):
-    accuracy = 0/2 = 0%  (temporal features unavailable)
+  - On datasets with full hour-level timestamps (6 datasets):
+    accuracy = 3/6 = 50%
+  - On date-only datasets (3 datasets):
+    accuracy = 0/3 = 0%  (temporal features unavailable)
   - Behavioral features are scale-invariant: datasets from different
     countries and currencies cluster correctly after amount normalisation
   - Model 2 expense ratios fall within published industry benchmarks
-    for 2 out of 5 business types validated
-  - Ticket-size identification accuracy: 50%
-  - Transaction-velocity identification accuracy: 33%
+    for 4 out of 8 business types validated
+  - Ticket-size identification accuracy: 56%
+  - Transaction-velocity identification accuracy: 44%
   - Isolation Forest anomaly rate on Car Dealer Sales: 72.4%
     (consistent with 5% contamination parameter)
-  - Average classifier confidence across real datasets: 4.2%
+  - Average classifier confidence across real datasets: 4.4%
 
 SECTION 6: LIMITATIONS
 ──────────────────────────────────────────────────────────────────────
@@ -134,9 +149,14 @@ CITATIONS
   Car Sales Data (2023). Kaggle.
   Real Estate Property Transactions Dataset (2024). Kaggle.
   Retail Transactions Dataset (2024). Kaggle.
+  Rounak Roy Chowdhury (2020). Pharma Sales Data. Kaggle.
+  Restaurant Sales Dataset (2024). Kaggle.
+  Bread Basket Dataset (2017). Kaggle.
   National Restaurant Association (2023). Restaurant Industry Outlook.
   Deloitte (2023). Global Powers of Retailing.
   NADA (2023). Annual Dealership Financial Profile.
   NAR (2023). Real Estate Industry Statistics.
   McKinsey (2023). The State of Grocery Retail.
+  NCPA (2023). NCPA Digest: Independent Community Pharmacy.
+  SCORE (2023). Bakery Industry Small Business Statistics.
 ══════════════════════════════════════════════════════════════════════

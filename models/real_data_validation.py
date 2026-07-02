@@ -52,6 +52,21 @@ REAL_BENCHMARKS = {
         "source": "McKinsey (2023). The State of Grocery Retail.",
         "range": (0.68, 0.76),
     },
+    "pharmacy_retail": {
+        "expense_ratio": 0.75,
+        "source": "NCPA (2023). NCPA Digest: Independent Community Pharmacy.",
+        "range": (0.70, 0.80),
+    },
+    "restaurant_food_service": {
+        "expense_ratio": 0.65,
+        "source": "National Restaurant Association (2023). Restaurant Industry Outlook.",
+        "range": (0.60, 0.70),
+    },
+    "bakery_food_service": {
+        "expense_ratio": 0.72,
+        "source": "SCORE (2023). Bakery Industry Small Business Statistics.",
+        "range": (0.67, 0.77),
+    },
 }
 
 # Which benchmark key applies to each dataset name
@@ -61,6 +76,9 @@ BENCHMARK_MAP = {
     "Car Dealer Sales":         "cardealer_automotive",
     "Real Estate Transactions": "realestate_brokerage",
     "General Retail":           "retail_general",
+    "Pharmacy Sales":           "pharmacy_retail",
+    "Restaurant Sales":         "restaurant_food_service",
+    "Bakery Sales":             "bakery_food_service",
 }
 
 # Scope classification: which datasets are within the model's design envelope
@@ -73,6 +91,9 @@ DATASET_SCOPE = {
     "General Retail":           "in_scope",       # SME retail, hour timestamps
     "Car Dealer Sales":         "out_of_scope",   # No hour-level timestamps
     "Real Estate Transactions": "out_of_scope",   # No hour-level timestamps + brokerage cost model
+    "Pharmacy Sales":           "in_scope",       # SME retail, hour timestamps
+    "Restaurant Sales":         "out_of_scope",   # Date-only timestamps
+    "Bakery Sales":             "in_scope",       # SME retail, hour timestamps
 }
 
 DATASET_SCOPE_REASON = {
@@ -80,6 +101,7 @@ DATASET_SCOPE_REASON = {
     "UCI Online Retail II":     "B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range",
     "Car Dealer Sales":         "Date-only timestamps; aggregated multi-dealer data",
     "Real Estate Transactions": "Date-only timestamps; brokerage cost model differs from retail SME",
+    "Restaurant Sales":         "Date-only timestamps; multi-restaurant aggregated data",
 }
 
 # Keywords that must all appear in the actual archetype_label for a match
@@ -371,6 +393,96 @@ def load_real_datasets():
         "has_hour_timestamps": has_hour,
     }
     print(f"    General Retail: {len(df):,} rows | {orig_period}-day span")
+
+    # ── G: Pharmacy Sales (saleshourly — melt drug cols to long format) ───────
+    print("  Loading Pharmacy Sales...")
+    path = os.path.join(REAL_DIR, "real_pharmacy_pharma_sales.csv")
+    df = pd.read_csv(path)
+    drug_cols = ["M01AB", "M01AE", "N02BA", "N02BE", "N05B", "N05C", "R03", "R06"]
+    df["_ts"] = pd.to_datetime(df["datum"], errors="coerce")
+    df = df.melt(id_vars=["_ts"], value_vars=drug_cols, var_name="_drug", value_name="amount_sar")
+    df.rename(columns={"_ts": "timestamp"}, inplace=True)
+    df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
+    true_row_count = len(df)
+    orig_period    = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    df = df.sample(n=min(50_000, len(df)), random_state=42)
+    df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
+    sampling_fraction = len(df) / max(true_row_count, 1)
+    has_hour = bool((df["timestamp"].dt.hour != 0).any())
+    datasets["Pharmacy Sales"] = {
+        "df":                  df,
+        "expected_archetype":  "high_freq_mid_ticket_retail",
+        "expected_cluster_tags": {
+            "ticket_size":          "low",
+            "transaction_velocity": "moderate",
+            "revenue_stability":    "stable",
+        },
+        "source":             "Rounak Roy Chowdhury (2020). Pharma Sales Data. Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     true_row_count,
+        "sampling_fraction":  sampling_fraction,
+        "has_hour_timestamps": has_hour,
+    }
+    print(f"    Pharmacy: {len(df):,} rows | {orig_period}-day span")
+
+    # ── H: Restaurant Sales (single restaurant filtered, date-only) ───────────
+    print("  Loading Restaurant Sales...")
+    path = os.path.join(REAL_DIR, "real_restaurant_sales.csv")
+    df = pd.read_csv(path)
+    top_rid = df.groupby("restaurant_id").size().idxmax()
+    df = df[df["restaurant_id"] == top_rid].copy()
+    df["timestamp"]  = pd.to_datetime(df["date"], errors="coerce")
+    df["amount_sar"] = pd.to_numeric(df["actual_selling_price"], errors="coerce")
+    df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
+    df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
+    orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    has_hour    = bool((df["timestamp"].dt.hour != 0).any())
+    datasets["Restaurant Sales"] = {
+        "df":                  df,
+        "expected_archetype":  "high_freq_low_ticket_food",
+        "expected_cluster_tags": {
+            "ticket_size":          "low",
+            "transaction_velocity": "low",
+        },
+        "source":             "Restaurant Sales Dataset (2024). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     len(df),
+        "sampling_fraction":  1.0,
+        "has_hour_timestamps": has_hour,
+    }
+    print(f"    Restaurant: {len(df):,} rows | {orig_period}-day span | restaurant_id={top_rid}")
+
+    # ── I: Bakery Sales (item-level rows with hour timestamps) ────────────────
+    print("  Loading Bakery Sales...")
+    path = os.path.join(REAL_DIR, "real_bakery_sales.csv")
+    df = pd.read_csv(path)
+    df["timestamp"]  = pd.to_datetime(df["DateTime"], errors="coerce")
+    df["amount_sar"] = 1.0  # one baked item per row; amounts normalised to SAR 150 median
+    df = df.dropna(subset=["timestamp"])
+    df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
+    orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+    has_hour    = bool((df["timestamp"].dt.hour != 0).any())
+    datasets["Bakery Sales"] = {
+        "df":                  df,
+        "expected_archetype":  "high_freq_low_ticket_food",
+        "expected_cluster_tags": {
+            "ticket_size":          "very_low",
+            "transaction_velocity": "high",
+            "temporal_pattern":     "sharp_peaks",
+        },
+        "source":             "Bread Basket Dataset (2017). Kaggle.",
+        "rows":               len(df),
+        "period_days":        orig_period,
+        "orig_period":        orig_period,
+        "true_row_count":     len(df),
+        "sampling_fraction":  1.0,
+        "has_hour_timestamps": has_hour,
+    }
+    print(f"    Bakery: {len(df):,} rows | {orig_period}-day span")
 
     return datasets
 
