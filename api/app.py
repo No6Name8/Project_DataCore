@@ -73,8 +73,9 @@ def load_models():
 
 
 # ── Model result cache (computed once per business per process lifetime) ──────
-_MODEL_CACHE = {}
-_FRAUD_CACHE = {}
+_MODEL_CACHE      = {}
+_FRAUD_CACHE      = {}
+_TRANSITION_CACHE = {}
 
 
 def get_model_result(bid):
@@ -87,6 +88,12 @@ def get_fraud_result(bid):
     if bid not in _FRAUD_CACHE:
         _FRAUD_CACHE[bid] = _detector.assess(bid)
     return _FRAUD_CACHE[bid]
+
+
+def get_transition_result(bid):
+    if bid not in _TRANSITION_CACHE:
+        _TRANSITION_CACHE[bid] = _dbr.transition_readiness(bid)
+    return _TRANSITION_CACHE[bid]
 
 
 # ── Raw CSV cache ─────────────────────────────────────────────────────────────
@@ -138,7 +145,8 @@ def build_summary(bid):
 def shape_dscr(bid, r):
     fr = r["fraud_assessment"]
     first_reason = fr["anomalies"][0]["description"] if fr["anomalies"] else None
-    dynamic = _forecaster.compute_dynamic_credit_limit(bid, r["credit_limit_sar"])
+    dynamic      = _forecaster.compute_dynamic_credit_limit(bid, r["credit_limit_sar"])
+    transition   = get_transition_result(bid)
     return {
         "business_id":               bid,
         "computed_at":               r["computed_at"],
@@ -163,6 +171,12 @@ def shape_dscr(bid, r):
         "fraud_flag":                fr["approval_frozen"] or fr["fraud_score"] > 0,
         "fraud_reason":              first_reason,
         "assessment_date":           r["computed_at"],
+        "transition_readiness": {
+            "decision":          transition["decision"],
+            "blocking_reasons":  transition["blocking_reasons"],
+            "gates_passed":      transition["gates_passed"],
+            "recommended_pipeline": transition["recommended_pipeline"],
+        },
     }
 
 # =============================================================================
@@ -390,7 +404,22 @@ def transition_check(business_id):
     try:
         if business_id not in VALID_BUSINESSES:
             return jsonify({"error": f"Unknown business: {business_id}"}), 404
-        return jsonify(_dbr.transition_readiness(business_id))
+        return jsonify(get_transition_result(business_id))
+    except Exception as e:
+        return jsonify({"error": str(e), "business_id": business_id}), 500
+
+
+@app.route("/api/<business_id>/classify")
+def get_classify(business_id):
+    try:
+        if business_id not in VALID_BUSINESSES:
+            return jsonify({"error": f"Unknown business: {business_id}"}), 404
+        tx = load_tx(business_id)
+        tx["timestamp"] = pd.to_datetime(tx["timestamp"])
+        result = _classifier.classify_from_data(tx)
+        result["business_id"] = business_id
+        result["business_name"] = BUSINESSES[business_id]["name"]
+        return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e), "business_id": business_id}), 500
 

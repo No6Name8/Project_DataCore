@@ -84,13 +84,17 @@ class DBRModel:
     # ── Transition readiness ──────────────────────────────────────────────────
 
     def transition_readiness(self, business_id):
-        tx_path = os.path.join(DATA_DIR, f"{business_id}_transactions.csv")
+        tx_path      = os.path.join(DATA_DIR, f"{business_id}_transactions.csv")
+        gates_passed = []
 
         if not os.path.exists(tx_path):
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               "No transaction data found.",
+                "blocking_reasons":     ["No transaction data found for this business ID"],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
 
@@ -105,9 +109,15 @@ class DBRModel:
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               f"Only {unique_days} days of transaction data (minimum: 14).",
+                "blocking_reasons":     [f"Insufficient data: {unique_days} days of transactions "
+                                         f"(minimum 14 required to establish reliable patterns)"],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
+        gates_passed.append(f"Data window gate: {unique_days} days of transaction history "
+                            f"(minimum 14)")
 
         # Rule 2: avg daily revenue > 500 SAR
         avg_daily = float(tx.groupby("date")["amount_sar"].sum().mean())
@@ -115,30 +125,39 @@ class DBRModel:
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               f"Avg daily revenue SAR {avg_daily:,.2f} below SAR 500 threshold.",
+                "blocking_reasons":     [f"Average daily revenue SAR {avg_daily:,.0f} below "
+                                         f"minimum SAR 500 threshold"],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
+        gates_passed.append(f"Revenue gate: avg daily revenue SAR {avg_daily:,.0f} "
+                            f"(minimum SAR 500)")
 
         # Rule 3: zero-revenue days < 5
         # Use only Sun-Thu (business days in Saudi Arabia) so that legitimate
         # Fri/Sat closures (real estate, offices) are not penalised.
-        tx_dates   = set(tx["date"].tolist())
-        biz_days   = [d for d in ALL_DATES if pd.Timestamp(d).weekday() not in [4, 5]]
-        zero_days  = sum(1 for d in biz_days if d not in tx_dates)
+        tx_dates  = set(tx["date"].tolist())
+        biz_days  = [d for d in ALL_DATES if pd.Timestamp(d).weekday() not in [4, 5]]
+        zero_days = sum(1 for d in biz_days if d not in tx_dates)
         if zero_days >= 5:
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               (f"{zero_days} zero-revenue days detected "
                                          f"(maximum allowed: 4) -- inconsistent cash flow."),
+                "blocking_reasons":     [f"{zero_days} zero-revenue business days (Sun-Thu) detected "
+                                         f"out of {len(biz_days)} business days — maximum allowed is 4; "
+                                         f"suggests inconsistent trading or incomplete POS data"],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
+        gates_passed.append(f"Cash flow gate: {zero_days} zero-revenue business days "
+                            f"in {len(biz_days)} business days (maximum 4)")
 
         # Rule 4: fraud gate — use the trained Isolation Forest model (FraudDetector).
-        # The old DSCRModel.detect_fraud() missed high-value outliers that survived the
-        # p99*2 filter and never ran behavioral_anomaly checks. FROZEN businesses
-        # (approval_frozen=True) and FLAGGED businesses with any critical-severity
-        # anomaly or fraud_score >= 60 are all blocked from SME transition.
         from models.fraud_detector import FraudDetector
         _saved_pkl = os.path.join(ROOT, "models", "saved", "fraud_detector.pkl")
         _detector  = FraudDetector()
@@ -146,23 +165,39 @@ class DBRModel:
         fraud = _detector.assess(business_id)
 
         if fraud["approval_frozen"]:
+            blocking = (f"Fraud gate blocked: approval frozen — fraud score {fraud['fraud_score']}/100 "
+                        f"with {fraud['anomalies_detected']} anomaly incident(s) detected "
+                        f"(threshold >55); manual review required before pipeline transition")
+            if fraud.get("reasons"):
+                blocking += " [" + "; ".join(r["detail"] for r in fraud["reasons"][:2]) + "]"
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               (f"Approval frozen: fraud score {fraud['fraud_score']} with "
                                          f"{fraud['anomalies_detected']} anomaly(ies) detected -- "
                                          f"manual review required before pipeline transition."),
+                "blocking_reasons":     [blocking],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
 
         critical = [a for a in fraud["anomalies"] if a["severity"] == "critical"]
         if fraud["overall_status"] == "flagged" and critical:
+            details = "; ".join(
+                r["detail"] for r in fraud.get("reasons", [])
+                if r.get("severity") == "critical"
+            )[:200]
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               (f"{len(critical)} critical fraud flag(s) detected "
                                          f"(score {fraud['fraud_score']}) -- "
                                          f"manual review required before pipeline transition."),
+                "blocking_reasons":     [f"Fraud gate blocked: {len(critical)} critical anomaly(ies) — "
+                                         + (details if details else "see anomalies list")],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
 
@@ -170,17 +205,31 @@ class DBRModel:
             return {
                 "business_id":          business_id,
                 "ready":                False,
+                "decision":             "NOT_READY",
                 "reason":               (f"High fraud risk score {fraud['fraud_score']} -- "
                                          f"manual review required before pipeline transition."),
+                "blocking_reasons":     [f"Fraud gate blocked: high risk score {fraud['fraud_score']}/100 "
+                                         f"(threshold 60); elevated anomaly rate requires review"],
+                "gates_passed":         gates_passed,
                 "recommended_pipeline": "continue_incubator",
             }
+
+        fraud_gate_msg = (f"Fraud gate: passed (score {fraud['fraud_score']}/100, "
+                          f"{fraud['anomalous_tx_count']}/{fraud['total_tx_scored']} "
+                          f"flagged transactions, no critical anomalies)")
+        if fraud.get("checks_passed"):
+            fraud_gate_msg += " — " + " | ".join(fraud["checks_passed"])
+        gates_passed.append(fraud_gate_msg)
 
         return {
             "business_id":          business_id,
             "ready":                True,
+            "decision":             "READY",
             "reason":               (f"All criteria met: {unique_days} days of data, "
                                      f"avg daily revenue SAR {avg_daily:,.2f}, "
                                      f"{zero_days} zero-revenue days, "
                                      f"no critical fraud flags."),
+            "blocking_reasons":     [],
+            "gates_passed":         gates_passed,
             "recommended_pipeline": "sme",
         }

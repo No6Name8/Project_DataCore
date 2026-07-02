@@ -481,6 +481,36 @@ class BusinessClassifier:
                 best_dist, best_cid = dist, cid
         return best_cid, best_dist
 
+    _KEY_FEATS = ["avg_ticket_sar", "avg_daily_transactions",
+                  "inter_transaction_gap_cv", "ticket_cv", "revenue_cv"]
+
+    def _confidence_explanation(self, confidence: float, archetype_label: str,
+                                 was_noise: bool, source: str) -> str:
+        conf_pct = f"{confidence:.0%}"
+        if source == "cluster_fallback" or was_noise:
+            return (f"Low confidence ({conf_pct}): business was HDBSCAN noise — "
+                    f"assigned to nearest archetype '{archetype_label}' by centroid distance; "
+                    f"confidence reflects distance, not cluster membership probability")
+        elif confidence >= 0.75:
+            return (f"High confidence ({conf_pct}): behavioral fingerprint closely matches "
+                    f"the '{archetype_label}' cluster archetype")
+        elif confidence >= 0.40:
+            return (f"Moderate confidence ({conf_pct}): profile broadly matches "
+                    f"'{archetype_label}' archetype with some feature variance")
+        else:
+            return (f"Low confidence ({conf_pct}): nearest archetype is '{archetype_label}' "
+                    f"but behavioral profile is ambiguous — more data may improve accuracy")
+
+    def _closest_archetype_features(self, features: dict, cluster_id: int) -> dict:
+        centroid = self.cluster_profiles[cluster_id]["centroid"]
+        return {
+            feat: {
+                "business":        round(float(features[feat]), 4),
+                "cluster_typical": round(float(centroid[feat]), 4),
+            }
+            for feat in self._KEY_FEATS
+        }
+
     def classify_from_data(self, transactions_df: pd.DataFrame,
                            period_days: int = 30) -> dict:
         """Extracts features from a real transaction DataFrame, classifies, and enriches output."""
@@ -496,10 +526,17 @@ class BusinessClassifier:
         elif data_days >= 7:  refinement_status = "early"
         else:                 refinement_status = "predicted"
 
-        result["profile_source"]    = "real_data"
-        result["data_days"]         = data_days
-        result["refinement_status"] = refinement_status
-        result["raw_features"]      = {k: round(float(v), 4) for k, v in features.items()}
+        clf_source = "cluster_fallback" if result["was_noise"] else "trained"
+
+        result["profile_source"]           = "real_data"
+        result["data_days"]                = data_days
+        result["refinement_status"]        = refinement_status
+        result["raw_features"]             = {k: round(float(v), 4) for k, v in features.items()}
+        result["classification_source"]    = clf_source
+        result["confidence_explanation"]   = self._confidence_explanation(
+            result["confidence"], result["archetype_label"], result["was_noise"], clf_source)
+        result["closest_archetype_features"] = self._closest_archetype_features(
+            features, result["cluster_id"])
         return result
 
     def classify_from_intake(self, intake_dict: dict) -> dict:
@@ -523,18 +560,25 @@ class BusinessClassifier:
             0.05, 0.65))
 
         profile = self.cluster_profiles.get(cluster_id, {})
+        arch_label = profile.get("archetype_label", "unknown")
+        conf_rounded = round(confidence, 4)
         return {
-            "cluster_id":              cluster_id,
-            "cluster_size":            profile.get("size", 0),
-            "behavioral_profile":      profile.get("tags", {}),
-            "archetype_description":   profile.get("archetype_label", "unknown"),
-            "profile_source":          "intake_form",
-            "confidence":              round(confidence, 4),
-            "data_days":               0,
-            "is_outlier":              is_outlier,
-            "distance_to_centroid":    round(float(distance), 4),
-            "refinement_status":       "predicted",
-            "raw_features":            {k: round(float(v), 4) for k, v in features.items()},
+            "cluster_id":                  cluster_id,
+            "cluster_size":                profile.get("size", 0),
+            "behavioral_profile":          profile.get("tags", {}),
+            "archetype_description":       arch_label,
+            "profile_source":              "intake_form",
+            "confidence":                  conf_rounded,
+            "data_days":                   0,
+            "is_outlier":                  is_outlier,
+            "distance_to_centroid":        round(float(distance), 4),
+            "refinement_status":           "predicted",
+            "raw_features":                {k: round(float(v), 4) for k, v in features.items()},
+            "classification_source":       "intake_form",
+            "confidence_explanation":      self._confidence_explanation(
+                conf_rounded, arch_label, False, "intake_form"),
+            "closest_archetype_features":  self._closest_archetype_features(
+                dict(features), cluster_id),
         }
 
     def classify_hybrid(self, transactions_df: pd.DataFrame,
@@ -572,18 +616,25 @@ class BusinessClassifier:
         else:                 refinement_status = "predicted"
 
         profile = self.cluster_profiles.get(cluster_id, {})
+        arch_label   = profile.get("archetype_label", "unknown")
+        conf_rounded = round(confidence, 4)
         return {
-            "cluster_id":              cluster_id,
-            "behavioral_profile":      profile.get("tags", {}),
-            "archetype_description":   profile.get("archetype_label", "unknown"),
-            "profile_source":          "hybrid",
-            "confidence":              round(confidence, 4),
-            "data_days":               data_days,
-            "blend_weight_real_data":  round(blend_weight, 2),
-            "is_outlier":              distance > self.outlier_threshold,
-            "distance_to_centroid":    round(float(distance), 4),
-            "refinement_status":       refinement_status,
-            "raw_features":            {k: round(float(v), 4) for k, v in blended.items()},
+            "cluster_id":                  cluster_id,
+            "behavioral_profile":          profile.get("tags", {}),
+            "archetype_description":       arch_label,
+            "profile_source":              "hybrid",
+            "confidence":                  conf_rounded,
+            "data_days":                   data_days,
+            "blend_weight_real_data":      round(blend_weight, 2),
+            "is_outlier":                  distance > self.outlier_threshold,
+            "distance_to_centroid":        round(float(distance), 4),
+            "refinement_status":           refinement_status,
+            "raw_features":                {k: round(float(v), 4) for k, v in blended.items()},
+            "classification_source":       "intake_blend",
+            "confidence_explanation":      self._confidence_explanation(
+                conf_rounded, arch_label, False, "intake_blend"),
+            "closest_archetype_features":  self._closest_archetype_features(
+                dict(blended), cluster_id),
         }
 
     # Stage 7: validate against known archetypes in synthetic data

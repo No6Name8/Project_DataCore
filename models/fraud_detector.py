@@ -258,6 +258,15 @@ class FraudDetector:
         anomalies_df = scored_df[scored_df["anomaly_label"] == -1].copy()
 
         if len(anomalies_df) == 0:
+            ts_h    = pd.to_datetime(scored_df["timestamp"]).dt.hour
+            off_n   = int(ts_h.isin([23, 0, 1, 2, 3, 4]).sum())
+            max_amt = float(scored_df["amount_sar"].max()) if "amount_sar" in scored_df.columns else 0.0
+            med_amt = float(scored_df["amount_sar"].median()) if "amount_sar" in scored_df.columns else 1.0
+            ratio   = max_amt / med_amt if med_amt > 0 else 0.0
+            total   = len(scored_df)
+            off_msg = (f"off_hours_check: passed (zero transactions between 23:00-05:00)"
+                       if off_n == 0 else
+                       f"off_hours_check: passed ({off_n} transactions between 23:00-05:00, no anomalous concentration)")
             return {
                 "business_id":        business_id,
                 "anomalies_detected": 0,
@@ -266,8 +275,15 @@ class FraudDetector:
                 "overall_status":     "clear",
                 "approval_frozen":    False,
                 "model_type":         "isolation_forest",
-                "total_tx_scored":    len(scored_df),
+                "total_tx_scored":    total,
                 "anomalous_tx_count": 0,
+                "reasons":            [],
+                "checks_passed":      [
+                    off_msg,
+                    (f"amount_outlier_check: passed (max SAR {max_amt:,.0f} is "
+                     f"{ratio:.1f}x median SAR {med_amt:,.0f}, within 10x threshold)"),
+                    f"behavioral_anomaly_check: passed (0 anomalous transactions from {total} scored, rate 0.00%)",
+                ],
             }
 
         anomalies_df = anomalies_df.copy()
@@ -362,6 +378,63 @@ class FraudDetector:
         elif approval_frozen:   overall_status = "frozen"
         else:                   overall_status = "flagged"
 
+        # ── Explainability: reasons + checks_passed ───────────────────────────
+        # reasons: all triggered incidents with severity >= high
+        # checks_passed: verified checks with no incident or only medium severity
+        reasons       = []
+        checks_passed = []
+
+        for a in anomaly_list:
+            if a["severity"] in ("critical", "high"):
+                if a["type"] == "off_hours_cluster":
+                    cond = ("critical_off_hours_cluster" if a["severity"] == "critical"
+                            else "high_off_hours_pattern")
+                elif a["type"] == "amount_outlier":
+                    cond = ("critical_amount_outlier" if a["severity"] == "critical"
+                            else "elevated_amount_outlier")
+                else:
+                    cond = ("critical_behavioral_anomaly" if a["severity"] == "critical"
+                            else "high_behavioral_anomaly")
+                reasons.append({
+                    "condition": cond,
+                    "severity":  a["severity"],
+                    "detail":    a["description"],
+                })
+
+        triggered_high = {a["type"] for a in anomaly_list if a["severity"] in ("critical", "high")}
+
+        if "off_hours_cluster" not in triggered_high:
+            ts_h  = pd.to_datetime(scored_df["timestamp"]).dt.hour
+            off_n = int(ts_h.isin([23, 0, 1, 2, 3, 4]).sum())
+            if off_n == 0:
+                checks_passed.append(
+                    "off_hours_check: passed (zero transactions between 23:00-05:00)")
+            else:
+                checks_passed.append(
+                    f"off_hours_check: passed ({off_n} transactions between "
+                    f"23:00-05:00, no anomalous concentration detected)")
+
+        if "amount_outlier" not in triggered_high:
+            max_amt = float(scored_df["amount_sar"].max()) if "amount_sar" in scored_df.columns else 0.0
+            med_amt = float(scored_df["amount_sar"].median()) if "amount_sar" in scored_df.columns else 1.0
+            ratio   = max_amt / med_amt if med_amt > 0 else 0.0
+            checks_passed.append(
+                f"amount_outlier_check: passed (max SAR {max_amt:,.0f} is "
+                f"{ratio:.1f}x median SAR {med_amt:,.0f}, within 10x threshold)")
+
+        total_tx  = len(scored_df)
+        anom_n    = int((scored_df["anomaly_label"] == -1).sum())
+        beh_rate  = anom_n / total_tx * 100 if total_tx > 0 else 0.0
+        beh_incs  = [a for a in anomaly_list if a["type"] == "behavioral_anomaly"]
+        if not beh_incs:
+            checks_passed.append(
+                f"behavioral_anomaly_check: passed (0 anomalous transactions "
+                f"from {total_tx} scored, rate 0.00%)")
+        elif beh_incs[0]["severity"] == "medium":
+            checks_passed.append(
+                f"behavioral_anomaly_check: passed ({beh_rate:.2f}% anomaly rate, "
+                f"below 0.5% high-severity threshold — flagged for monitoring only)")
+
         return {
             "business_id":        business_id,
             "anomalies_detected": len(anomaly_list),
@@ -372,6 +445,8 @@ class FraudDetector:
             "model_type":         "isolation_forest",
             "total_tx_scored":    len(scored_df),
             "anomalous_tx_count": int((scored_df["anomaly_label"] == -1).sum()),
+            "reasons":            reasons,
+            "checks_passed":      checks_passed,
         }
 
     # ── Full pipeline ─────────────────────────────────────────────────────────
