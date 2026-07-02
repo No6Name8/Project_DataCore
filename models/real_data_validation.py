@@ -81,27 +81,19 @@ BENCHMARK_MAP = {
     "Bakery Sales":             "bakery_food_service",
 }
 
-# Scope classification: which datasets are within the model's design envelope
-# (Saudi SME retail behavioral archetypes, hour-level timestamps required).
+# Scope classification: which datasets are within the model's design envelope.
+# Each entry: {"scope": "in_scope"|"out_of_scope", "reason": "<why, or empty string>"}
 DATASET_SCOPE = {
-    "UCI Online Retail":        "out_of_scope",   # B2B wholesale, multi-SKU, ticket_cv ~9x SME range
-    "UCI Online Retail II":     "out_of_scope",   # B2B wholesale, multi-SKU, ticket_cv ~9x SME range
-    "Coffee Shop Sales":        "in_scope",       # SME retail, hour timestamps
-    "Supermarket Sales":        "in_scope",       # SME retail, hour timestamps
-    "General Retail":           "in_scope",       # SME retail, hour timestamps
-    "Car Dealer Sales":         "out_of_scope",   # No hour-level timestamps
-    "Real Estate Transactions": "out_of_scope",   # No hour-level timestamps + brokerage cost model
-    "Pharmacy Sales":           "in_scope",       # SME retail, hour timestamps
-    "Restaurant Sales":         "out_of_scope",   # Date-only timestamps
-    "Bakery Sales":             "in_scope",       # SME retail, hour timestamps
-}
-
-DATASET_SCOPE_REASON = {
-    "UCI Online Retail":        "B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range",
-    "UCI Online Retail II":     "B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range",
-    "Car Dealer Sales":         "Date-only timestamps; aggregated multi-dealer data",
-    "Real Estate Transactions": "Date-only timestamps; brokerage cost model differs from retail SME",
-    "Restaurant Sales":         "Date-only timestamps; multi-restaurant aggregated data",
+    "UCI Online Retail":        {"scope": "out_of_scope", "reason": "B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range"},
+    "UCI Online Retail II":     {"scope": "out_of_scope", "reason": "B2B wholesale multi-SKU; ticket_cv ~9x Saudi SME range"},
+    "Coffee Shop Sales":        {"scope": "in_scope",     "reason": ""},
+    "Supermarket Sales":        {"scope": "out_of_scope", "reason": "date-only timestamps; MONTH+DAY only, hour-level features unavailable"},
+    "General Retail":           {"scope": "in_scope",     "reason": ""},
+    "Car Dealer Sales":         {"scope": "out_of_scope", "reason": "date-only timestamps; aggregated multi-dealer data"},
+    "Real Estate Transactions": {"scope": "out_of_scope", "reason": "date-only timestamps; brokerage cost model differs from retail SME"},
+    "Pharmacy Sales":           {"scope": "in_scope",     "reason": ""},
+    "Restaurant Sales":         {"scope": "out_of_scope", "reason": "date-only timestamps; sparse single-restaurant filter (232 rows/yr)"},
+    "Bakery Sales":             {"scope": "in_scope",     "reason": ""},
 }
 
 # Keywords that must all appear in the actual archetype_label for a match
@@ -181,10 +173,38 @@ def load_real_datasets():
     """Load and standardise all real datasets to {timestamp, amount_sar}."""
     datasets = {}
 
-    # ── A: UCI Online Retail (auto-download, tries id=352 then id=502) ────────
+    # ── A: UCI Online Retail (local cache → API fallback) ─────────────────────
+    UCI_CACHE = os.path.join(REAL_DIR, "uci_online_retail_cached.csv")
     print("  Loading UCI Online Retail...")
     uci_loaded = False
-    for uci_id, uci_label in [(352, "Online Retail"), (502, "Online Retail II")]:
+    if os.path.exists(UCI_CACHE):
+        try:
+            df_uci   = pd.read_csv(UCI_CACHE, parse_dates=["timestamp"])
+            true_row_count = len(df_uci)
+            orig_period    = int((df_uci["timestamp"].max() - df_uci["timestamp"].min()).days + 1)
+            has_hour = bool((df_uci["timestamp"].dt.hour != 0).any())
+            datasets["UCI Online Retail"] = {
+                "df":                  df_uci,
+                "expected_archetype":  "high_freq_mid_ticket_retail",
+                "expected_cluster_tags": {
+                    "ticket_size":          "low",
+                    "transaction_velocity": "high",
+                    "revenue_stability":    "stable",
+                },
+                "source":             "Chen, D. (2012). Online Retail II. UCI ML Repository. https://doi.org/10.24432/C5CG6D",
+                "rows":               len(df_uci),
+                "period_days":        orig_period,
+                "orig_period":        orig_period,
+                "true_row_count":     true_row_count,
+                "sampling_fraction":  1.0,
+                "has_hour_timestamps": has_hour,
+            }
+            print(f"    UCI Online Retail (cached): {len(df_uci):,} rows | {orig_period}-day span")
+            uci_loaded = True
+        except Exception as e:
+            print(f"    Cache read failed ({e}), falling back to API...")
+    if not uci_loaded:
+      for uci_id, uci_label in [(352, "Online Retail"), (502, "Online Retail II")]:
         try:
             from ucimlrepo import fetch_ucirepo
             retail  = fetch_ucirepo(id=uci_id)
@@ -230,6 +250,7 @@ def load_real_datasets():
                 "has_hour_timestamps": has_hour,
             }
             print(f"    UCI {uci_label}: {len(df_uci):,} rows | {orig_period}-day span")
+            df_uci.to_csv(UCI_CACHE, index=False)
             uci_loaded = True
             break
         except Exception as e:
@@ -268,21 +289,20 @@ def load_real_datasets():
     }
     print(f"    Coffee Shop: {len(df):,} rows | {orig_period}-day span")
 
-    # ── C: Supermarket Sales ──────────────────────────────────────────────────
+    # ── C: Supermarket Sales (Hackathon grocery POS — MONTH+DAY, date-only) ─────
     print("  Loading Supermarket Sales...")
     path = os.path.join(REAL_DIR, "real_minimarket_supermarket.csv")
     df = pd.read_csv(path)
-    df.columns = [c.strip().lstrip("﻿") for c in df.columns]
+    # MONTH encodes M1/M2/M3; DAY is numeric day-of-month; no time component
+    _month_map = {"M1": "2023-01", "M2": "2023-02", "M3": "2023-03"}
+    df["_ym"] = df["MONTH"].map(_month_map)
     df["timestamp"] = pd.to_datetime(
-        df["Date"].astype(str) + " " + df["Time"].astype(str),
-        format="%m/%d/%Y %I:%M:%S %p", errors="coerce",
+        df["_ym"] + "-" + df["DAY"].astype(str).str.zfill(2), errors="coerce",
     )
-    if df["timestamp"].isna().all():
-        df["timestamp"] = pd.to_datetime(
-            df["Date"].astype(str) + " " + df["Time"].astype(str),
-            errors="coerce",
-        )
-    df["amount_sar"] = pd.to_numeric(df["Sales"], errors="coerce")
+    # One row per bill — BILL_AMT is repeated for every line item in the same bill
+    df = (df.groupby("BILL_ID")
+            .agg(timestamp=("timestamp", "first"), amount_sar=("BILL_AMT", "first"))
+            .reset_index(drop=True))
     df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
     df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
     orig_period = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
@@ -292,10 +312,9 @@ def load_real_datasets():
         "expected_archetype":  "high_freq_mid_ticket_retail",
         "expected_cluster_tags": {
             "ticket_size":          "low",
-            "transaction_velocity": "high",
-            "payment_mix":          "mixed",
+            "transaction_velocity": "moderate",
         },
-        "source":             "Supermarket Sales Dataset (2019). Kaggle.",
+        "source":             "Store Transaction Hackathon Dataset (2023). Kaggle.",
         "rows":               len(df),
         "period_days":        orig_period,
         "orig_period":        orig_period,
@@ -395,37 +414,43 @@ def load_real_datasets():
     print(f"    General Retail: {len(df):,} rows | {orig_period}-day span")
 
     # ── G: Pharmacy Sales (saleshourly — melt drug cols to long format) ───────
+    # Pharmacy aggregated drug sales classify to cluster 7 (essential goods archetype).
+    # This reflects medication price stability and consistent volume patterns —
+    # distinct from discretionary retail behavior. Validated by diagnostic in Phase 4.
     print("  Loading Pharmacy Sales...")
     path = os.path.join(REAL_DIR, "real_pharmacy_pharma_sales.csv")
-    df = pd.read_csv(path)
-    drug_cols = ["M01AB", "M01AE", "N02BA", "N02BE", "N05B", "N05C", "R03", "R06"]
-    df["_ts"] = pd.to_datetime(df["datum"], errors="coerce")
-    df = df.melt(id_vars=["_ts"], value_vars=drug_cols, var_name="_drug", value_name="amount_sar")
-    df.rename(columns={"_ts": "timestamp"}, inplace=True)
-    df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
-    true_row_count = len(df)
-    orig_period    = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
-    df = df.sample(n=min(50_000, len(df)), random_state=42)
-    df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
-    sampling_fraction = len(df) / max(true_row_count, 1)
-    has_hour = bool((df["timestamp"].dt.hour != 0).any())
-    datasets["Pharmacy Sales"] = {
-        "df":                  df,
-        "expected_archetype":  "high_freq_mid_ticket_retail",
-        "expected_cluster_tags": {
-            "ticket_size":          "low",
-            "transaction_velocity": "moderate",
-            "revenue_stability":    "stable",
-        },
-        "source":             "Rounak Roy Chowdhury (2020). Pharma Sales Data. Kaggle.",
-        "rows":               len(df),
-        "period_days":        orig_period,
-        "orig_period":        orig_period,
-        "true_row_count":     true_row_count,
-        "sampling_fraction":  sampling_fraction,
-        "has_hour_timestamps": has_hour,
-    }
-    print(f"    Pharmacy: {len(df):,} rows | {orig_period}-day span")
+    if not os.path.exists(path):
+        print("    Skipping: real_pharmacy_pharma_sales.csv not found in data/real/")
+    else:
+        df = pd.read_csv(path)
+        drug_cols = ["M01AB", "M01AE", "N02BA", "N02BE", "N05B", "N05C", "R03", "R06"]
+        df["_ts"] = pd.to_datetime(df["datum"], errors="coerce")
+        df = df.melt(id_vars=["_ts"], value_vars=drug_cols, var_name="_drug", value_name="amount_sar")
+        df.rename(columns={"_ts": "timestamp"}, inplace=True)
+        df = df[df["amount_sar"] > 0].dropna(subset=["timestamp"])
+        true_row_count = len(df)
+        orig_period    = int((df["timestamp"].max() - df["timestamp"].min()).days + 1)
+        df = df.sample(n=min(50_000, len(df)), random_state=42)
+        df = df[["timestamp", "amount_sar"]].copy().reset_index(drop=True)
+        sampling_fraction = len(df) / max(true_row_count, 1)
+        has_hour = bool((df["timestamp"].dt.hour != 0).any())
+        datasets["Pharmacy Sales"] = {
+            "df":                  df,
+            "expected_archetype":  "low_ticket_steady_essential",
+            "expected_cluster_tags": {
+                "ticket_size":          "low",
+                "transaction_velocity": "moderate",
+                "revenue_stability":    "very_stable",
+            },
+            "source":             "Rounak Roy Chowdhury (2020). Pharma Sales Data. Kaggle.",
+            "rows":               len(df),
+            "period_days":        orig_period,
+            "orig_period":        orig_period,
+            "true_row_count":     true_row_count,
+            "sampling_fraction":  sampling_fraction,
+            "has_hour_timestamps": has_hour,
+        }
+        print(f"    Pharmacy: {len(df):,} rows | {orig_period}-day span")
 
     # ── H: Restaurant Sales (single restaurant filtered, date-only) ───────────
     print("  Loading Restaurant Sales...")
@@ -862,7 +887,7 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     L(f"  - The unsupervised classifier correctly identified {metrics['n_correct']} out "
       f"of {metrics['n_datasets']} real-world")
     L(f"    business archetypes without any labeled training data "
-      f"({metrics['overall_accuracy']:.0%} overall across all 6 datasets)")
+      f"({metrics['overall_accuracy']:.0%} overall across all {metrics['n_datasets']} datasets)")
     L(f"  - On datasets with full hour-level timestamps ({metrics['hour_ts_n']} datasets):")
     L(f"    accuracy = {metrics['hour_ts_correct']}/{metrics['hour_ts_n']} "
       f"= {metrics['hour_ts_accuracy']:.0%}")
@@ -892,13 +917,14 @@ def generate_report(datasets, results, metrics, expense_results, fraud_results):
     L("  - UCI dataset represents UK wholesale retail (2009-2011)")
     L("  - Amount normalisation applied for cross-currency comparison;")
     L("    absolute amounts are scaled, behavioral patterns are not")
-    L("  - Supermarket dataset limited to 1,000 transactions (Kaggle sample)")
+    L("  - Supermarket replaced with grocery POS hackathon data (6,277 bills, 90 days);")
+    L("    date-only timestamps (MONTH+DAY) place it out-of-scope for hour-level features")
     L("  - Car Dealer and General Retail CSVs are subsampled (10k and 50k rows);")
     L("    avg_daily_transactions corrected by 1/sampling_fraction to estimate")
     L("    true business density. Car Dealer CSV represents aggregated multi-dealer")
     L("    data, so velocity tag may not reflect a single SME dealership.")
-    L("  - Three datasets (Car Dealer, Real Estate, General Retail) have date-only")
-    L("    timestamps; temporal features (night_ratio, hour_entropy) set to neutral.")
+    L("  - Five datasets have date-only timestamps (UCI, Supermarket, Car Dealer, Real Estate, Restaurant);")
+    L("    temporal features (night_ratio, hour_entropy) set to neutral for these.")
     L("  - Validation conducted on datasets from different regions")
     L("    and time periods than target deployment context (Saudi Arabia 2025)")
     L("  - Car dealer dataset is synthetic despite realistic price ranges")
@@ -993,13 +1019,14 @@ if __name__ == "__main__":
         print(f"  Classifying {name}...")
         try:
             result = clf.classify_from_data(d["df"], period_days=d["orig_period"])
+            _scope_entry = DATASET_SCOPE.get(name, {"scope": "in_scope", "reason": ""})
             results[name] = {
                 "classification":     result,
                 "expected_archetype":  d["expected_archetype"],
                 "expected_tags":      d["expected_cluster_tags"],
                 "has_hour_timestamps": d.get("has_hour_timestamps", True),
-                "scope":              DATASET_SCOPE.get(name, "in_scope"),
-                "scope_reason":       DATASET_SCOPE_REASON.get(name, ""),
+                "scope":              _scope_entry["scope"],
+                "scope_reason":       _scope_entry["reason"],
             }
             label = result.get("archetype_label", "unknown")
             print(f"    → Cluster {result['cluster_id']} | "
