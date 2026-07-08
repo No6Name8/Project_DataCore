@@ -19,4 +19,8 @@ export const assessDBR         = (params)     =>
 export const getBusinessProfile = (params)   =>
   api.get("/api/incubator/business-profile", { params });
 
+export const getPortfolioSummary  = ()    => api.get("/api/portfolio/summary");
+export const getPortfolioStats    = ()    => api.get("/api/portfolio/stats");
+export const getPortfolioBusiness = (bid) => api.get(`/api/portfolio/business/${bid}`);
+
 export default api;

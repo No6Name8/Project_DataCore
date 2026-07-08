@@ -5,13 +5,14 @@ AI engine: DSCR, fraud (Isolation Forest), revenue forecast (Prophet).
 Run from project root: python api/app.py
 """
 
-import os, sys
+import os, sys, json
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 import pandas as pd
 
-ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(ROOT, "data", "processed")
+ROOT          = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR      = os.path.join(ROOT, "data", "processed")
+PORTFOLIO_DIR = os.path.join(ROOT, "data", "portfolio")
 sys.path.insert(0, ROOT)
 
 from models.dscr_model          import DSCRModel
@@ -422,6 +423,71 @@ def get_classify(business_id):
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e), "business_id": business_id}), 500
+
+# =============================================================================
+# Portfolio endpoints
+# =============================================================================
+
+_portfolio_summary_cache = None
+
+def _load_portfolio_summary():
+    global _portfolio_summary_cache
+    if _portfolio_summary_cache is None:
+        summary_path = os.path.join(PORTFOLIO_DIR, "portfolio_summary.json")
+        if not os.path.exists(summary_path):
+            return None
+        with open(summary_path, "r", encoding="utf-8") as f:
+            _portfolio_summary_cache = json.load(f)
+    return _portfolio_summary_cache
+
+
+@app.route("/api/portfolio/summary")
+def portfolio_summary():
+    data = _load_portfolio_summary()
+    if data is None:
+        return jsonify({"error": "Portfolio not generated yet. Run data/generate_portfolio.py"}), 404
+    return jsonify(data)
+
+
+@app.route("/api/portfolio/stats")
+def portfolio_stats():
+    data = _load_portfolio_summary()
+    if data is None:
+        return jsonify({"error": "Portfolio not generated yet."}), 404
+
+    from collections import Counter
+    total          = len(data)
+    risk_counts    = Counter(r["risk_tier"]    for r in data)
+    fraud_counts   = Counter(r["fraud_status"] for r in data)
+    arch_counts    = Counter(r["archetype_key"] for r in data)
+    trend_counts   = Counter(r["revenue_trend"] for r in data)
+    sme_ready      = sum(1 for r in data if r["sme_transition_ready"])
+    avg_dscr       = round(sum(r["dscr_score"] for r in data) / total, 4)
+    avg_daily_rev  = round(sum(r["avg_daily_revenue_sar"] for r in data) / total, 2)
+    total_portfolio_rev = round(sum(r["avg_daily_revenue_sar"] * 365 for r in data), 0)
+
+    return jsonify({
+        "total_businesses":     total,
+        "sme_transition_ready": sme_ready,
+        "avg_dscr_score":       avg_dscr,
+        "avg_daily_revenue_sar": avg_daily_rev,
+        "total_portfolio_annual_revenue_sar": total_portfolio_rev,
+        "risk_tier_distribution":    dict(risk_counts),
+        "fraud_status_distribution": dict(fraud_counts),
+        "archetype_distribution":    dict(arch_counts),
+        "revenue_trend_distribution": dict(trend_counts),
+    })
+
+
+@app.route("/api/portfolio/business/<bid>")
+def portfolio_business(bid):
+    detail_path = os.path.join(PORTFOLIO_DIR, f"{bid}_detail.json")
+    if not os.path.exists(detail_path):
+        return jsonify({"error": f"Business {bid} not found in portfolio"}), 404
+    with open(detail_path, "r", encoding="utf-8") as f:
+        detail = json.load(f)
+    return jsonify(detail)
+
 
 # =============================================================================
 # Error handlers

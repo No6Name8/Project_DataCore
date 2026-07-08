@@ -1,22 +1,24 @@
 import { Outlet, NavLink } from "react-router-dom";
 import { useLang } from "../i18n/LanguageContext";
-import { LayoutDashboard, GitBranch, Star, Brain, Globe } from "lucide-react";
+import { LayoutDashboard, GitBranch, Star, Brain, Globe, Briefcase } from "lucide-react";
 
 export default function Layout() {
   const { t, lang, toggleLang } = useLang();
 
   const navItems = [
     { to: "/demo",         icon: LayoutDashboard, labelEn: "Demo",         labelAr: "العرض" },
+    { to: "/portfolio",    icon: Briefcase,        labelEn: "Portfolio",    labelAr: "المحفظة" },
     { to: "/how-it-works", icon: GitBranch,        labelEn: "How It Works", labelAr: "كيف يعمل" },
     { to: "/benefits",     icon: Star,             labelEn: "Benefits",     labelAr: "الفوائد" },
     { to: "/ai-engine",    icon: Brain,            labelEn: "AI Engine",    labelAr: "محرك الذكاء" },
   ];
 
   const mobileItems = [
-    { to: "/demo",         icon: LayoutDashboard, labelEn: "Demo",     labelAr: "العرض" },
-    { to: "/how-it-works", icon: GitBranch,        labelEn: "How It",   labelAr: "كيف" },
-    { to: "/benefits",     icon: Star,             labelEn: "Benefits", labelAr: "الفوائد" },
-    { to: "/ai-engine",    icon: Brain,            labelEn: "AI",       labelAr: "الذكاء" },
+    { to: "/demo",         icon: LayoutDashboard, labelEn: "Demo",      labelAr: "العرض" },
+    { to: "/portfolio",    icon: Briefcase,        labelEn: "Portfolio", labelAr: "المحفظة" },
+    { to: "/how-it-works", icon: GitBranch,        labelEn: "How It",    labelAr: "كيف" },
+    { to: "/benefits",     icon: Star,             labelEn: "Benefits",  labelAr: "الفوائد" },
+    { to: "/ai-engine",    icon: Brain,            labelEn: "AI",        labelAr: "الذكاء" },
   ];
 
   const activeClass =

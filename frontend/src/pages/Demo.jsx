@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLang } from "../i18n/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { getDashboard, getForecast, assessDBR, getBusinessProfile } from "../services/api";
+import { getDashboard, getForecast, assessDBR, getBusinessProfile, getPortfolioBusiness } from "../services/api";
 import AnimatedNumber from "../components/AnimatedNumber";
 import {
   Building2, Sprout, Activity, CreditCard,
@@ -58,8 +59,8 @@ function getVerdict(dscr, fraud) {
 }
 
 // ── Track 1: Existing Business ────────────────────────────────
-function Track1({ isRTL }) {
-  const [selected, setSelected] = useState("cafe");
+function Track1({ isRTL, portfolioBid }) {
+  const [selected, setSelected] = useState(portfolioBid || "cafe");
   const [data,     setData]     = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading,  setLoading]  = useState(true);
@@ -75,24 +76,50 @@ function Track1({ isRTL }) {
     }
     setLoading(true);
     setError(null);
-    Promise.all([
-      getDashboard(id),
-      getForecast(id),
-    ]).then(([dashRes, foreRes]) => {
-      const dash = dashRes.data;
-      const series = foreRes.data.series || [];
-      const fore = series.map(d => ({
-        date:  d.date.slice(5),
-        value: Math.round(d.predicted_revenue),
-        upper: Math.round(d.upper_bound),
-        lower: Math.round(d.lower_bound),
-      }));
-      cache.current[id] = { dash, fore };
-      setData(dash);
-      setForecast(fore);
-    }).catch(e => setError(e.message))
+
+    // Portfolio businesses load from a single combined endpoint
+    const isPortfolio = id.startsWith("biz_");
+    const fetchFn = isPortfolio
+      ? getPortfolioBusiness(id).then(res => {
+          const detail = res.data;
+          const series = detail?.forecast?.series || [];
+          const fore = series.map(d => ({
+            date:  d.date.slice(5),
+            value: Math.round(d.predicted_revenue),
+            upper: Math.round(d.upper_bound),
+            lower: Math.round(d.lower_bound),
+          }));
+          cache.current[id] = { dash: detail, fore };
+          setData(detail);
+          setForecast(fore);
+        })
+      : Promise.all([getDashboard(id), getForecast(id)])
+          .then(([dashRes, foreRes]) => {
+            const dash = dashRes.data;
+            const series = foreRes.data.series || [];
+            const fore = series.map(d => ({
+              date:  d.date.slice(5),
+              value: Math.round(d.predicted_revenue),
+              upper: Math.round(d.upper_bound),
+              lower: Math.round(d.lower_bound),
+            }));
+            cache.current[id] = { dash, fore };
+            setData(dash);
+            setForecast(fore);
+          });
+
+    fetchFn
+      .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  // Sync if portfolioBid changes (navigating from portfolio page)
+  useEffect(() => {
+    if (portfolioBid && portfolioBid !== selected) {
+      setSelected(portfolioBid);
+      setData(null);
+    }
+  }, [portfolioBid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { load(selected); }, [selected, load]);
 
@@ -110,6 +137,22 @@ function Track1({ isRTL }) {
 
       {/* Business selector */}
       <div className="flex gap-2 overflow-x-auto pb-1">
+        {/* Portfolio business chip — shown only when navigated from /portfolio */}
+        {selected.startsWith("biz_") && (
+          <button
+            key={selected}
+            className="relative flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-white"
+            style={{ transition: "color 150ms var(--ease-out)" }}
+          >
+            <motion.div
+              layoutId="bizPill"
+              className="absolute inset-0 rounded-lg bg-brand-blue"
+              style={{ zIndex: -1 }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+            />
+            {data?.business?.name || selected}
+          </button>
+        )}
         {BUSINESSES.map(biz => (
           <button
             key={biz.id}
@@ -145,12 +188,16 @@ function Track1({ isRTL }) {
           >
             <div>
               <h2 className="text-lg font-bold text-white">
-                {isRTL
-                  ? BUSINESSES.find(b => b.id === selected)?.nameAr
-                  : BUSINESSES.find(b => b.id === selected)?.nameEn}
+                {selected.startsWith("biz_")
+                  ? (data?.business?.name || selected)
+                  : isRTL
+                    ? BUSINESSES.find(b => b.id === selected)?.nameAr
+                    : BUSINESSES.find(b => b.id === selected)?.nameEn}
               </h2>
               <div className="text-xs text-gray-400 mt-0.5">
-                {BUSINESSES.find(b => b.id === selected)?.sector}
+                {selected.startsWith("biz_")
+                  ? (data?.business?.sector || "SME Portfolio")
+                  : BUSINESSES.find(b => b.id === selected)?.sector}
                 {dscr?.archetype_description && (
                   <span className="text-brand-gold/60 ms-2">
                     · {dscr.archetype_description.slice(0, 40)}
@@ -928,6 +975,8 @@ function Track2({ isRTL }) {
 // ── Main ──────────────────────────────────────────────────────
 export default function Demo() {
   const { t, isRTL } = useLang();
+  const [searchParams] = useSearchParams();
+  const portfolioBid = searchParams.get("business") || null;
   const [track, setTrack] = useState("existing");
 
   return (
@@ -994,7 +1043,7 @@ export default function Demo() {
           transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
         >
           {track === "existing"
-            ? <Track1 isRTL={isRTL} t={t} />
+            ? <Track1 isRTL={isRTL} t={t} portfolioBid={portfolioBid} />
             : <Track2 isRTL={isRTL} t={t} />}
         </motion.div>
       </AnimatePresence>
