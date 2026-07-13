@@ -10,6 +10,22 @@ import { getPortfolioSummary, getPortfolioStats } from "../services/api";
 
 const PAGE_SIZE = 50;
 
+// ── Archetype letter → human name (from models/business_classifier.py labels) ─
+const ARCH_NAMES = {
+  A: "Food & Beverage",
+  B: "Retail",
+  C: "Automotive (High-Value)",
+  D: "Real Estate / Brokerage",
+  E: "Services",
+  F: "Essential Services",
+  G: "Supermarket",
+  H: "Electronics",
+  I: "Vehicle Dealer",
+  J: "Personal Services",
+  K: "Medical / Dental",
+  L: "Fashion & Boutique",
+};
+
 // ── Archetype badge colours ───────────────────────────────────────────────────
 const ARCH_COLORS = {
   A: "bg-orange-500/20 text-orange-300 border-orange-500/40",
@@ -233,7 +249,7 @@ export default function Portfolio() {
         <div>
           <h1 className="text-xl font-bold text-white">SME Portfolio</h1>
           <p className="text-sm text-gray-400">
-            {stats?.total_businesses ?? 507} businesses · 12 behavioral archetypes
+            507 businesses · 12 behavioral archetypes
           </p>
         </div>
       </div>
@@ -289,8 +305,8 @@ export default function Portfolio() {
 
         <select className={selectCls} value={filterArch} onChange={handleFilterChange(setFilterArch)}>
           <option value="all">All Archetypes</option>
-          {["A","B","C","D","E","F","G","H","I","J","K","L"].map((k) => (
-            <option key={k} value={k}>Archetype {k}</option>
+          {Object.entries(ARCH_NAMES).map(([k, name]) => (
+            <option key={k} value={k}>{k} · {name}</option>
           ))}
         </select>
 
