@@ -53,15 +53,18 @@ function FraudDot({ status }) {
 function Counter({ target, prefix = "", suffix = "", decimals = 0, duration = 800 }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
+    if (!target) { setVal(target); return; }
+    let rafId;
     let start = null;
     const step = (ts) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
       setVal(target * progress);
-      if (progress < 1) requestAnimationFrame(step);
+      if (progress < 1) { rafId = requestAnimationFrame(step); }
       else setVal(target);
     };
-    requestAnimationFrame(step);
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
   }, [target, duration]);
 
   const formatted = decimals > 0
