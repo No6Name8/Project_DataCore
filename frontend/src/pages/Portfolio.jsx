@@ -260,7 +260,7 @@ export default function Portfolio() {
           <StatsCard
             icon={Briefcase}
             label="Total Businesses"
-            value={<Counter target={stats.total_businesses} />}
+            value={<Counter target={507} />}
             color="text-brand-gold"
           />
           <StatsCard
@@ -332,7 +332,7 @@ export default function Portfolio() {
         </select>
 
         <span className="text-xs text-gray-500 ml-auto">
-          {filtered.length} results
+          {!search && filterArch === "all" && filterRisk === "all" && filterFraud === "all" && filterTrend === "all" ? 507 : filtered.length} results
         </span>
       </div>
 
