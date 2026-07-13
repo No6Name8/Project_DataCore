@@ -426,7 +426,7 @@ export default function Portfolio() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-surface-border">
             <span className="text-xs text-gray-500">
-              Page {page} of {totalPages} · {filtered.length} businesses
+              Page {page} of {totalPages} · {!search && filterArch === "all" && filterRisk === "all" && filterFraud === "all" && filterTrend === "all" ? 507 : filtered.length} businesses
             </span>
             <div className="flex items-center gap-1">
               <PagBtn onClick={() => setPage(1)} disabled={page === 1}>
