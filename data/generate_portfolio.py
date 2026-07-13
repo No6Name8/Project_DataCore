@@ -38,13 +38,13 @@ _n = LOAN_TERM
 AMORT_FACTOR       = _r * (1 + _r) ** _n / ((1 + _r) ** _n - 1)
 ANNUAL_DEBT_FACTOR = AMORT_FACTOR * 12 * LOAN_PCT   # ≈ 0.1484
 
-# ── Archetype distribution (500 total) ───────────────────────────────────────
+# ── Archetype distribution (507 total) ───────────────────────────────────────
 ARCH_DIST = {
-    "A": 110, "B": 70,  "C": 20,  "D": 40,
-    "E": 30,  "F": 50,  "G": 35,  "H": 30,
-    "I": 20,  "J": 30,  "K": 25,  "L": 40,
+    "A": 111, "B": 71,  "C": 20,  "D": 40,
+    "E": 31,  "F": 51,  "G": 36,  "H": 30,
+    "I": 20,  "J": 31,  "K": 25,  "L": 41,
 }
-assert sum(ARCH_DIST.values()) == 500
+assert sum(ARCH_DIST.values()) == 507
 
 # ── Hour weight templates (24 bins, normalized) ───────────────────────────────
 def _hw(*v):
@@ -348,7 +348,7 @@ def compute_dscr(total_revenue_30d, expense_ratio):
 
 # ── Fraud assignment ──────────────────────────────────────────────────────────
 # Target: ~68% clean, ~24% flagged, ~8% frozen
-FRAUD_ROLL = rng.random(500)
+FRAUD_ROLL = rng.random(507)
 
 def assign_fraud(idx):
     r = FRAUD_ROLL[idx]

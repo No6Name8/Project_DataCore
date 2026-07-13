@@ -233,7 +233,7 @@ export default function Portfolio() {
         <div>
           <h1 className="text-xl font-bold text-white">SME Portfolio</h1>
           <p className="text-sm text-gray-400">
-            {stats?.total_businesses ?? 0} businesses · 12 behavioral archetypes
+            {stats?.total_businesses ?? 507} businesses · 12 behavioral archetypes
           </p>
         </div>
       </div>
