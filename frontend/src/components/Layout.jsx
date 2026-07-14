@@ -34,19 +34,37 @@ export default function Layout() {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <NavLink to="/demo" className="flex items-center gap-3 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-brand-gold flex items-center
-                            justify-center text-brand-blueDark font-bold text-sm shrink-0">
-              DC
-            </div>
-            <div className="hidden sm:block">
-              <div className="font-bold text-white text-sm leading-none">
-                {t.appName}
-              </div>
-              <div className="text-[10px] text-brand-gold leading-none mt-0.5 whitespace-nowrap">
-                {t.poweredBy}
-              </div>
-            </div>
+          <NavLink to="/demo" className="flex items-center gap-3 shrink-0 group">
+            <svg
+              viewBox="0 0 64 64"
+              width="36"
+              height="36"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="shrink-0"
+            >
+              {/* Bold geometric D — navy stroke, rounded joins */}
+              <path
+                d="M14 10 L14 54 L34 54 C48 54 56 44 56 32 C56 20 48 10 34 10 Z"
+                stroke="#1B3A6B"
+                strokeWidth="8"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Gold data-core node inside the D */}
+              <circle
+                cx="36"
+                cy="32"
+                r="5"
+                fill="#C9A84C"
+                className="transition-all duration-200 group-hover:brightness-125"
+                style={{ filter: "drop-shadow(0 0 0px #C9A84C)" }}
+              />
+            </svg>
+            <span className="hidden sm:block font-bold text-white text-sm tracking-tight leading-none">
+              DataCore
+            </span>
           </NavLink>
 
           {/* Nav links */}
