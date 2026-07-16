@@ -88,6 +88,7 @@ function Track1({ isRTL, portfolioBid }) {
             value: Math.round(d.predicted_revenue),
             upper: Math.round(d.upper_bound),
             lower: Math.round(d.lower_bound),
+            band:  Math.round(d.upper_bound - d.lower_bound),
           }));
           cache.current[id] = { dash: detail, fore };
           setData(detail);
@@ -475,8 +476,12 @@ function Track1({ isRTL, portfolioBid }) {
               margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="goldGrad2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#C9A84C" stopOpacity={0.3} />
+                  <stop offset="5%"  stopColor="#C9A84C" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#C9A84C" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="ciGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stopColor="#C9A84C" stopOpacity={0.18} />
+                  <stop offset="100%" stopColor="#C9A84C" stopOpacity={0.04} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1E2D42" />
@@ -495,8 +500,15 @@ function Track1({ isRTL, portfolioBid }) {
                   backdropFilter: "blur(12px)",
                 }}
                 labelStyle={{ color: "#C9A84C", fontWeight: 600 }}
-                formatter={v => [`SAR ${fmtFull(v)}`, ""]}
+                formatter={(v, name) => name === "band" || name === "lower" ? null : [`SAR ${fmtFull(v)}`, ""]}
               />
+              {/* CI lower baseline (invisible, stacks to create band) */}
+              <Area type="monotone" dataKey="lower" stackId="ci"
+                stroke="none" fill="none" dot={false} legendType="none" />
+              {/* CI band = upper - lower, stacked on top of lower */}
+              <Area type="monotone" dataKey="band" stackId="ci"
+                stroke="none" fill="url(#ciGrad)" dot={false} legendType="none" />
+              {/* Main prediction line */}
               <Area type="monotone" dataKey="value"
                 stroke="#C9A84C" strokeWidth={2}
                 fill="url(#goldGrad2)" dot={false}

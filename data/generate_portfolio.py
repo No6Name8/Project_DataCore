@@ -381,18 +381,41 @@ def revenue_trend(tx_df):
     return "steady"
 
 
-# ── Forecast series (synthetic linear projection) ────────────────────────────
-def make_forecast_series(avg_daily_rev, trend_dir, n=30):
-    trend_mult = {"growing": 1.02, "steady": 1.00, "declining": 0.98}[trend_dir]
+# ── Weekday multiplier patterns (Mon=0 … Sun=6, Saudi Thu/Fri weekend) ────────
+_WDAY = {
+    # arch → [Mon, Tue, Wed, Thu,  Fri,  Sat,  Sun]
+    "A": [0.80, 0.90, 1.00, 1.30, 1.35, 1.10, 0.55],  # food — Thu/Fri peak
+    "B": [0.75, 0.85, 0.95, 1.30, 1.40, 1.05, 0.70],  # retail
+    "C": [1.05, 1.10, 1.10, 0.85, 0.50, 0.90, 1.00],  # auto — closed Fri
+    "D": [1.05, 1.10, 1.10, 0.70, 0.40, 0.90, 1.00],  # real estate
+    "E": [1.05, 1.10, 1.10, 0.80, 0.50, 0.90, 1.05],  # services
+    "F": [0.85, 0.90, 1.00, 1.20, 1.25, 1.10, 0.70],  # laundromat
+    "G": [0.80, 0.85, 0.95, 1.30, 1.45, 1.10, 0.55],  # supermarket
+    "H": [0.90, 0.95, 1.05, 1.20, 1.10, 1.10, 0.70],  # electronics
+    "I": [1.00, 1.05, 1.05, 1.15, 0.75, 1.05, 0.95],  # vehicle dealer
+    "J": [0.90, 0.95, 1.00, 1.20, 1.10, 1.10, 0.75],  # personal services
+    "K": [1.10, 1.15, 1.15, 0.75, 0.35, 0.85, 1.00],  # medical
+    "L": [0.80, 0.85, 0.95, 1.30, 1.40, 1.10, 0.60],  # fashion
+}
+
+# ── Forecast series with weekday variation, noise, widening CI ───────────────
+def make_forecast_series(avg_daily_rev, trend_dir, arch_key="A", n=30):
+    trend_rate = {"growing": 0.005, "steady": 0.0, "declining": -0.004}[trend_dir]
+    wday_mults = _WDAY.get(arch_key, _WDAY["A"])
+    base_date  = datetime(2025, 7, 1)
     series = []
     for i in range(n):
-        fdate = (datetime(2025, 1, 1) + timedelta(days=i)).strftime("%Y-%m-%d")
-        pred  = round(avg_daily_rev * (trend_mult ** i), 2)
+        fdate        = base_date + timedelta(days=i)
+        wday         = fdate.weekday()
+        trend_factor = math.exp(trend_rate * i)
+        noise        = float(rng.normal(1.0, 0.06))          # ±6% noise
+        pred         = max(0.0, avg_daily_rev * trend_factor * wday_mults[wday] * noise)
+        uncertainty  = 0.12 + i * 0.004                      # widens with horizon
         series.append({
-            "date": fdate,
-            "predicted_revenue": pred,
-            "upper_bound": round(pred * 1.15, 2),
-            "lower_bound": round(pred * 0.85, 2),
+            "date":              fdate.strftime("%Y-%m-%d"),
+            "predicted_revenue": round(pred, 2),
+            "upper_bound":       round(pred * (1 + uncertainty), 2),
+            "lower_bound":       round(max(0.0, pred * (1 - uncertainty)), 2),
         })
     return series
 
@@ -484,7 +507,7 @@ def main():
         # ── Build detail JSON (same shape as /api/dashboard/{bid}) ────────────
         recent_tx = tx_df.tail(10).to_dict(orient="records")
         energy_trend_data = en_df.tail(7).to_dict(orient="records")
-        forecast_series   = make_forecast_series(avg_daily, trend_dir)
+        forecast_series   = make_forecast_series(avg_daily, trend_dir, arch_key)
 
         detail = {
             "business": {
