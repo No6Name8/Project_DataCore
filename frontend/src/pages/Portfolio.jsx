@@ -313,7 +313,7 @@ export default function Portfolio() {
         <select className={selectCls} value={filterRisk} onChange={handleFilterChange(setFilterRisk)}>
           <option value="all">All Risk Tiers</option>
           {["very_low","low","medium","high","critical"].map((t) => (
-            <option key={t} value={t}>{t.replace("_"," ")}</option>
+            <option key={t} value={t}>{t.replace("_"," ")} risk</option>
           ))}
         </select>
 
@@ -377,7 +377,7 @@ export default function Portfolio() {
                     {row.dscr_score?.toFixed(2) ?? "—"}
                   </td>
                   <td className={`px-3 py-3 text-xs capitalize ${RISK_COLORS[row.risk_tier] ?? ""}`}>
-                    {row.risk_tier?.replace("_"," ")}
+                    {row.risk_tier ? row.risk_tier.replace("_"," ") + " risk" : "—"}
                   </td>
                   <td className="px-3 py-3">
                     <span className="flex items-center gap-1.5">

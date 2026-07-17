@@ -273,7 +273,7 @@ function Track1({ isRTL, portfolioBid }) {
               iconColor: "text-status-blue",
               label: isRTL ? "معدل تغطية الدين" : "DSCR Score",
               value: dscr?.dscr_score?.toFixed(2) || "—",
-              sub: dscr?.risk_tier?.replace("_", " ") || "",
+              sub: dscr?.risk_tier ? dscr.risk_tier.replace("_", " ") + " risk" : "",
               subColor: RISK_COLOR[dscr?.risk_tier] || "text-gray-400",
             },
             {
