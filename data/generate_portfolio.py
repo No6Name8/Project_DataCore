@@ -36,7 +36,24 @@ LOAN_PCT   = 0.40
 _r = BASE_RATE / 12
 _n = LOAN_TERM
 AMORT_FACTOR       = _r * (1 + _r) ** _n / ((1 + _r) ** _n - 1)
-ANNUAL_DEBT_FACTOR = AMORT_FACTOR * 12 * LOAN_PCT   # ≈ 0.1484
+ANNUAL_DEBT_FACTOR = AMORT_FACTOR * 12   # monthly payment factor (excludes LOAN_PCT — loan is fixed, not %-of-revenue)
+
+# Per-archetype loan amount ranges (SAR) — fixed per business, independent of revenue
+# This ensures DSCR = NOI / debt_service varies realistically across businesses
+ARCH_LOAN_RANGE = {
+    "A": (80_000,   400_000),   # Food & Beverage
+    "B": (120_000,  600_000),   # Retail
+    "C": (300_000, 1_500_000),  # Automotive (high-value)
+    "D": (40_000,   200_000),   # Real Estate / Brokerage (commission, small loans)
+    "E": (60_000,   350_000),   # Services
+    "F": (80_000,   400_000),   # Essential Services
+    "G": (150_000,  700_000),   # Supermarket
+    "H": (100_000,  500_000),   # Electronics
+    "I": (250_000, 1_200_000),  # Vehicle Dealer
+    "J": (30_000,   180_000),   # Personal Services
+    "K": (100_000,  600_000),   # Medical / Dental
+    "L": (50_000,   300_000),   # Fashion & Boutique
+}
 
 # ── Archetype distribution (507 total) ───────────────────────────────────────
 ARCH_DIST = {
@@ -319,19 +336,24 @@ def gen_energy(arch_key, tx_df):
 
 
 # ── DSCR computation (inline) ─────────────────────────────────────────────────
-def compute_dscr(total_revenue_30d, expense_ratio):
-    """Compute DSCR from 30-day (or period) revenue and expense ratio."""
+def compute_dscr(total_revenue_30d, expense_ratio, target_dscr):
+    """Compute DSCR record given a pre-drawn per-business DSCR value.
+
+    Revenue spans 3 orders of magnitude (630–674K SAR/day), so any approach
+    that derives loan_amount from revenue (fixed-ratio or fixed-SAR-range) either
+    cancels revenue out of the fraction or produces absurd values for large businesses.
+    Instead we draw DSCR from a lognormal distribution per business so each gets
+    a unique, realistic value. Revenue still drives NOI and credit_limit.
+    """
     annual_revenue = total_revenue_30d * (365 / N_DAYS)
     noi_annual     = annual_revenue * (1 - expense_ratio)
-    loan_amount    = annual_revenue * LOAN_PCT
-    ann_debt_svc   = loan_amount * ANNUAL_DEBT_FACTOR
-    dscr           = noi_annual / ann_debt_svc if ann_debt_svc > 0 else 0.0
+    dscr           = target_dscr
 
-    if   dscr >= 2.0: risk_tier = "very_low"
-    elif dscr >= 1.5: risk_tier = "low"
+    if   dscr >= 2.0:  risk_tier = "very_low"
+    elif dscr >= 1.5:  risk_tier = "low"
     elif dscr >= 1.25: risk_tier = "medium"
-    elif dscr >= 1.0: risk_tier = "high"
-    else:             risk_tier = "critical"
+    elif dscr >= 1.0:  risk_tier = "high"
+    else:              risk_tier = "critical"
 
     mults = {"very_low":1.5, "low":1.2, "medium":0.9, "high":0.6, "critical":0.0}
     avg_daily = annual_revenue / 365
@@ -481,9 +503,15 @@ def main():
             is_commission = (arch_key == "D")
             expense_ratio = 0.35 if arch_key == "D" else 0.65
 
-        # DSCR
+        # DSCR — draw per-business DSCR from lognormal distribution
+        # Revenue spans 3 orders of magnitude so no loan-amount formula avoids
+        # cancellation; instead we draw directly and let NOI/credit_limit use
+        # real revenue.  lognormal(log(2.0), 0.55) ≈ 10% critical, 8% high,
+        # 10% medium, 22% low, 50% very_low — a realistic SME portfolio spread.
         total_rev  = float(tx_df["amount_sar"].sum())
-        dscr_data  = compute_dscr(total_rev, expense_ratio)
+        raw_dscr   = float(rng.lognormal(mean=math.log(2.0), sigma=0.55))
+        target_dscr = round(max(0.50, min(20.0, raw_dscr)), 4)
+        dscr_data  = compute_dscr(total_rev, expense_ratio, target_dscr)
 
         # Revenue metrics
         tx_df["_date"] = tx_df["timestamp"].str[:10]
