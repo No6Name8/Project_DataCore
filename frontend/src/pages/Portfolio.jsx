@@ -215,7 +215,7 @@ export default function Portfolio() {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-gray-400 gap-4">
         <RefreshCw size={32} className="animate-spin text-brand-gold" />
-        <p>Loading 500-business portfolio…</p>
+        <p>Loading 507-business portfolio…</p>
       </div>
     );
   }
