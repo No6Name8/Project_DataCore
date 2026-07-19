@@ -1,22 +1,24 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
-import Demo from "./pages/Demo";
-import HowItWorks from "./pages/HowItWorks";
-import Benefits from "./pages/Benefits";
-import AIEngine from "./pages/AIEngine";
-import Portfolio from "./pages/Portfolio";
+import Marketing from "./pages/Marketing";
+import DemoHub from "./pages/DemoHub";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="/demo" replace />} />
-        <Route path="demo" element={<Demo />} />
-        <Route path="how-it-works" element={<HowItWorks />} />
-        <Route path="benefits" element={<Benefits />} />
-        <Route path="ai-engine" element={<AIEngine />} />
-        <Route path="portfolio" element={<Portfolio />} />
-      </Route>
+      {/* Marketing landing */}
+      <Route path="/" element={<Marketing />} />
+
+      {/* Unified demo — Bank View + Client View */}
+      <Route path="/demo" element={<DemoHub />} />
+
+      {/* Legacy routes now live as Bank View sections — keep old links working */}
+      <Route path="/portfolio"    element={<Navigate to="/demo?view=bank&section=portfolio" replace />} />
+      <Route path="/how-it-works" element={<Navigate to="/demo?view=bank&section=how" replace />} />
+      <Route path="/benefits"     element={<Navigate to="/demo?view=bank&section=benefits" replace />} />
+      <Route path="/ai-engine"    element={<Navigate to="/demo?view=bank&section=ai" replace />} />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

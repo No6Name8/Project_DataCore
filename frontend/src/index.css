@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 
@@ -23,9 +23,18 @@
   --color-status-red:    #EF4444;
   --color-status-blue:   #3B82F6;
 
+  /* Warm marketing palette — Tabby-inspired warmth on a navy base */
+  --color-cream:      #F5EFE4;
+  --color-cream-dim:  #C7BFAE;
+  --color-sage:       #8FB996;
+  --color-sageDark:   #6E9E76;
+  --color-amber:      #E0A458;
+  --color-ink:        #0B1420;
+
   /* Fonts */
-  --font-family-arabic: "Tajawal", sans-serif;
-  --font-family-latin:  "Inter", sans-serif;
+  --font-family-arabic:  "Tajawal", sans-serif;
+  --font-family-latin:   "Inter", sans-serif;
+  --font-family-display: "Space Grotesk", "Inter", sans-serif;
 
   /* Border radius */
   --radius-xl2: 1rem;
@@ -128,6 +137,114 @@ body {
   animation: fadeUp 0.3s var(--ease-out) forwards;
 }
 
+/* ── Marketing display type ─────────────────────────────────── */
+.font-display {
+  font-family: var(--font-family-display);
+  letter-spacing: -0.02em;
+}
+/* Arabic has no Space Grotesk glyphs — fall back to Tajawal */
+[dir="rtl"] .font-display {
+  font-family: 'Tajawal', sans-serif;
+  letter-spacing: normal;
+}
+
+/* Warm cream headline gradient (static, editorial) */
+.text-cream-gradient {
+  background: linear-gradient(135deg, #FBF7EF 0%, #E9C97C 55%, #C9A84C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero warmth — layered radial glows behind the fold */
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  width: 900px;
+  height: 900px;
+  max-width: 130vw;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at center,
+    rgba(201, 168, 76, 0.18) 0%,
+    rgba(201, 168, 76, 0.06) 32%,
+    transparent 62%);
+}
+.hero-glow::after {
+  content: "";
+  position: absolute;
+  bottom: -30%;
+  right: -10%;
+  width: 640px;
+  height: 640px;
+  max-width: 90vw;
+  background: radial-gradient(circle at center,
+    rgba(143, 185, 150, 0.10) 0%,
+    transparent 60%);
+}
+
+/* Gradient-border card — warm hairline that lifts on hover */
+.grad-card {
+  position: relative;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(180deg, rgba(22,32,48,0.92), rgba(15,25,35,0.92)) padding-box,
+    linear-gradient(140deg, rgba(201,168,76,0.45), rgba(30,45,66,0.35) 45%, rgba(143,185,150,0.30)) border-box;
+  border: 1px solid transparent;
+  transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .grad-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.45), 0 0 0 1px rgba(201,168,76,0.15);
+  }
+}
+
+/* Soft warm surface panel */
+.warm-panel {
+  background: linear-gradient(180deg, rgba(28,40,58,0.75), rgba(18,28,40,0.75));
+  border: 1px solid rgba(201,168,76,0.14);
+  backdrop-filter: blur(10px);
+}
+
+/* Pill CTA — warm gold */
+.cta-gold {
+  background: linear-gradient(135deg, #E8C96A, #C9A84C);
+  color: #10202F;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 0 6px 24px rgba(201,168,76,0.28);
+  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out), filter 150ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta-gold:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,168,76,0.4); filter: brightness(1.04); }
+}
+.cta-gold:active { transform: scale(0.98); }
+
+.cta-ghost {
+  border-radius: 9999px;
+  border: 1px solid rgba(245,239,228,0.22);
+  color: var(--color-cream);
+  font-weight: 500;
+  transition: border-color 150ms var(--ease-out), background-color 150ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cta-ghost:hover { border-color: rgba(201,168,76,0.6); background: rgba(201,168,76,0.06); }
+}
+
+/* Subtle grid texture for section backgrounds */
+.dot-grid {
+  background-image: radial-gradient(rgba(201,168,76,0.10) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
 /* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .page-enter {
@@ -138,6 +255,8 @@ body {
   .text-gold-gradient {
     animation: none;
   }
+  .grad-card:hover,
+  .cta-gold:hover { transform: none; }
   * {
     transition-duration: 0.01ms !important;
     animation-duration:  0.01ms !important;
