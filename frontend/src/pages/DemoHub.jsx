@@ -3,25 +3,17 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLang } from "../i18n/LanguageContext";
 import TopNav from "../components/TopNav";
-import {
-  LayoutDashboard, Briefcase, GitBranch, Star, Brain,
-  Building2, User,
-} from "lucide-react";
+import SidebarShell from "../components/SidebarShell";
+import { LayoutDashboard, Briefcase, Building2, User } from "lucide-react";
 
 import Demo from "./Demo";
 import Portfolio from "./Portfolio";
-import HowItWorks from "./HowItWorks";
-import Benefits from "./Benefits";
-import AIEngine from "./AIEngine";
 import ClientView from "./ClientView";
 
-/* Bank View sidebar sections — merge of the previously separate pages */
+/* Bank View sidebar — the working lending dashboard only */
 const SECTIONS = [
   { id: "lending",   icon: LayoutDashboard, en: "Lending Engine", ar: "محرك الإقراض", Comp: Demo },
   { id: "portfolio", icon: Briefcase,       en: "Portfolio",      ar: "المحفظة",       Comp: Portfolio },
-  { id: "how",       icon: GitBranch,       en: "How It Works",   ar: "كيف يعمل",      Comp: HowItWorks },
-  { id: "benefits",  icon: Star,            en: "Benefits",       ar: "الفوائد",       Comp: Benefits },
-  { id: "ai",        icon: Brain,           en: "AI Engine",      ar: "محرك الذكاء",   Comp: AIEngine },
 ];
 
 export default function DemoHub() {
@@ -80,7 +72,7 @@ export default function DemoHub() {
                 key={tab.id}
                 onClick={() => chooseView(tab.id)}
                 className={`relative flex items-center gap-2 px-5 sm:px-6 py-2.5
-                            rounded-lg text-sm font-medium
+                            rounded-lg text-sm font-medium cursor-pointer
                             ${view === tab.id ? "text-cream" : "text-gray-400 hover:text-cream"}`}
                 style={{ transition: "color 150ms var(--ease-out)" }}
               >
@@ -106,62 +98,15 @@ export default function DemoHub() {
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="flex flex-col lg:flex-row gap-6"
             >
-              {/* Desktop sidebar */}
-              <aside className="hidden lg:block w-56 shrink-0">
-                <nav className="sticky top-24 space-y-1">
-                  {SECTIONS.map(s => (
-                    <button
-                      key={s.id}
-                      onClick={() => chooseSection(s.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl
-                                  text-sm font-medium text-start
-                                  ${section === s.id
-                                    ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/25"
-                                    : "text-gray-400 hover:text-cream hover:bg-white/5 border border-transparent"}`}
-                      style={{ transition: "color 150ms var(--ease-out), background-color 150ms var(--ease-out)" }}
-                    >
-                      <s.icon size={17} className="shrink-0" />
-                      {lang === "ar" ? s.ar : s.en}
-                    </button>
-                  ))}
-                </nav>
-              </aside>
-
-              {/* Mobile / tablet section chips */}
-              <div className="lg:hidden -mx-4 px-4 overflow-x-auto">
-                <div className="flex gap-2 pb-1 w-max">
-                  {SECTIONS.map(s => (
-                    <button
-                      key={s.id}
-                      onClick={() => chooseSection(s.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg
-                                  text-sm font-medium whitespace-nowrap
-                                  ${section === s.id
-                                    ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/25"
-                                    : "text-gray-400 border border-surface-border"}`}
-                    >
-                      <s.icon size={15} />
-                      {lang === "ar" ? s.ar : s.en}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Section content */}
-              <div className="flex-1 min-w-0">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={section}
-                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-                  >
-                    <ActiveComp />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+              <SidebarShell
+                sections={SECTIONS}
+                active={section}
+                onSelect={chooseSection}
+                layoutId="bankRailPill"
+              >
+                <ActiveComp />
+              </SidebarShell>
             </motion.div>
           ) : (
             <motion.div

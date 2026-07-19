@@ -24,8 +24,9 @@ export default function TopNav() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { to: "/",     labelEn: "Home",    labelAr: "الرئيسية" },
-    { to: "/demo", labelEn: "Demo",    labelAr: "العرض" },
+    { to: "/",             labelEn: "Home",         labelAr: "الرئيسية" },
+    { to: "/demo",         labelEn: "Demo",         labelAr: "العرض" },
+    { to: "/how-it-works", labelEn: "How It Works", labelAr: "كيف يعمل" },
   ];
 
   // Contact lives as an anchor on the marketing page.
