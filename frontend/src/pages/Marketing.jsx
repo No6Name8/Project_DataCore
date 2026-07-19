@@ -93,6 +93,7 @@ const COPY = {
     contactBody:
       "For pilots, partnerships, or a walkthrough of the engine — reach out directly.",
     emailCta: "Email Abdullah",
+    linkedinCta: "LinkedIn",
 
     footerRights: "© 2026 DataCore · Abdullah Ali Alanazi",
     footerGh: "GitHub",
@@ -180,6 +181,7 @@ const COPY = {
     contactBody:
       "للتجارب أو الشراكات أو جولة في المحرك — تواصل مباشرة.",
     emailCta: "راسل عبدالله",
+    linkedinCta: "LinkedIn",
 
     footerRights: "© ٢٠٢٦ DataCore · عبدالله علي العنزي",
     footerGh: "GitHub",
@@ -187,6 +189,7 @@ const COPY = {
 };
 
 const GITHUB_URL = "https://github.com/";
+const LINKEDIN_URL = "https://linkedin.com/in/abdullah-alanazi";
 const EMAIL = "abud2754@gmail.com";
 
 /* ── Motion helper ───────────────────────────────────────────── */
@@ -586,12 +589,22 @@ export default function Marketing() {
             <p className="mt-5 text-base sm:text-lg text-cream-dim">{c.contactBody}</p>
           </Reveal>
           <Reveal i={3}>
-            <a href={`mailto:${EMAIL}`}
-              className="cta-gold mt-9 inline-flex items-center gap-2 px-7 py-3.5 text-base">
-              <Mail size={18} />
-              {c.emailCta}
-            </a>
-            <div className="mt-4 text-sm text-cream-dim font-mono">{EMAIL}</div>
+            <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href={`mailto:${EMAIL}`}
+                className="cta-gold inline-flex items-center justify-center gap-2
+                           px-7 py-3.5 text-base w-full sm:w-52">
+                <Mail size={18} />
+                {c.emailCta}
+              </a>
+              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer"
+                className="cta-ghost inline-flex items-center justify-center gap-2
+                           px-7 py-3.5 text-base w-full sm:w-52">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 110-4.14 2.07 2.07 0 010 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z" />
+                </svg>
+                {c.linkedinCta}
+              </a>
+            </div>
           </Reveal>
         </div>
       </section>

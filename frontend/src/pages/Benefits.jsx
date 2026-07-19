@@ -337,53 +337,6 @@ export default function Benefits() {
         />
       </div>
 
-      {/* Bottom summary strip */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-        className="glass-card rounded-xl p-6 border border-brand-gold/20"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          {[
-            {
-              value: "250K+",
-              labelEn: "SAR Prize at Stake",
-              labelAr: "ريال جائزة على المحك",
-              color: "text-brand-gold",
-            },
-            {
-              value: "99%",
-              labelEn: "of Saudi Businesses are SMEs",
-              labelAr: "من الأعمال السعودية منشآت صغيرة",
-              color: "text-status-green",
-            },
-            {
-              value: "35%",
-              labelEn: "Vision 2030 SME GDP Target",
-              labelAr: "هدف رؤية 2030 لمساهمة المنشآت",
-              color: "text-status-blue",
-            },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            >
-              <div className={`text-3xl font-bold ${stat.color}`}>
-                {stat.value}
-              </div>
-              <div className="text-gray-400 text-xs mt-1">
-                {isRTL ? stat.labelAr : stat.labelEn}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
     </div>
   );
 }
