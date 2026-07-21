@@ -6,8 +6,14 @@ Run from project root: python api/app.py
 """
 
 import os, sys, json
-from flask import Flask, jsonify, request, abort
-from flask_cors import CORS
+try:
+    from flask import Flask, jsonify, request, abort
+    from flask_cors import CORS
+except ImportError as exc:
+    raise ImportError(
+        "Flask and Flask-CORS are required to run this application. "
+        "Install them with `pip install flask flask-cors`."
+    ) from exc
 import pandas as pd
 
 ROOT          = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,7 +29,12 @@ from models.business_classifier import BusinessClassifier
 from models.expense_estimator   import ExpenseEstimator
 
 app = Flask(__name__)
-CORS(app)
+
+# ALLOWED_ORIGINS env var: comma-separated list of allowed origins, or "*" (default).
+# Set to your Vercel domain on Railway: ALLOWED_ORIGINS=https://your-app.vercel.app
+_raw_origins = os.environ.get("ALLOWED_ORIGINS", "*")
+_cors_origins = "*" if _raw_origins == "*" else [o.strip() for o in _raw_origins.split(",")]
+CORS(app, origins=_cors_origins)
 
 # ── Business registry ─────────────────────────────────────────────────────────
 BUSINESSES = {
@@ -179,6 +190,14 @@ def shape_dscr(bid, r):
             "recommended_pipeline": transition["recommended_pipeline"],
         },
     }
+
+# =============================================================================
+# ROUTES -- Health check (no model dependency — responds immediately)
+# =============================================================================
+
+@app.route("/api/health")
+def health():
+    return jsonify({"status": "ok", "models_loaded": _models_loaded}), 200
 
 # =============================================================================
 # ROUTES -- Core data
@@ -502,6 +521,9 @@ def server_error(e):
     return jsonify({"error": "Internal server error"}), 500
 
 
+# Load models at import time so gunicorn workers are warm on first request.
+# The _models_loaded flag ensures this is a no-op on subsequent calls.
+load_models()
+
 if __name__ == "__main__":
-    load_models()
     app.run(host="0.0.0.0", port=5000, debug=False)
