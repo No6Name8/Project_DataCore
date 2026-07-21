@@ -10,6 +10,9 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+from models._guardrails import get_logger, make_data_quality
+_log = get_logger("estimator")
+
 
 class ExpenseEstimator:
 
@@ -84,18 +87,51 @@ class ExpenseEstimator:
 
     def _derive_profile(self, raw_features: dict,
                         profile_source: str = "real_data",
-                        is_outlier: bool = False) -> dict:
+                        is_outlier: bool = False,
+                        bid: str = "unknown") -> dict:
         """
         Maps the 15-dim raw feature dict from Model 1 into behavioral tags
         consumed by estimate(). Called by estimate_from_classifier/intake.
+        Missing fields fall back to safe defaults with a logged warning.
         """
-        avg_ticket        = raw_features.get("avg_ticket_sar", 100.0)
-        daily_tx          = raw_features.get("avg_daily_transactions", 20.0)
-        rev_cv            = raw_features.get("revenue_cv", 0.30)
-        cash_ratio        = raw_features.get("cash_ratio", 0.30)
-        night             = raw_features.get("night_transaction_ratio", 0.01)
-        active_days_ratio = raw_features.get("active_days_ratio", 0.5)
-        ticket_cv_val     = raw_features.get("ticket_cv", 0.5)
+        _dq_warnings = []
+
+        def _get(key, default, lo=None, hi=None):
+            val = raw_features.get(key)
+            if val is None:
+                _log.warning(
+                    f"model=estimator | bid={bid} | rule=missing_feature | "
+                    f"field={key} | default={default}"
+                )
+                _dq_warnings.append({"rule": "missing_feature", "field": key,
+                                      "default": default})
+                return float(default)
+            v = float(val)
+            if lo is not None and v < lo:
+                _log.warning(
+                    f"model=estimator | bid={bid} | rule=feature_out_of_range | "
+                    f"field={key} | value={v} | clamped_to={lo}"
+                )
+                _dq_warnings.append({"rule": "feature_out_of_range", "field": key,
+                                      "value": v, "clamped_to": lo})
+                return float(lo)
+            if hi is not None and v > hi:
+                _log.warning(
+                    f"model=estimator | bid={bid} | rule=feature_out_of_range | "
+                    f"field={key} | value={v} | clamped_to={hi}"
+                )
+                _dq_warnings.append({"rule": "feature_out_of_range", "field": key,
+                                      "value": v, "clamped_to": hi})
+                return float(hi)
+            return v
+
+        avg_ticket        = _get("avg_ticket_sar",            100.0,  lo=0.01)
+        daily_tx          = _get("avg_daily_transactions",     20.0,  lo=0.01)
+        rev_cv            = _get("revenue_cv",                  0.30,  lo=0.0)
+        cash_ratio        = _get("cash_ratio",                  0.30,  lo=0.0, hi=1.0)
+        night             = _get("night_transaction_ratio",     0.01,  lo=0.0, hi=1.0)
+        active_days_ratio = _get("active_days_ratio",           0.5,   lo=0.0, hi=1.0)
+        ticket_cv_val     = _get("ticket_cv",                   0.5,   lo=0.0)
 
         # Ticket size → COGS proxy
         if   avg_ticket < 50:      ticket_size = "very_low"
@@ -147,30 +183,51 @@ class ExpenseEstimator:
         )
 
         return {
-            "ticket_size":          ticket_size,
-            "transaction_velocity": velocity_tag,
-            "revenue_stability":    stability_tag,
-            "payment_mix":          payment_mix,
-            "nocturnal_activity":   nocturnal,
-            "temporal_pattern":     temporal_pattern,
-            "profile_source":       profile_source,
-            "is_outlier":           is_outlier,
-            "is_commission_based":  is_commission_based,
+            "ticket_size":            ticket_size,
+            "transaction_velocity":   velocity_tag,
+            "revenue_stability":      stability_tag,
+            "payment_mix":            payment_mix,
+            "nocturnal_activity":     nocturnal,
+            "temporal_pattern":       temporal_pattern,
+            "profile_source":         profile_source,
+            "is_outlier":             is_outlier,
+            "is_commission_based":    is_commission_based,
+            "_data_quality_warnings": _dq_warnings,
         }
 
     # ── Core estimate ─────────────────────────────────────────────────────────
 
     def estimate(self, behavioral_profile: dict,
-                 holds_inventory: bool = False) -> dict:
+                 holds_inventory: bool = False,
+                 bid: str = "unknown") -> dict:
         """
         Derives an expense ratio from behavioral tags.
         Input dict must contain: ticket_size, transaction_velocity,
         revenue_stability. Optional: payment_mix, nocturnal_activity,
         profile_source, is_outlier.
+        Unknown tags fall back to safe defaults with a logged warning.
         """
-        ticket_size      = behavioral_profile.get("ticket_size",          "low")
-        velocity_tag     = behavioral_profile.get("transaction_velocity",  "moderate")
-        stability_tag    = behavioral_profile.get("revenue_stability",    "moderate")
+        _dq_warnings = list(behavioral_profile.get("_data_quality_warnings", []))
+
+        VALID_TICKET    = {"very_low", "low", "mid", "high", "very_high"}
+        VALID_VELOCITY  = {"very_high", "high", "moderate", "low", "very_low"}
+        VALID_STABILITY = {"very_stable", "stable", "moderate", "volatile", "highly_volatile"}
+
+        def _validated_tag(key, default, valid_set):
+            val = behavioral_profile.get(key, default)
+            if val not in valid_set:
+                _log.warning(
+                    f"model=estimator | bid={bid} | rule=unknown_tag | "
+                    f"field={key} | got={val!r} | default={default}"
+                )
+                _dq_warnings.append({"rule": "unknown_tag", "field": key,
+                                      "got": val, "default": default})
+                return default
+            return val
+
+        ticket_size      = _validated_tag("ticket_size",          "low",         VALID_TICKET)
+        velocity_tag     = _validated_tag("transaction_velocity",  "moderate",    VALID_VELOCITY)
+        stability_tag    = _validated_tag("revenue_stability",     "moderate",    VALID_STABILITY)
         payment_mix      = behavioral_profile.get("payment_mix",          "mixed")
         nocturnal        = behavioral_profile.get("nocturnal_activity",    "minimal")
         temporal_pattern = behavioral_profile.get("temporal_pattern",     "distributed")
@@ -214,6 +271,7 @@ class ExpenseEstimator:
                 "derived_from":         "behavioral_profile",
                 "profile_source":       profile_src,
                 "expense_source":       "commission_based_lookup",
+                "data_quality":         make_data_quality(_dq_warnings),
             }
 
         cogs_ratio  = self.cogs_by_ticket.get(ticket_size, 0.35)
@@ -285,6 +343,7 @@ class ExpenseEstimator:
             "derived_from":         "behavioral_profile",
             "profile_source":       profile_src,
             "expense_source":       "behavioral_three_layer",
+            "data_quality":         make_data_quality(_dq_warnings),
         }
 
     # ── Benchmark validation ──────────────────────────────────────────────────

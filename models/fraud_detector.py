@@ -18,16 +18,37 @@ DATA_DIR  = os.path.join(ROOT, "data", "processed")
 SAVED_DIR = os.path.join(ROOT, "models", "saved")
 sys.path.insert(0, ROOT)
 
+from models._guardrails import (
+    get_logger, check_required_columns, check_amount_range,
+    make_data_quality, make_insufficient_result,
+    MIN_TX_FRAUD_TRAIN, MIN_TX_FRAUD_SCORE,
+)
+_log = get_logger("fraud")
+
 # ── Feature engineering ───────────────────────────────────────────────────────
 
 class TransactionFeatureEngineer:
     """Computes 15 per-transaction behavioral features for Isolation Forest."""
 
-    def engineer(self, tx: pd.DataFrame) -> pd.DataFrame:
+    def engineer(self, tx: pd.DataFrame, bid: str = "unknown") -> pd.DataFrame:
+        # ── Guard 1: required columns ─────────────────────────────────────────
+        missing = check_required_columns(tx, ["timestamp", "amount_sar"], "fraud", bid, _log)
+        if missing:
+            raise ValueError(f"fraud engineer: missing_required_column: {missing} (bid={bid})")
+
         df = tx.copy()
         df["timestamp"]  = pd.to_datetime(df["timestamp"])
-        df["amount_sar"] = df["amount_sar"].astype(float)
+        df["amount_sar"] = pd.to_numeric(df["amount_sar"], errors="coerce").fillna(0.0)
         df = df.sort_values("timestamp").reset_index(drop=True)
+
+        # ── Guard 2: amount range ─────────────────────────────────────────────
+        # Remove negatives; just log out-of-range highs (don't remove them)
+        neg_mask = df["amount_sar"] < 0
+        if neg_mask.any():
+            check_amount_range(df["amount_sar"], "fraud", bid, _log)
+            df = df[~neg_mask].copy().reset_index(drop=True)
+        else:
+            check_amount_range(df["amount_sar"], "fraud", bid, _log)
 
         df["hour_of_day"]  = df["timestamp"].dt.hour
         df["day_of_week"]  = df["timestamp"].dt.weekday
@@ -103,9 +124,17 @@ class FraudDetector:
         tx = transactions_df.copy()
         tx["timestamp"]  = pd.to_datetime(tx["timestamp"])
         tx               = tx.sort_values("timestamp").reset_index(drop=True)
-        tx["amount_sar"] = tx["amount_sar"].astype(float)
+        tx["amount_sar"] = pd.to_numeric(tx["amount_sar"], errors="coerce").fillna(0.0)
 
-        features_df = self.engineer.engineer(tx)
+        # ── Guard: minimum rows for stable Isolation Forest fit ───────────────
+        if len(tx) < MIN_TX_FRAUD_TRAIN:
+            _log.warning(
+                f"model=fraud | bid={business_id} | rule=insufficient_data_for_training | "
+                f"actual={len(tx)} | min_required={MIN_TX_FRAUD_TRAIN}"
+            )
+            return  # skip training; scorer will fall back to cluster model
+
+        features_df = self.engineer.engineer(tx, bid=business_id)
 
         scaler = StandardScaler()
         X      = scaler.fit_transform(features_df)
@@ -150,7 +179,7 @@ class FraudDetector:
         all_tx["timestamp"]  = pd.to_datetime(all_tx["timestamp"])
         all_tx               = all_tx.sort_values("timestamp").reset_index(drop=True)
 
-        features_df = self.engineer.engineer(all_tx)
+        features_df = self.engineer.engineer(all_tx, bid=f"cluster_{cluster_id}")
 
         scaler = StandardScaler()
         X      = scaler.fit_transform(features_df)
@@ -206,12 +235,29 @@ class FraudDetector:
     def score_transactions(self, transactions_df: pd.DataFrame,
                            business_id: str = None,
                            cluster_id: int = None) -> pd.DataFrame:
+        bid = business_id or f"cluster_{cluster_id}"
         tx = transactions_df.copy()
         tx["timestamp"]  = pd.to_datetime(tx["timestamp"])
         tx               = tx.sort_values("timestamp").reset_index(drop=True)
-        tx["amount_sar"] = tx["amount_sar"].astype(float)
+        tx["amount_sar"] = pd.to_numeric(tx["amount_sar"], errors="coerce").fillna(0.0)
 
-        features_df = self.engineer.engineer(tx)
+        # Strip negatives here so tx and features_df stay aligned in row count
+        neg_mask = tx["amount_sar"] < 0
+        if neg_mask.any():
+            tx = tx[~neg_mask].copy().reset_index(drop=True)
+
+        # ── Guard: minimum rows to score ──────────────────────────────────────
+        if len(tx) < MIN_TX_FRAUD_SCORE:
+            _log.warning(
+                f"model=fraud | bid={bid} | rule=insufficient_data_for_scoring | "
+                f"actual={len(tx)} | min_required={MIN_TX_FRAUD_SCORE}"
+            )
+            tx["anomaly_score"]      = 0.0
+            tx["anomaly_label"]      = 1
+            tx["anomaly_percentile"] = 50.0
+            return tx
+
+        features_df = self.engineer.engineer(tx, bid=bid)
 
         if business_id and business_id in self.business_models:
             entry  = self.business_models[business_id]
@@ -284,6 +330,7 @@ class FraudDetector:
                      f"{ratio:.1f}x median SAR {med_amt:,.0f}, within 10x threshold)"),
                     f"behavioral_anomaly_check: passed (0 anomalous transactions from {total} scored, rate 0.00%)",
                 ],
+                "data_quality":       make_data_quality([]),
             }
 
         anomalies_df = anomalies_df.copy()
@@ -447,6 +494,7 @@ class FraudDetector:
             "anomalous_tx_count": int((scored_df["anomaly_label"] == -1).sum()),
             "reasons":            reasons,
             "checks_passed":      checks_passed,
+            "data_quality":       make_data_quality([]),
         }
 
     # ── Full pipeline ─────────────────────────────────────────────────────────

@@ -16,6 +16,27 @@ from sklearn.decomposition import PCA
 
 warnings.filterwarnings("ignore")
 
+from models._guardrails import (
+    get_logger, check_required_columns, check_min_rows,
+    check_amount_range, check_avg_ticket_range,
+    make_data_quality, make_insufficient_result,
+    MIN_TX_CLASSIFY, MIN_TX_WARN, AVG_TICKET_MAX_SAR,
+)
+
+_log = get_logger("classifier")
+
+
+class InsufficientDataError(Exception):
+    """Raised when a model receives fewer rows than its minimum threshold."""
+    def __init__(self, model: str, bid: str, reason: str, detail: dict = None):
+        self.model  = model
+        self.bid    = bid
+        self.reason = reason
+        self.detail = detail or {}
+        super().__init__(
+            f"model={model} | bid={bid} | rule={reason} | detail={self.detail}"
+        )
+
 try:
     import hdbscan
 except ImportError:
@@ -33,10 +54,56 @@ ALL_DATES = pd.date_range("2025-04-01", "2025-06-30").strftime("%Y-%m-%d").tolis
 class BusinessFeatureExtractor:
     """Converts raw transaction CSV into a 15-dim behavioral fingerprint."""
 
-    def extract(self, tx: pd.DataFrame) -> dict:
+    def extract(self, tx: pd.DataFrame, bid: str = "unknown") -> dict:
+        # ── Guard 1: required columns ─────────────────────────────────────────
+        missing = check_required_columns(
+            tx, ["timestamp", "amount_sar"], "classifier", bid, _log)
+        if missing:
+            raise ValueError(
+                f"missing_required_column: {missing} — cannot extract features "
+                f"(bid={bid})"
+            )
+
         tx = tx.copy()
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
-        tx["amount_sar"] = tx["amount_sar"].astype(float)
+        tx["amount_sar"] = pd.to_numeric(tx["amount_sar"], errors="coerce").fillna(0.0)
+
+        # ── Guard 2: minimum row count ────────────────────────────────────────
+        n = len(tx)
+        if n < MIN_TX_CLASSIFY:
+            raise InsufficientDataError(
+                model="classifier", bid=bid,
+                reason="insufficient_history",
+                detail={"actual_rows": n, "min_required": MIN_TX_CLASSIFY},
+            )
+
+        _dq_warnings = []
+        if n < MIN_TX_WARN:
+            _log.warning(
+                f"model=classifier | bid={bid} | rule=thin_data_warning | "
+                f"actual={n} | min_recommended={MIN_TX_WARN}"
+            )
+            _dq_warnings.append({
+                "rule": "thin_data_warning",
+                "actual": n, "min_recommended": MIN_TX_WARN,
+            })
+
+        # ── Guard 3: amount range ─────────────────────────────────────────────
+        # Remove negatives before computing features; log them
+        neg_mask = tx["amount_sar"] < 0
+        if neg_mask.any():
+            _dq_warnings += check_amount_range(tx["amount_sar"], "classifier", bid, _log)
+            tx = tx[~neg_mask].copy()
+            if len(tx) < MIN_TX_CLASSIFY:
+                raise InsufficientDataError(
+                    model="classifier", bid=bid,
+                    reason="insufficient_history_after_cleaning",
+                    detail={"actual_rows": len(tx), "min_required": MIN_TX_CLASSIFY,
+                            "removed_negative": int(neg_mask.sum())},
+                )
+        else:
+            _dq_warnings += check_amount_range(tx["amount_sar"], "classifier", bid, _log)
+
         tx["hour"]  = tx["timestamp"].dt.hour
         tx["date"]  = tx["timestamp"].dt.strftime("%Y-%m-%d")
         tx["wday"]  = tx["timestamp"].dt.weekday   # Mon=0 ... Sun=6
@@ -118,6 +185,9 @@ class BusinessFeatureExtractor:
             digital_ratio = 0.5
             cash_ratio    = 0.5
 
+        # ── Guard 4: avg_ticket scale check ──────────────────────────────────
+        _dq_warnings += check_avg_ticket_range(avg_ticket, "classifier", bid, _log)
+
         return {
             "avg_ticket_sar":            round(avg_ticket, 4),
             "median_ticket_sar":         round(median_ticket, 4),
@@ -134,22 +204,74 @@ class BusinessFeatureExtractor:
             "inter_transaction_gap_cv":  round(itg_cv, 4),
             "digital_payment_ratio":     round(digital_ratio, 4),
             "cash_ratio":                round(cash_ratio, 4),
+            # ── data quality metadata (not a feature — stripped before ML) ───
+            "_data_quality": make_data_quality(_dq_warnings),
         }
 
-    def extract_from_intake(self, intake_dict: dict) -> OrderedDict:
+    def extract_from_intake(self, intake_dict: dict,
+                            bid: str = "unknown") -> OrderedDict:
         """
         Maps intake form answers to the same 15-feature vector format
         as extract(). Used for Track 2 (zero transaction history).
+        Missing/invalid fields fall back to safe defaults with a logged warning.
         """
-        t          = intake_dict
-        ticket     = float(t["typical_ticket_sar"])
-        daily_tx   = float(t["expected_daily_customers"])
-        hours      = float(t["operating_hours_per_day"])
-        consumer   = bool(t["is_consumer_facing"])
-        high_value = bool(t["sells_high_value_items"])
-        payment    = t["expected_payment_mix"]
-        late_night = bool(t["operates_late_night"])
-        biz_days   = float(t["business_days_per_week"])
+        t = intake_dict
+
+        def _get_float(key, default, lo=None, hi=None):
+            val = t.get(key)
+            if val is None:
+                _log.warning(
+                    f"model=classifier | bid={bid} | rule=missing_intake_field | "
+                    f"field={key} | default={default}"
+                )
+                return float(default)
+            try:
+                v = float(val)
+            except (TypeError, ValueError):
+                _log.warning(
+                    f"model=classifier | bid={bid} | rule=invalid_intake_field | "
+                    f"field={key} | got={val!r} | default={default}"
+                )
+                return float(default)
+            if lo is not None and v < lo:
+                _log.warning(
+                    f"model=classifier | bid={bid} | rule=intake_field_out_of_range | "
+                    f"field={key} | value={v} | clamped_to={lo}"
+                )
+                return float(lo)
+            if hi is not None and v > hi:
+                _log.warning(
+                    f"model=classifier | bid={bid} | rule=intake_field_out_of_range | "
+                    f"field={key} | value={v} | clamped_to={hi}"
+                )
+                return float(hi)
+            return v
+
+        def _get_bool(key, default):
+            val = t.get(key)
+            if val is None:
+                _log.warning(
+                    f"model=classifier | bid={bid} | rule=missing_intake_field | "
+                    f"field={key} | default={default}"
+                )
+                return default
+            return bool(val)
+
+        VALID_PAYMENT = {"mostly_cash", "mostly_digital", "mixed"}
+        ticket     = _get_float("typical_ticket_sar",       50.0,  lo=1.0, hi=AVG_TICKET_MAX_SAR)
+        daily_tx   = _get_float("expected_daily_customers", 20.0,  lo=1.0, hi=10000.0)
+        hours      = _get_float("operating_hours_per_day",  10.0,  lo=1.0, hi=24.0)
+        biz_days   = _get_float("business_days_per_week",    6.0,  lo=1.0, hi=7.0)
+        consumer   = _get_bool("is_consumer_facing",   True)
+        high_value = _get_bool("sells_high_value_items", False)
+        late_night = _get_bool("operates_late_night",   False)
+        payment    = t.get("expected_payment_mix", "mixed")
+        if payment not in VALID_PAYMENT:
+            _log.warning(
+                f"model=classifier | bid={bid} | rule=invalid_intake_field | "
+                f"field=expected_payment_mix | got={payment!r} | default=mixed"
+            )
+            payment = "mixed"
 
         digital_ratio = 0.2 if payment == "mostly_cash" else (0.8 if payment == "mostly_digital" else 0.5)
         cash_ratio    = 0.7 if payment == "mostly_cash" else (0.1 if payment == "mostly_digital" else 0.35)
@@ -512,10 +634,16 @@ class BusinessClassifier:
         }
 
     def classify_from_data(self, transactions_df: pd.DataFrame,
-                           period_days: int = 30) -> dict:
+                           period_days: int = 30,
+                           bid: str = "unknown") -> dict:
         """Extracts features from a real transaction DataFrame, classifies, and enriches output."""
-        features = self.extractor.extract(transactions_df)
-        result   = self.classify(features)
+        try:
+            features = self.extractor.extract(transactions_df, bid=bid)
+        except InsufficientDataError as exc:
+            return make_insufficient_result("classifier", bid, exc.reason, exc.detail)
+
+        dq = features.pop("_data_quality")
+        result = self.classify(features)
 
         tx = transactions_df.copy()
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
@@ -528,24 +656,26 @@ class BusinessClassifier:
 
         clf_source = "cluster_fallback" if result["was_noise"] else "trained"
 
-        result["profile_source"]           = "real_data"
-        result["data_days"]                = data_days
-        result["refinement_status"]        = refinement_status
-        result["raw_features"]             = {k: round(float(v), 4) for k, v in features.items()}
-        result["classification_source"]    = clf_source
-        result["confidence_explanation"]   = self._confidence_explanation(
+        result["profile_source"]             = "real_data"
+        result["data_days"]                  = data_days
+        result["refinement_status"]          = refinement_status
+        result["raw_features"]               = {k: round(float(v), 4) for k, v in features.items()}
+        result["classification_source"]      = clf_source
+        result["confidence_explanation"]     = self._confidence_explanation(
             result["confidence"], result["archetype_label"], result["was_noise"], clf_source)
         result["closest_archetype_features"] = self._closest_archetype_features(
             features, result["cluster_id"])
+        result["data_quality"]               = dq
         return result
 
-    def classify_from_intake(self, intake_dict: dict) -> dict:
+    def classify_from_intake(self, intake_dict: dict,
+                             bid: str = "unknown") -> dict:
         """
         Track 2: classify a brand new business with zero transaction history.
         Uses intake form answers mapped to the same 15-feature vector.
         Max confidence capped at 0.65 — model is honest about uncertainty.
         """
-        features = self.extractor.extract_from_intake(intake_dict)
+        features = self.extractor.extract_from_intake(intake_dict, bid=bid)
         x = np.array([features[f] for f in self.feature_names], dtype=float).reshape(1, -1)
 
         x_log              = x.copy()
@@ -579,17 +709,21 @@ class BusinessClassifier:
                 conf_rounded, arch_label, False, "intake_form"),
             "closest_archetype_features":  self._closest_archetype_features(
                 dict(features), cluster_id),
+            "data_quality":                make_data_quality([]),
         }
 
     def classify_hybrid(self, transactions_df: pd.DataFrame,
-                        intake_dict: dict, period_days: int = 30) -> dict:
+                        intake_dict: dict, period_days: int = 30,
+                        bid: str = "unknown") -> dict:
         """
         Track 2 transition: blend real data with intake form.
         As real data accumulates the intake form weight approaches zero.
         This is the refinement loop — runs during the first 30 days.
         """
-        real_result   = self.classify_from_data(transactions_df, period_days)
-        intake_result = self.classify_from_intake(intake_dict)
+        real_result   = self.classify_from_data(transactions_df, period_days, bid=bid)
+        if real_result.get("status") == "insufficient_data":
+            return real_result
+        intake_result = self.classify_from_intake(intake_dict, bid=bid)
 
         data_days = real_result["data_days"]
         blended   = self.extractor.blend(
@@ -618,6 +752,7 @@ class BusinessClassifier:
         profile = self.cluster_profiles.get(cluster_id, {})
         arch_label   = profile.get("archetype_label", "unknown")
         conf_rounded = round(confidence, 4)
+        merged_dq = make_data_quality(real_result.get("data_quality", {}).get("warnings", []))
         return {
             "cluster_id":                  cluster_id,
             "behavioral_profile":          profile.get("tags", {}),
@@ -635,6 +770,7 @@ class BusinessClassifier:
                 conf_rounded, arch_label, False, "intake_blend"),
             "closest_archetype_features":  self._closest_archetype_features(
                 dict(blended), cluster_id),
+            "data_quality":                merged_dq,
         }
 
     # Stage 7: validate against known archetypes in synthetic data

@@ -14,6 +14,13 @@ DATA_DIR  = os.path.join(ROOT, "data", "processed")
 SAVED_DIR = os.path.join(ROOT, "models", "saved")
 sys.path.insert(0, ROOT)
 
+from models._guardrails import (
+    get_logger, check_required_columns, check_amount_range,
+    make_data_quality, make_insufficient_result,
+    MIN_ACTIVE_DAYS, MIN_ACTIVE_DAYS_WARN,
+)
+_log = get_logger("forecaster")
+
 ALL_HIST_DATES = pd.date_range("2025-04-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
 FORECAST_START = "2025-07-01"
 FORECAST_END   = "2025-07-30"
@@ -46,17 +53,35 @@ def suppress_stdout_stderr():
 class RevenueForecaster:
 
     def __init__(self):
-        self.models    = {}   # {business_id: fitted Prophet model}
-        self.forecasts = {}   # {business_id: forecast DataFrame}
-        self.summaries = {}   # {business_id: summary dict}
+        self.models          = {}   # {business_id: fitted Prophet model}
+        self.forecasts       = {}   # {business_id: forecast DataFrame}
+        self.summaries       = {}   # {business_id: summary dict}
+        self._fit_dq_warnings = {}  # {business_id: list of dq warning dicts}
 
     # ── Data preparation ──────────────────────────────────────────────────────
 
-    def prepare_data(self, transactions_df: pd.DataFrame) -> pd.DataFrame:
+    def prepare_data(self, transactions_df: pd.DataFrame,
+                     bid: str = "unknown") -> pd.DataFrame:
+        # ── Guard 1: required columns ─────────────────────────────────────────
+        missing = check_required_columns(
+            transactions_df, ["timestamp", "amount_sar"], "forecaster", bid, _log)
+        if missing:
+            raise ValueError(
+                f"forecaster prepare_data: missing_required_column: {missing} (bid={bid})")
+
         tx = transactions_df.copy()
         tx["timestamp"]  = pd.to_datetime(tx["timestamp"])
-        tx["amount_sar"] = tx["amount_sar"].astype(float)
-        tx["date"]       = tx["timestamp"].dt.strftime("%Y-%m-%d")
+        tx["amount_sar"] = pd.to_numeric(tx["amount_sar"], errors="coerce").fillna(0.0)
+
+        # ── Guard 2: amount range ─────────────────────────────────────────────
+        neg_mask = tx["amount_sar"] < 0
+        if neg_mask.any():
+            check_amount_range(tx["amount_sar"], "forecaster", bid, _log)
+            tx = tx[~neg_mask].copy()
+        else:
+            check_amount_range(tx["amount_sar"], "forecaster", bid, _log)
+
+        tx["date"] = tx["timestamp"].dt.strftime("%Y-%m-%d")
 
         daily = (tx.groupby("date")["amount_sar"]
                    .sum()
@@ -71,7 +96,30 @@ class RevenueForecaster:
     def fit(self, business_id: str, transactions_df: pd.DataFrame):
         from prophet import Prophet
 
-        df = self.prepare_data(transactions_df)
+        df = self.prepare_data(transactions_df, bid=business_id)
+
+        # ── Guard 3: minimum active days ──────────────────────────────────────
+        active_days = int((df["y"] > 0).sum())
+        _dq_warnings = []
+        if active_days < MIN_ACTIVE_DAYS:
+            _log.warning(
+                f"model=forecaster | bid={business_id} | rule=insufficient_active_days | "
+                f"actual={active_days} | min_required={MIN_ACTIVE_DAYS}"
+            )
+            self.summaries[business_id] = make_insufficient_result(
+                "forecaster", business_id, "insufficient_active_days",
+                {"active_days": active_days, "min_required": MIN_ACTIVE_DAYS})
+            return
+        if active_days < MIN_ACTIVE_DAYS_WARN:
+            _log.warning(
+                f"model=forecaster | bid={business_id} | rule=thin_data_warning | "
+                f"actual={active_days} | min_recommended={MIN_ACTIVE_DAYS_WARN}"
+            )
+            _dq_warnings.append({
+                "rule": "thin_data_warning",
+                "active_days": active_days, "min_recommended": MIN_ACTIVE_DAYS_WARN,
+            })
+        self._fit_dq_warnings = {business_id: _dq_warnings}
 
         model = Prophet(
             changepoint_prior_scale=0.15,
@@ -131,6 +179,7 @@ class RevenueForecaster:
         elif pct_change < -5:  trend = "declining"
         else:                  trend = "flat"
 
+        dq_warnings = self._fit_dq_warnings.get(business_id, [])
         self.summaries[business_id] = {
             "business_id":           business_id,
             "historical_avg_daily":  round(historical_avg, 2),
@@ -144,6 +193,7 @@ class RevenueForecaster:
             "peak_forecast_amount":  round(peak_amount, 2),
             "confidence_band_width": round(band_width, 2),
             "forecast_period":       f"{FORECAST_START} to {FORECAST_END}",
+            "data_quality":          make_data_quality(dq_warnings),
         }
 
         return future_fc
@@ -231,6 +281,10 @@ class RevenueForecaster:
         self.models    = data["models"]
         self.forecasts = data["forecasts"]
         self.summaries = data["summaries"]
+        # backfill data_quality for summaries persisted before robustness hardening
+        for s in self.summaries.values():
+            if "data_quality" not in s and s.get("status") != "insufficient_data":
+                s["data_quality"] = make_data_quality([])
         print(f"Revenue forecaster loaded — {len(self.models)} business models")
         return self
 
