@@ -77,15 +77,17 @@ const COPY = {
     founderBody:
       "DataCore is built end-to-end by a single founder — the models, the data engine, and the interface you're looking at. The goal is simple: give Saudi banks a way to see the businesses they've never quite been able to see, and give those businesses a fair shot at capital.",
 
-    roadmapTag: "Roadmap",
-    roadmapTitle: "Where DataCore is headed.",
+    roadmapTag: "What's Next",
+    roadmapTitle: "Direction, not promises.",
     roadmap: [
-      { icon: Rocket,     when: "Q3 2026", what: "Pilot with a Saudi bank",
-        detail: "First live portfolio running on real SME activity." },
-      { icon: ScrollText, when: "Q4 2026 – Q1 2027", what: "Patent filing (SAIP) + academic paper",
-        detail: "Protecting the per-business modeling approach and publishing the method." },
-      { icon: Landmark,   when: "2027+", what: "SAMA sandbox & expansion",
-        detail: "Regulated testing, then scale across the Kingdom's SME base." },
+      { icon: Sparkles,   label: "Now",        what: "Validated prototype",
+        detail: "Working prototype validated against real-world datasets. Ready for pilot conversations with Saudi banks." },
+      { icon: Rocket,     label: "Next",       what: "Bank pilot",
+        detail: "Pilot deployment with a Saudi bank as a decision support layer, running alongside existing lending workflows." },
+      { icon: ScrollText, label: "After That", what: "Protect & expand",
+        detail: "Patent filing with SAIP, academic publication, expanded portfolio-level monitoring, and partnerships with additional banks." },
+      { icon: Landmark,   label: "Long Term",  what: "Regulated scale",
+        detail: "SAMA sandbox approval, path from decision support to production lending, expansion across the GCC." },
     ],
 
     contactTag: "Get in Touch",
@@ -165,15 +167,17 @@ const COPY = {
     founderBody:
       "DataCore مبنيّ بالكامل بيد مؤسس واحد — النماذج، ومحرك البيانات، والواجهة التي تراها. الهدف بسيط: منح البنوك السعودية وسيلة لرؤية المنشآت التي لم تستطع رؤيتها، ومنح تلك المنشآت فرصة عادلة للتمويل.",
 
-    roadmapTag: "خارطة الطريق",
-    roadmapTitle: "إلى أين يتجه DataCore.",
+    roadmapTag: "ما القادم",
+    roadmapTitle: "اتجاه، لا وعود.",
     roadmap: [
-      { icon: Rocket,     when: "الربع الثالث ٢٠٢٦", what: "تجربة مع بنك سعودي",
-        detail: "أول محفظة حية تعمل على نشاط منشآت حقيقي." },
-      { icon: ScrollText, when: "ر٤ ٢٠٢٦ – ر١ ٢٠٢٧", what: "تسجيل براءة اختراع (SAIP) + ورقة علمية",
-        detail: "حماية منهج النمذجة لكل منشأة ونشر الطريقة." },
-      { icon: Landmark,   when: "٢٠٢٧+", what: "بيئة ساما التجريبية والتوسّع",
-        detail: "اختبار منظَّم، ثم التوسّع عبر قاعدة المنشآت في المملكة." },
+      { icon: Sparkles,   label: "الآن",        what: "نموذج مُتحقَّق منه",
+        detail: "نموذج أوّلي عامل تم التحقق منه مقابل بيانات واقعية. جاهز لمحادثات التجربة مع البنوك السعودية." },
+      { icon: Rocket,     label: "التالي",      what: "تجربة مع بنك",
+        detail: "نشر تجريبي مع بنك سعودي كطبقة دعم قرار، تعمل بجانب مسارات الإقراض القائمة." },
+      { icon: ScrollText, label: "بعد ذلك",     what: "حماية وتوسّع",
+        detail: "تسجيل براءة اختراع مع SAIP، ونشر علمي، ومراقبة موسّعة على مستوى المحفظة، وشراكات مع بنوك إضافية." },
+      { icon: Landmark,   label: "المدى البعيد", what: "توسّع منظَّم",
+        detail: "موافقة بيئة ساما التجريبية، ومسار من دعم القرار إلى الإقراض الإنتاجي، والتوسّع عبر دول الخليج." },
     ],
 
     contactTag: "تواصل",
@@ -191,6 +195,18 @@ const COPY = {
 const GITHUB_URL = "https://github.com/";
 const LINKEDIN_URL = "https://linkedin.com/in/abdullah-alanazi";
 const EMAIL = "abud2754@gmail.com";
+
+/* Distinct accent per roadmap phase — momentum from bright "Now" to muted "Long Term" */
+const PHASE_ACCENTS = [
+  { node: "bg-brand-gold border border-brand-gold", nodeIcon: "text-ink",
+    pill: "bg-brand-gold text-ink" },
+  { node: "bg-brand-gold/12 border border-brand-gold/35", nodeIcon: "text-brand-gold",
+    pill: "bg-brand-gold/12 text-brand-gold border border-brand-gold/35" },
+  { node: "bg-sage/12 border border-sage/35", nodeIcon: "text-sage",
+    pill: "bg-sage/12 text-sage border border-sage/30" },
+  { node: "bg-white/5 border border-white/12", nodeIcon: "text-cream-dim",
+    pill: "bg-white/5 text-cream-dim border border-white/12" },
+];
 
 /* ── Motion helper ───────────────────────────────────────────── */
 const reveal = {
@@ -548,29 +564,59 @@ export default function Marketing() {
           </Reveal>
         </div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-3">
-          {c.roadmap.map((r, i) => (
-            <Reveal key={i} i={i}>
-              <div className="warm-panel rounded-3xl p-8 h-full">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-brand-gold/12
-                                  border border-brand-gold/20
-                                  flex items-center justify-center shrink-0">
-                    <r.icon size={20} className="text-brand-gold" />
+        <div className="mt-14">
+
+          {/* Desktop node rail — a connecting line with a node per phase */}
+          <div className="hidden md:block relative mb-7">
+            <div className="absolute top-1/2 -translate-y-1/2 left-[12.5%] right-[12.5%]
+                            h-0.5 bg-gradient-to-r from-brand-gold/50 via-sage/30 to-white/10" />
+            <div className="relative grid grid-cols-4">
+              {c.roadmap.map((r, i) => {
+                const a = PHASE_ACCENTS[i];
+                return (
+                  <Reveal key={i} i={i} className="flex justify-center">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center
+                                     ${a.node}`}>
+                      <r.icon size={22} className={a.nodeIcon} />
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Phase cards */}
+          <div className="grid gap-5 md:grid-cols-4">
+            {c.roadmap.map((r, i) => {
+              const a = PHASE_ACCENTS[i];
+              return (
+                <Reveal key={i} i={i}>
+                  <div className="warm-panel rounded-3xl p-6 h-full flex flex-col">
+                    <div className="flex items-center gap-3">
+                      {/* Icon shown inline on mobile (rail hidden there) */}
+                      <div className={`md:hidden w-10 h-10 rounded-xl flex items-center
+                                       justify-center shrink-0 ${a.node}`}>
+                        <r.icon size={19} className={a.nodeIcon} />
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+                                        text-xs font-semibold uppercase tracking-wide ${a.pill}`}>
+                        {i === 0 && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink/70 animate-pulse" />
+                        )}
+                        {r.label}
+                      </span>
+                    </div>
+                    <h3 className="mt-4 font-display font-semibold text-lg text-cream">
+                      {r.what}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-cream-dim">
+                      {r.detail}
+                    </p>
                   </div>
-                  <span className="font-display font-semibold text-sm text-brand-gold">
-                    {r.when}
-                  </span>
-                </div>
-                <h3 className="mt-5 font-display font-semibold text-lg text-cream">
-                  {r.what}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-cream-dim">
-                  {r.detail}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
       </Section>
 
