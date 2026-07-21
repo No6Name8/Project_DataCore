@@ -1,5 +1,6 @@
+import { useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { useLang } from "../i18n/LanguageContext";
 import TopNav, { DataCoreMark } from "../components/TopNav";
 import {
@@ -78,7 +79,7 @@ const COPY = {
       "DataCore is built end-to-end by a single founder — the models, the data engine, and the interface you're looking at. The goal is simple: give Saudi banks a way to see the businesses they've never quite been able to see, and give those businesses a fair shot at capital.",
 
     roadmapTag: "What's Next",
-    roadmapTitle: "Direction, not promises.",
+    roadmapTitle: "Direction",
     roadmap: [
       { icon: Sparkles,   label: "Now",        what: "Validated prototype",
         detail: "Working prototype validated against real-world datasets. Ready for pilot conversations with Saudi banks." },
@@ -193,7 +194,7 @@ const COPY = {
 };
 
 const GITHUB_URL = "https://github.com/";
-const LINKEDIN_URL = "https://linkedin.com/in/abdullah-alanazi";
+const LINKEDIN_URL = "https://www.linkedin.com/in/abdullah-ali-alanazi-a9302733a/";
 const EMAIL = "abud2754@gmail.com";
 
 /* Distinct accent per roadmap phase — momentum from bright "Now" to muted "Long Term" */
@@ -208,14 +209,56 @@ const PHASE_ACCENTS = [
     pill: "bg-white/5 text-cream-dim border border-white/12" },
 ];
 
-/* ── Motion helper ───────────────────────────────────────────── */
+/* ── Motion helper — fade-up, staggered 100ms, ease-out ──────── */
 const reveal = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20 },
   show: (i = 0) => ({
     opacity: 1, y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: [0.23, 1, 0.32, 1] },
+    transition: { duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] },
   }),
 };
+
+/* Cursor-following radial glow — organic lag via rAF lerp.
+   Pointer-fine + motion-safe only; gracefully absent on touch. */
+function useCursorGlow(heroRef, glowRef, disabled) {
+  useEffect(() => {
+    if (disabled) return;
+    const hero = heroRef.current;
+    const glow = glowRef.current;
+    if (!hero || !glow) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const target = { x: 0, y: 0 };
+    const cur = { x: null, y: null };
+    let raf = 0;
+
+    const loop = () => {
+      if (cur.x === null) { cur.x = target.x; cur.y = target.y; }
+      cur.x += (target.x - cur.x) * 0.15;   // slight lag = organic feel
+      cur.y += (target.y - cur.y) * 0.15;
+      glow.style.setProperty("--mx", `${cur.x}px`);
+      glow.style.setProperty("--my", `${cur.y}px`);
+      raf = requestAnimationFrame(loop);
+    };
+    const onMove = (e) => {
+      const r = hero.getBoundingClientRect();
+      target.x = e.clientX - r.left;
+      target.y = e.clientY - r.top;
+    };
+    const onEnter = () => { glow.classList.add("is-active"); if (!raf) raf = requestAnimationFrame(loop); };
+    const onLeave = () => { glow.classList.remove("is-active"); if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+
+    hero.addEventListener("mousemove", onMove);
+    hero.addEventListener("mouseenter", onEnter);
+    hero.addEventListener("mouseleave", onLeave);
+    return () => {
+      hero.removeEventListener("mousemove", onMove);
+      hero.removeEventListener("mouseenter", onEnter);
+      hero.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [heroRef, glowRef, disabled]);
+}
 
 function Reveal({ children, i = 0, className = "" }) {
   return (
@@ -247,13 +290,19 @@ function Tag({ children }) {
 export default function Marketing() {
   const { lang, isRTL } = useLang();
   const c = COPY[lang];
+  const reduceMotion = useReducedMotion();
+  const heroRef = useRef(null);
+  const glowRef = useRef(null);
+  useCursorGlow(heroRef, glowRef, reduceMotion);
 
   return (
-    <div className="min-h-dvh bg-surface-dark text-cream" dir={isRTL ? "rtl" : "ltr"}>
+    <MotionConfig reducedMotion="user">
+    <div className="mkt min-h-dvh bg-surface-dark text-cream" dir={isRTL ? "rtl" : "ltr"}>
       <TopNav />
 
       {/* ── 1. Hero ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
+      <section ref={heroRef} className="relative overflow-hidden">
+        <div ref={glowRef} className="cursor-glow" aria-hidden="true" />
         <div className="hero-glow" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6
                         pt-24 pb-20 sm:pt-32 sm:pb-28 text-center">
@@ -682,6 +731,7 @@ export default function Marketing() {
         </div>
       </footer>
     </div>
+    </MotionConfig>
   );
 }
 

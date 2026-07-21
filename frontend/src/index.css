@@ -245,6 +245,138 @@ body {
   background-size: 22px 22px;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   MARKETING SCOPE — bold plum + warm gold.
+   Scoped under .mkt so /demo and /how-it-works keep their palette.
+   Tailwind v4 color utilities resolve var(--color-*), so redefining
+   those variables here recolors every utility inside the marketing page.
+   ══════════════════════════════════════════════════════════════ */
+.mkt {
+  /* Surfaces */
+  --color-surface-dark:   #1A0E1F;   /* primary background (deep plum) */
+  --color-surface-card:   #2A1B2E;   /* elevated cards */
+  --color-surface-border: #3A2A3E;   /* plum hairline */
+  --color-surface-hover:  #34233A;
+
+  /* Warm gold accent */
+  --color-brand-gold:      #D4A574;
+  --color-brand-goldLight: #E6BE8E;
+  --color-brand-goldDark:  #B4885C;
+
+  /* Text */
+  --color-cream:     #F5EDE0;
+  --color-cream-dim: #C9B4B7;         /* rose-tinted muted cream */
+
+  /* Muted rose — secondary accent / tags (remaps the old sage usages) */
+  --color-sage:     #B8878D;
+  --color-sageDark: #9E6E74;
+
+  /* Ink for text on gold buttons */
+  --color-ink: #1A0E1F;
+
+  /* Neutralise any stray navy/blue references to plum */
+  --color-brand-blue:      #2A1B2E;
+  --color-brand-blueLight: #B8878D;
+  --color-brand-blueDark:  #0F0A11;
+
+  background-color: #1A0E1F;
+}
+
+/* Ambient hero glows — gold + rose on plum */
+.mkt .hero-glow::before {
+  background: radial-gradient(circle at center,
+    rgba(212, 165, 116, 0.20) 0%,
+    rgba(212, 165, 116, 0.07) 32%,
+    transparent 62%);
+}
+.mkt .hero-glow::after {
+  background: radial-gradient(circle at center,
+    rgba(184, 135, 141, 0.12) 0%,
+    transparent 60%);
+}
+
+/* Cursor-following glow layer (position driven by JS via --mx / --my) */
+.mkt .cursor-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-out);
+  background: radial-gradient(circle 520px at var(--mx, 50%) var(--my, 30%),
+    rgba(212, 165, 116, 0.14) 0%,
+    rgba(212, 165, 116, 0.06) 35%,
+    transparent 68%);
+}
+.mkt .cursor-glow.is-active { opacity: 1; }
+
+/* Gradient-border card — plum fill, gold→rose hairline */
+.mkt .grad-card {
+  background:
+    linear-gradient(180deg, rgba(42,27,46,0.94), rgba(26,14,31,0.94)) padding-box,
+    linear-gradient(140deg, rgba(212,165,116,0.50), rgba(58,42,62,0.35) 45%, rgba(184,135,141,0.35)) border-box;
+}
+@media (hover: hover) and (pointer: fine) {
+  .mkt .grad-card:hover {
+    box-shadow: 0 18px 48px rgba(15,10,17,0.55), 0 0 0 1px rgba(212,165,116,0.18);
+  }
+}
+
+/* Warm surface panel — plum */
+.mkt .warm-panel {
+  background: linear-gradient(180deg, rgba(42,27,46,0.80), rgba(26,14,31,0.80));
+  border: 1px solid rgba(212,165,116,0.16);
+}
+
+/* Primary CTA — gold with inner glow + press feedback */
+.mkt .cta-gold {
+  background:
+    linear-gradient(135deg, #E6BE8E 0%, #D4A574 55%, #C69763 100%);
+  color: #1A0E1F;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    0 6px 22px rgba(15,10,17,0.45),
+    0 2px 10px rgba(212,165,116,0.30);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mkt .cta-gold:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      0 12px 32px rgba(15,10,17,0.5),
+      0 4px 16px rgba(212,165,116,0.45);
+    filter: brightness(1.04);
+  }
+}
+.mkt .cta-gold:active { transform: translateY(0) scale(0.975); }
+
+/* Secondary CTA — gold outline, cream text */
+.mkt .cta-ghost {
+  border: 1px solid rgba(212,165,116,0.55);
+  color: var(--color-cream);
+  background: rgba(212,165,116,0.02);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mkt .cta-ghost:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212,165,116,0.9);
+    background: rgba(212,165,116,0.08);
+    box-shadow: 0 8px 24px rgba(15,10,17,0.4);
+  }
+}
+.mkt .cta-ghost:active { transform: translateY(0) scale(0.975); }
+
+/* Dot texture + cream headline gradient — retinted */
+.mkt .dot-grid {
+  background-image: radial-gradient(rgba(212,165,116,0.10) 1px, transparent 1px);
+}
+.mkt .text-cream-gradient {
+  background: linear-gradient(135deg, #FBF4E9 0%, #E6BE8E 55%, #D4A574 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
   .page-enter {
@@ -257,6 +389,7 @@ body {
   }
   .grad-card:hover,
   .cta-gold:hover { transform: none; }
+  .mkt .cursor-glow { display: none; }
   * {
     transition-duration: 0.01ms !important;
     animation-duration:  0.01ms !important;
