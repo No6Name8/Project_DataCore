@@ -74,9 +74,9 @@ const COPY = {
 
     founderTag: "About the Founder",
     founderName: "Abdullah Ali Alanazi",
-    founderRole: "Prince Sultan University, Riyadh · Solo builder",
+    founderRole: "Prince Sultan University, Riyadh",
     founderBody:
-      "DataCore is built end-to-end by a single founder — the models, the data engine, and the interface you're looking at. The goal is simple: give Saudi banks a way to see the businesses they've never quite been able to see, and give those businesses a fair shot at capital.",
+      "Building DataCore to help banks understand every business",
 
     roadmapTag: "What's Next",
     roadmapTitle: "Direction",
@@ -164,9 +164,9 @@ const COPY = {
 
     founderTag: "عن المؤسس",
     founderName: "عبدالله علي العنزي",
-    founderRole: "جامعة الأمير سلطان، الرياض · مطوّر منفرد",
+    founderRole: "جامعة الأمير سلطان، الرياض",
     founderBody:
-      "DataCore مبنيّ بالكامل بيد مؤسس واحد — النماذج، ومحرك البيانات، والواجهة التي تراها. الهدف بسيط: منح البنوك السعودية وسيلة لرؤية المنشآت التي لم تستطع رؤيتها، ومنح تلك المنشآت فرصة عادلة للتمويل.",
+      "أبني DataCore لمساعدة البنوك على فهم كل منشأة",
 
     roadmapTag: "ما القادم",
     roadmapTitle: "اتجاه، لا وعود.",
@@ -583,17 +583,11 @@ export default function Marketing() {
           <div className="max-w-3xl mx-auto text-center">
             <Tag>{c.founderTag}</Tag>
             <div className="mt-8 flex flex-col items-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br
-                              from-brand-gold to-brand-goldDark
-                              flex items-center justify-center
-                              font-display font-bold text-2xl text-ink shadow-lg">
-                {isRTL ? "ع" : "AA"}
-              </div>
-              <h2 className="mt-5 font-display font-bold text-2xl sm:text-3xl text-cream">
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-cream">
                 {c.founderName}
               </h2>
-              <div className="mt-2 text-sm text-brand-gold">{c.founderRole}</div>
-              <p className="mt-6 text-base sm:text-lg leading-relaxed text-cream-dim">
+              <div className="mt-3 text-sm sm:text-base text-brand-gold">{c.founderRole}</div>
+              <p className="mt-2 text-base sm:text-lg leading-relaxed text-cream-dim max-w-xl">
                 {c.founderBody}
               </p>
             </div>
