@@ -120,7 +120,8 @@ def get_fraud_result(bid):
         # Optional location + registration enrichment (demo district / license, if any)
         meta = BUSINESSES.get(bid, {})
         _FRAUD_CACHE[bid] = _detector.assess(
-            bid, location=meta.get("location"), registration=meta.get("registration"))
+            bid, location=meta.get("location"), registration=meta.get("registration"),
+            business_type=meta.get("type"))
     return _FRAUD_CACHE[bid]
 
 
@@ -159,6 +160,12 @@ def load_en(bid):
     if bid not in _EN:
         _EN[bid] = pd.read_csv(os.path.join(DATA_DIR, f"{bid}_energy.csv"))
     return _EN[bid].copy()
+
+
+def _records(df):
+    """to_dict(records) with NaN → None so the output is strict-valid JSON.
+    (Optional columns like counterparty_raw are blank on some rows → NaN.)"""
+    return df.astype(object).where(pd.notnull(df), None).to_dict(orient="records")
 
 
 # ── Summary helper ────────────────────────────────────────────────────────────
@@ -266,7 +273,7 @@ def get_transactions(business_id):
         if limit:
             df = df.head(limit)
 
-        return jsonify(df.to_dict(orient="records"))
+        return jsonify(_records(df))
     except Exception as e:
         return jsonify({"error": str(e), "business_id": business_id}), 500
 
@@ -343,10 +350,8 @@ def get_dashboard(business_id):
         en  = load_en(business_id)
         r   = get_model_result(business_id)
 
-        recent_tx    = (tx.sort_values("timestamp", ascending=False)
-                          .head(10)
-                          .to_dict(orient="records"))
-        energy_trend = en.tail(7).to_dict(orient="records")
+        recent_tx    = _records(tx.sort_values("timestamp", ascending=False).head(10))
+        energy_trend = _records(en.tail(7))
 
         fc_summary = _forecaster.summaries[business_id]
         fc_series  = _forecaster.get_forecast_series(business_id)[:7]

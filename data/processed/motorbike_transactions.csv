@@ -1,645 +1,645 @@
-transaction_id,timestamp,amount_sar,payment_method,bike_type,sale_type,accessories_included
-MOTO-20250401-001,2025-04-01 10:30:42,1706.76,mada,accessories_only,accessories,True
-MOTO-20250401-002,2025-04-01 10:51:25,505.17,cash,accessories_only,accessories,True
-MOTO-20250401-003,2025-04-01 11:10:35,12165.67,cash,entry_bike,new,False
-MOTO-20250401-004,2025-04-01 12:31:29,472.14,mada,accessories_only,accessories,True
-MOTO-20250401-005,2025-04-01 13:50:34,1645.23,cash,accessories_only,accessories,True
-MOTO-20250401-006,2025-04-01 13:56:01,19096.71,mada,mid_sport,new,False
-MOTO-20250401-007,2025-04-01 15:22:04,1023.95,cash,accessories_only,accessories,True
-MOTO-20250401-008,2025-04-01 17:30:31,13675.4,bank_transfer,entry_bike,used,False
-MOTO-20250401-009,2025-04-01 17:40:48,5428.86,mada,scooter,new,False
-MOTO-20250401-010,2025-04-01 19:52:08,572.78,cash,accessories_only,accessories,True
-MOTO-20250402-001,2025-04-02 10:11:21,2172.03,cash,accessories_only,accessories,True
-MOTO-20250402-002,2025-04-02 10:37:26,18717.33,cash,mid_sport,new,False
-MOTO-20250402-003,2025-04-02 13:08:06,47153.7,mada,large_sport,new,True
-MOTO-20250402-004,2025-04-02 13:12:55,1589.28,cash,accessories_only,accessories,True
-MOTO-20250402-005,2025-04-02 13:43:33,73937.31,cash,premium,new,False
-MOTO-20250402-006,2025-04-02 15:15:36,86129.34,mada,premium,new,True
-MOTO-20250402-007,2025-04-02 15:36:26,29114.14,cash,mid_sport,new,False
-MOTO-20250402-008,2025-04-02 19:38:13,1082.28,mada,accessories_only,accessories,True
-MOTO-20250402-009,2025-04-02 20:36:31,987.08,cash,accessories_only,accessories,True
-MOTO-20250403-001,2025-04-03 12:14:46,33089.77,mada,large_sport,new,True
-MOTO-20250403-002,2025-04-03 14:44:53,1098.83,mada,accessories_only,accessories,True
-MOTO-20250403-003,2025-04-03 14:53:19,67407.04,bank_transfer,premium,used,False
-MOTO-20250403-004,2025-04-03 15:46:13,1457.99,mada,accessories_only,accessories,True
-MOTO-20250403-005,2025-04-03 16:23:59,53638.0,mada,premium,new,False
-MOTO-20250403-006,2025-04-03 17:45:03,666.57,cash,accessories_only,accessories,True
-MOTO-20250403-007,2025-04-03 19:21:48,32053.02,mada,large_sport,used,False
-MOTO-20250403-008,2025-04-03 20:00:56,7804.81,cash,scooter,used,False
-MOTO-20250403-009,2025-04-03 20:48:39,986.55,mada,accessories_only,accessories,True
-MOTO-20250403-010,2025-04-03 21:18:28,29967.44,cash,mid_sport,new,False
-MOTO-20250404-001,2025-04-04 10:33:06,1174.65,cash,accessories_only,accessories,True
-MOTO-20250404-002,2025-04-04 11:01:42,868.3,cash,accessories_only,accessories,True
-MOTO-20250404-003,2025-04-04 11:13:23,417.08,mada,accessories_only,accessories,True
-MOTO-20250404-004,2025-04-04 12:17:57,14920.13,cash,entry_bike,new,False
-MOTO-20250404-005,2025-04-04 12:44:17,2058.06,mada,accessories_only,accessories,True
-MOTO-20250404-006,2025-04-04 13:51:52,5519.55,cash,scooter,new,False
-MOTO-20250404-007,2025-04-04 15:12:18,2061.51,credit,accessories_only,accessories,True
-MOTO-20250404-008,2025-04-04 15:14:51,6438.35,credit,scooter,new,False
-MOTO-20250404-009,2025-04-04 17:44:46,378.31,cash,accessories_only,accessories,True
-MOTO-20250404-010,2025-04-04 19:35:18,811.21,cash,accessories_only,accessories,True
-MOTO-20250404-011,2025-04-04 19:54:18,69455.97,mada,premium,used,False
-MOTO-20250404-012,2025-04-04 20:46:42,47180.24,mada,large_sport,used,False
-MOTO-20250405-001,2025-04-05 11:29:41,93025.29,bank_transfer,premium,new,True
-MOTO-20250405-002,2025-04-05 13:03:03,25589.9,bank_transfer,mid_sport,new,False
-MOTO-20250405-003,2025-04-05 13:29:29,12716.56,cash,entry_bike,new,False
-MOTO-20250405-004,2025-04-05 16:53:10,28955.95,mada,mid_sport,new,True
-MOTO-20250405-005,2025-04-05 18:47:45,27525.32,cash,mid_sport,new,False
-MOTO-20250405-006,2025-04-05 18:54:05,1708.06,bank_transfer,accessories_only,accessories,True
-MOTO-20250405-007,2025-04-05 19:35:08,13110.97,cash,entry_bike,new,True
-MOTO-20250405-008,2025-04-05 21:37:24,1051.9,cash,accessories_only,accessories,True
-MOTO-20250406-001,2025-04-06 11:04:52,11302.22,mada,entry_bike,new,False
-MOTO-20250406-002,2025-04-06 11:18:57,2481.68,mada,accessories_only,accessories,True
-MOTO-20250406-003,2025-04-06 19:22:42,11373.49,mada,entry_bike,used,False
-MOTO-20250406-004,2025-04-06 20:10:05,11065.23,mada,entry_bike,new,True
-MOTO-20250407-001,2025-04-07 14:02:57,24030.27,cash,mid_sport,new,False
-MOTO-20250407-002,2025-04-07 15:12:17,1766.84,mada,accessories_only,accessories,True
-MOTO-20250407-003,2025-04-07 18:56:34,16840.73,mada,mid_sport,new,True
-MOTO-20250407-004,2025-04-07 21:34:18,561.31,mada,accessories_only,accessories,True
-MOTO-20250408-001,2025-04-08 13:09:24,313.56,cash,accessories_only,accessories,True
-MOTO-20250408-002,2025-04-08 16:19:41,10752.46,mada,entry_bike,new,False
-MOTO-20250408-003,2025-04-08 17:24:30,19087.18,bank_transfer,mid_sport,new,False
-MOTO-20250408-004,2025-04-08 20:20:55,33054.38,mada,large_sport,new,False
-MOTO-20250408-005,2025-04-08 21:25:06,10004.8,mada,entry_bike,new,False
-MOTO-20250409-001,2025-04-09 10:42:38,90035.9,mada,premium,new,False
-MOTO-20250409-002,2025-04-09 14:21:28,1012.85,bank_transfer,accessories_only,accessories,True
-MOTO-20250409-003,2025-04-09 15:19:42,1440.28,mada,accessories_only,accessories,True
-MOTO-20250409-004,2025-04-09 15:28:19,22190.94,mada,mid_sport,new,True
-MOTO-20250409-005,2025-04-09 15:36:02,12516.19,mada,entry_bike,new,False
-MOTO-20250409-006,2025-04-09 16:25:20,96834.36,mada,premium,new,False
-MOTO-20250409-007,2025-04-09 19:04:15,13272.98,cash,entry_bike,new,False
-MOTO-20250409-008,2025-04-09 19:44:32,37421.79,cash,large_sport,new,False
-MOTO-20250409-009,2025-04-09 21:36:47,7768.6,cash,scooter,used,False
-MOTO-20250409-010,2025-04-09 21:58:16,812.97,cash,accessories_only,accessories,True
-MOTO-20250410-001,2025-04-10 12:55:23,695.75,mada,accessories_only,accessories,True
-MOTO-20250410-002,2025-04-10 18:50:23,1075.79,cash,accessories_only,accessories,True
-MOTO-20250410-003,2025-04-10 21:12:09,22770.53,mada,mid_sport,new,False
-MOTO-20250410-004,2025-04-10 21:55:37,49565.74,bank_transfer,large_sport,used,False
-MOTO-20250411-001,2025-04-11 11:21:17,1478.86,mada,accessories_only,accessories,True
-MOTO-20250411-002,2025-04-11 12:05:45,98810.9,mada,premium,used,False
-MOTO-20250411-003,2025-04-11 12:56:52,49446.32,mada,premium,used,False
-MOTO-20250411-004,2025-04-11 13:20:02,444.37,cash,accessories_only,accessories,True
-MOTO-20250411-005,2025-04-11 14:53:08,19667.73,mada,mid_sport,used,False
-MOTO-20250411-006,2025-04-11 15:58:41,306.57,cash,accessories_only,accessories,True
-MOTO-20250411-007,2025-04-11 18:48:00,1598.45,bank_transfer,accessories_only,accessories,True
-MOTO-20250411-008,2025-04-11 19:16:24,1398.45,mada,accessories_only,accessories,True
-MOTO-20250411-009,2025-04-11 19:16:28,1665.5,mada,accessories_only,accessories,True
-MOTO-20250411-010,2025-04-11 20:34:12,84462.83,cash,premium,new,False
-MOTO-20250412-001,2025-04-12 11:54:12,14939.3,mada,entry_bike,used,True
-MOTO-20250412-002,2025-04-12 16:10:13,18245.72,bank_transfer,mid_sport,new,False
-MOTO-20250413-001,2025-04-13 17:02:05,5760.21,mada,scooter,used,True
-MOTO-20250413-002,2025-04-13 18:56:24,1020.76,credit,accessories_only,accessories,True
-MOTO-20250414-001,2025-04-14 21:41:40,1452.46,cash,accessories_only,accessories,True
-MOTO-20250415-001,2025-04-15 14:07:04,43982.72,mada,premium,new,True
-MOTO-20250415-002,2025-04-15 15:28:34,1940.18,cash,accessories_only,accessories,True
-MOTO-20250415-003,2025-04-15 16:35:57,1883.77,cash,accessories_only,accessories,True
-MOTO-20250415-004,2025-04-15 16:58:56,87884.92,bank_transfer,premium,new,True
-MOTO-20250415-005,2025-04-15 17:35:46,25359.01,cash,mid_sport,new,False
-MOTO-20250415-006,2025-04-15 18:33:57,12193.24,mada,entry_bike,new,True
-MOTO-20250415-007,2025-04-15 18:57:11,7978.13,cash,scooter,new,False
-MOTO-20250416-001,2025-04-16 12:06:08,1964.68,mada,accessories_only,accessories,True
-MOTO-20250416-002,2025-04-16 17:36:33,23220.34,cash,mid_sport,new,False
-MOTO-20250416-003,2025-04-16 18:13:17,10569.03,cash,entry_bike,new,False
-MOTO-20250416-004,2025-04-16 20:29:14,25083.12,mada,mid_sport,new,True
-MOTO-20250417-001,2025-04-17 11:08:34,2012.6,mada,accessories_only,accessories,True
-MOTO-20250417-002,2025-04-17 12:01:31,21588.74,bank_transfer,mid_sport,new,False
-MOTO-20250417-003,2025-04-17 12:48:30,2351.56,mada,accessories_only,accessories,True
-MOTO-20250417-004,2025-04-17 13:57:18,1126.18,mada,accessories_only,accessories,True
-MOTO-20250417-005,2025-04-17 15:02:29,31916.46,cash,large_sport,new,True
-MOTO-20250417-006,2025-04-17 15:35:01,733.9,bank_transfer,accessories_only,accessories,True
-MOTO-20250417-007,2025-04-17 16:23:18,13838.15,cash,entry_bike,used,False
-MOTO-20250417-008,2025-04-17 17:30:28,18687.04,cash,mid_sport,new,False
-MOTO-20250417-009,2025-04-17 17:50:41,851.12,bank_transfer,accessories_only,accessories,True
-MOTO-20250417-010,2025-04-17 18:06:46,2135.55,bank_transfer,accessories_only,accessories,True
-MOTO-20250417-011,2025-04-17 21:04:39,431.65,mada,accessories_only,accessories,True
-MOTO-20250417-012,2025-04-17 21:40:51,15558.04,cash,mid_sport,used,False
-MOTO-20250418-001,2025-04-18 10:30:18,27283.01,mada,mid_sport,new,True
-MOTO-20250418-002,2025-04-18 10:43:43,2030.79,credit,accessories_only,accessories,True
-MOTO-20250418-003,2025-04-18 11:02:03,523.54,mada,accessories_only,accessories,True
-MOTO-20250418-004,2025-04-18 11:07:02,1778.38,mada,accessories_only,accessories,True
-MOTO-20250418-005,2025-04-18 13:44:24,2374.41,cash,accessories_only,accessories,True
-MOTO-20250418-006,2025-04-18 14:21:02,23985.92,cash,mid_sport,new,False
-MOTO-20250418-007,2025-04-18 15:54:15,15292.87,bank_transfer,mid_sport,used,False
-MOTO-20250418-008,2025-04-18 16:06:28,21720.1,mada,mid_sport,new,False
-MOTO-20250418-009,2025-04-18 16:45:09,318.17,cash,accessories_only,accessories,True
-MOTO-20250418-010,2025-04-18 17:50:39,43402.11,cash,large_sport,new,False
-MOTO-20250418-011,2025-04-18 20:06:29,5053.57,mada,scooter,used,True
-MOTO-20250418-012,2025-04-18 21:54:10,1436.01,mada,accessories_only,accessories,True
-MOTO-20250419-001,2025-04-19 10:38:53,1043.61,mada,accessories_only,accessories,True
-MOTO-20250419-002,2025-04-19 11:44:44,1490.3,bank_transfer,accessories_only,accessories,True
-MOTO-20250419-003,2025-04-19 11:54:14,14337.56,bank_transfer,entry_bike,used,False
-MOTO-20250419-004,2025-04-19 12:25:59,20892.34,cash,mid_sport,used,False
-MOTO-20250419-005,2025-04-19 13:08:45,1657.99,mada,accessories_only,accessories,True
-MOTO-20250419-006,2025-04-19 14:46:21,14212.39,bank_transfer,entry_bike,new,True
-MOTO-20250419-007,2025-04-19 15:27:26,831.73,cash,accessories_only,accessories,True
-MOTO-20250419-008,2025-04-19 20:55:37,29282.41,credit,mid_sport,used,True
-MOTO-20250420-001,2025-04-20 10:38:32,56985.15,credit,premium,new,False
-MOTO-20250420-002,2025-04-20 11:04:32,5006.89,mada,scooter,used,False
-MOTO-20250420-003,2025-04-20 11:45:18,49282.46,cash,premium,used,False
-MOTO-20250420-004,2025-04-20 12:31:10,11350.23,mada,entry_bike,used,False
-MOTO-20250420-005,2025-04-20 14:38:08,17910.49,bank_transfer,mid_sport,new,False
-MOTO-20250420-006,2025-04-20 14:49:38,10309.06,cash,entry_bike,new,False
-MOTO-20250420-007,2025-04-20 15:15:56,28455.71,cash,mid_sport,new,False
-MOTO-20250420-008,2025-04-20 15:16:23,45613.72,cash,large_sport,used,False
-MOTO-20250420-009,2025-04-20 16:50:59,838.14,cash,accessories_only,accessories,True
-MOTO-20250420-010,2025-04-20 17:59:33,32779.09,credit,large_sport,new,False
-MOTO-20250421-001,2025-04-21 10:15:17,18045.59,cash,mid_sport,used,False
-MOTO-20250421-002,2025-04-21 10:36:58,768.26,cash,accessories_only,accessories,True
-MOTO-20250421-003,2025-04-21 13:30:24,5359.37,credit,scooter,new,True
-MOTO-20250421-004,2025-04-21 15:02:24,18496.18,mada,mid_sport,used,False
-MOTO-20250421-005,2025-04-21 17:33:38,75068.97,bank_transfer,premium,new,False
-MOTO-20250421-006,2025-04-21 20:41:00,22771.47,mada,mid_sport,new,True
-MOTO-20250422-001,2025-04-22 11:38:07,30010.04,bank_transfer,large_sport,new,False
-MOTO-20250422-002,2025-04-22 11:44:11,202.01,cash,accessories_only,accessories,True
-MOTO-20250422-003,2025-04-22 15:13:21,2137.25,mada,accessories_only,accessories,True
-MOTO-20250422-004,2025-04-22 17:55:16,23328.4,cash,mid_sport,used,True
-MOTO-20250422-005,2025-04-22 19:56:13,4713.9,mada,scooter,new,False
-MOTO-20250423-001,2025-04-23 10:14:36,22730.85,mada,mid_sport,new,False
-MOTO-20250423-002,2025-04-23 16:23:16,49529.31,mada,premium,used,False
-MOTO-20250423-003,2025-04-23 16:25:08,1182.03,cash,accessories_only,accessories,True
-MOTO-20250423-004,2025-04-23 16:47:51,165.97,cash,accessories_only,accessories,True
-MOTO-20250423-005,2025-04-23 17:44:36,72818.12,mada,premium,new,True
-MOTO-20250423-006,2025-04-23 18:30:48,2144.05,cash,accessories_only,accessories,True
-MOTO-20250423-007,2025-04-23 21:04:20,61274.83,credit,premium,new,False
-MOTO-20250424-001,2025-04-24 14:04:04,22854.47,mada,mid_sport,used,False
-MOTO-20250424-002,2025-04-24 14:34:43,22841.18,cash,mid_sport,new,False
-MOTO-20250424-003,2025-04-24 14:52:54,1493.91,mada,accessories_only,accessories,True
-MOTO-20250424-004,2025-04-24 21:59:39,32923.46,mada,large_sport,used,True
-MOTO-20250425-001,2025-04-25 10:10:01,489.04,credit,accessories_only,accessories,True
-MOTO-20250425-002,2025-04-25 10:31:57,6743.34,cash,scooter,new,False
-MOTO-20250425-003,2025-04-25 12:09:58,13640.44,mada,entry_bike,new,False
-MOTO-20250425-004,2025-04-25 13:14:22,1910.1,cash,accessories_only,accessories,True
-MOTO-20250425-005,2025-04-25 14:10:59,12725.0,mada,entry_bike,used,False
-MOTO-20250425-006,2025-04-25 15:17:11,2068.52,cash,accessories_only,accessories,True
-MOTO-20250425-007,2025-04-25 18:09:18,2166.64,cash,accessories_only,accessories,True
-MOTO-20250426-001,2025-04-26 10:45:04,1495.38,credit,accessories_only,accessories,True
-MOTO-20250426-002,2025-04-26 13:54:22,84462.78,cash,premium,new,False
-MOTO-20250426-003,2025-04-26 15:40:19,11849.16,cash,entry_bike,new,True
-MOTO-20250426-004,2025-04-26 17:20:57,674.26,cash,accessories_only,accessories,True
-MOTO-20250426-005,2025-04-26 19:35:09,29883.16,mada,large_sport,new,False
-MOTO-20250426-006,2025-04-26 19:45:01,594.21,cash,accessories_only,accessories,True
-MOTO-20250426-007,2025-04-26 21:10:49,5830.17,mada,scooter,used,False
-MOTO-20250427-001,2025-04-27 10:08:22,12979.56,mada,entry_bike,new,True
-MOTO-20250427-002,2025-04-27 10:30:41,5663.51,cash,scooter,used,False
-MOTO-20250427-003,2025-04-27 12:38:32,1185.25,mada,accessories_only,accessories,True
-MOTO-20250427-004,2025-04-27 12:49:24,2421.55,mada,accessories_only,accessories,True
-MOTO-20250427-005,2025-04-27 12:52:52,2045.94,cash,accessories_only,accessories,True
-MOTO-20250427-006,2025-04-27 18:23:32,7377.33,cash,scooter,used,True
-MOTO-20250427-007,2025-04-27 19:09:33,26890.1,cash,mid_sport,new,True
-MOTO-20250427-008,2025-04-27 19:11:58,1994.34,cash,accessories_only,accessories,True
-MOTO-20250428-001,2025-04-28 12:49:55,19765.75,cash,mid_sport,new,False
-MOTO-20250428-002,2025-04-28 13:18:05,1202.93,mada,accessories_only,accessories,True
-MOTO-20250428-003,2025-04-28 13:21:31,6231.86,mada,scooter,new,True
-MOTO-20250428-004,2025-04-28 16:17:51,23489.49,mada,mid_sport,used,False
-MOTO-20250428-005,2025-04-28 16:21:33,14337.2,bank_transfer,entry_bike,used,False
-MOTO-20250428-006,2025-04-28 17:44:29,1244.94,mada,accessories_only,accessories,True
-MOTO-20250428-007,2025-04-28 17:56:50,27049.57,bank_transfer,mid_sport,new,False
-MOTO-20250428-008,2025-04-28 18:28:10,11789.95,cash,entry_bike,used,True
-MOTO-20250428-009,2025-04-28 19:42:53,2415.74,cash,accessories_only,accessories,True
-MOTO-20250428-010,2025-04-28 19:51:03,14644.94,mada,entry_bike,new,False
-MOTO-20250429-001,2025-04-29 10:53:55,10288.49,mada,entry_bike,used,True
-MOTO-20250429-002,2025-04-29 14:42:37,26230.95,mada,mid_sport,new,False
-MOTO-20250429-003,2025-04-29 15:21:04,1671.96,mada,accessories_only,accessories,True
-MOTO-20250430-001,2025-04-30 16:02:44,21658.01,cash,mid_sport,used,True
-MOTO-20250430-002,2025-04-30 16:03:47,2479.39,bank_transfer,accessories_only,accessories,True
-MOTO-20250430-003,2025-04-30 16:18:51,1982.11,credit,accessories_only,accessories,True
-MOTO-20250430-004,2025-04-30 16:37:48,61799.59,mada,premium,new,True
-MOTO-20250430-005,2025-04-30 16:42:07,26413.72,cash,mid_sport,used,False
-MOTO-20250430-006,2025-04-30 17:03:10,1114.65,mada,accessories_only,accessories,True
-MOTO-20250430-007,2025-04-30 17:40:07,2360.06,cash,accessories_only,accessories,True
-MOTO-20250430-008,2025-04-30 19:54:23,42123.8,cash,premium,new,False
-MOTO-20250501-001,2025-05-01 11:21:50,5798.64,mada,scooter,new,False
-MOTO-20250501-002,2025-05-01 12:30:57,1361.69,mada,accessories_only,accessories,True
-MOTO-20250501-003,2025-05-01 13:31:06,13675.95,mada,entry_bike,new,False
-MOTO-20250501-004,2025-05-01 13:55:14,1232.77,mada,accessories_only,accessories,True
-MOTO-20250501-005,2025-05-01 14:09:04,6084.13,mada,scooter,new,False
-MOTO-20250501-006,2025-05-01 14:23:04,13882.69,cash,entry_bike,new,True
-MOTO-20250501-007,2025-05-01 15:17:48,28950.66,mada,mid_sport,new,True
-MOTO-20250501-008,2025-05-01 15:28:15,1857.28,mada,accessories_only,accessories,True
-MOTO-20250501-009,2025-05-01 15:50:25,2199.79,mada,accessories_only,accessories,True
-MOTO-20250501-010,2025-05-01 17:29:16,6023.47,credit,scooter,new,False
-MOTO-20250501-011,2025-05-01 17:44:19,45663.52,credit,large_sport,new,False
-MOTO-20250501-012,2025-05-01 19:36:34,49565.02,mada,large_sport,used,True
-MOTO-20250502-001,2025-05-02 11:16:31,2149.19,cash,accessories_only,accessories,True
-MOTO-20250502-002,2025-05-02 12:02:32,10665.71,cash,entry_bike,new,False
-MOTO-20250502-003,2025-05-02 13:42:13,5876.92,cash,scooter,new,False
-MOTO-20250502-004,2025-05-02 15:34:38,1354.06,cash,accessories_only,accessories,True
-MOTO-20250502-005,2025-05-02 17:00:54,496.33,credit,accessories_only,accessories,True
-MOTO-20250502-006,2025-05-02 17:42:51,1470.82,mada,accessories_only,accessories,True
-MOTO-20250502-007,2025-05-02 19:25:30,18320.55,mada,mid_sport,new,False
-MOTO-20250502-008,2025-05-02 20:33:43,14367.43,mada,entry_bike,used,False
-MOTO-20250502-009,2025-05-02 20:36:56,39203.06,cash,large_sport,new,False
-MOTO-20250502-010,2025-05-02 20:43:46,2283.34,cash,accessories_only,accessories,True
-MOTO-20250502-011,2025-05-02 21:14:57,65129.63,bank_transfer,premium,new,False
-MOTO-20250502-012,2025-05-02 21:18:57,10967.73,mada,entry_bike,new,False
-MOTO-20250502-013,2025-05-02 21:51:04,91379.36,cash,premium,used,False
-MOTO-20250503-001,2025-05-03 10:38:38,5843.58,mada,scooter,new,False
-MOTO-20250503-002,2025-05-03 17:44:36,80131.32,cash,premium,new,False
-MOTO-20250503-003,2025-05-03 20:53:09,931.55,cash,accessories_only,accessories,True
-MOTO-20250503-004,2025-05-03 21:36:48,14813.54,mada,entry_bike,used,False
-MOTO-20250504-001,2025-05-04 11:02:35,2149.98,mada,accessories_only,accessories,True
-MOTO-20250504-002,2025-05-04 13:21:42,386.29,mada,accessories_only,accessories,True
-MOTO-20250504-003,2025-05-04 17:16:48,4674.51,cash,scooter,new,True
-MOTO-20250504-004,2025-05-04 18:16:14,1821.76,mada,accessories_only,accessories,True
-MOTO-20250504-005,2025-05-04 18:31:37,14367.36,mada,entry_bike,new,True
-MOTO-20250504-006,2025-05-04 19:23:21,1730.93,mada,accessories_only,accessories,True
-MOTO-20250504-007,2025-05-04 19:24:15,10667.83,mada,entry_bike,new,False
-MOTO-20250505-001,2025-05-05 11:43:20,29709.4,bank_transfer,mid_sport,new,False
-MOTO-20250505-002,2025-05-05 13:13:55,641.84,cash,accessories_only,accessories,True
-MOTO-20250505-003,2025-05-05 14:58:59,1743.89,credit,accessories_only,accessories,True
-MOTO-20250505-004,2025-05-05 16:00:59,1388.96,mada,accessories_only,accessories,True
-MOTO-20250505-005,2025-05-05 16:17:39,15989.66,credit,mid_sport,new,False
-MOTO-20250505-006,2025-05-05 17:00:22,11234.29,cash,entry_bike,used,False
-MOTO-20250505-007,2025-05-05 19:11:41,28430.76,mada,mid_sport,new,False
-MOTO-20250505-008,2025-05-05 19:31:19,15090.58,cash,mid_sport,new,True
-MOTO-20250506-001,2025-05-06 10:47:54,23090.95,mada,mid_sport,new,True
-MOTO-20250506-002,2025-05-06 14:58:30,2325.01,cash,accessories_only,accessories,True
-MOTO-20250506-003,2025-05-06 18:50:43,1499.02,mada,accessories_only,accessories,True
-MOTO-20250506-004,2025-05-06 19:28:12,157.62,cash,accessories_only,accessories,True
-MOTO-20250507-001,2025-05-07 12:11:14,1775.52,mada,accessories_only,accessories,True
-MOTO-20250507-002,2025-05-07 12:25:32,96736.05,cash,premium,used,True
-MOTO-20250507-003,2025-05-07 15:09:25,268.98,mada,accessories_only,accessories,True
-MOTO-20250507-004,2025-05-07 16:10:22,26711.58,cash,mid_sport,new,False
-MOTO-20250507-005,2025-05-07 17:39:06,7982.2,mada,scooter,used,False
-MOTO-20250507-006,2025-05-07 21:58:20,68000.54,cash,premium,new,False
-MOTO-20250508-001,2025-05-08 11:26:37,29207.47,cash,large_sport,used,False
-MOTO-20250508-002,2025-05-08 14:17:29,88828.5,cash,premium,new,False
-MOTO-20250508-003,2025-05-08 14:46:45,47237.94,credit,large_sport,new,False
-MOTO-20250508-004,2025-05-08 18:53:03,33793.66,cash,large_sport,new,False
-MOTO-20250508-005,2025-05-08 19:28:32,595.2,cash,accessories_only,accessories,True
-MOTO-20250508-006,2025-05-08 21:00:35,27643.82,mada,mid_sport,new,True
-MOTO-20250508-007,2025-05-08 21:46:53,464.01,cash,accessories_only,accessories,True
-MOTO-20250509-001,2025-05-09 13:35:10,31019.28,cash,large_sport,new,False
-MOTO-20250509-002,2025-05-09 14:54:04,29124.05,mada,large_sport,new,False
-MOTO-20250509-003,2025-05-09 15:02:02,29237.02,mada,large_sport,new,True
-MOTO-20250509-004,2025-05-09 16:36:23,2324.01,cash,accessories_only,accessories,True
-MOTO-20250509-005,2025-05-09 16:57:26,51052.72,mada,premium,new,False
-MOTO-20250509-006,2025-05-09 17:39:10,17257.76,cash,mid_sport,new,False
-MOTO-20250509-007,2025-05-09 18:19:53,831.19,cash,accessories_only,accessories,True
-MOTO-20250509-008,2025-05-09 18:28:59,48901.23,cash,large_sport,new,False
-MOTO-20250509-009,2025-05-09 18:32:11,11428.35,cash,entry_bike,used,False
-MOTO-20250509-010,2025-05-09 18:53:15,14274.73,cash,entry_bike,new,False
-MOTO-20250509-011,2025-05-09 20:04:15,1596.8,mada,accessories_only,accessories,True
-MOTO-20250509-012,2025-05-09 20:56:47,35107.63,cash,large_sport,new,False
-MOTO-20250510-001,2025-05-10 13:16:07,10754.47,mada,entry_bike,used,False
-MOTO-20250510-002,2025-05-10 13:34:37,1446.75,credit,accessories_only,accessories,True
-MOTO-20250510-003,2025-05-10 13:36:32,21301.75,cash,mid_sport,used,True
-MOTO-20250510-004,2025-05-10 17:43:51,25679.06,mada,mid_sport,used,True
-MOTO-20250510-005,2025-05-10 18:53:08,802.08,cash,accessories_only,accessories,True
-MOTO-20250510-006,2025-05-10 20:11:14,47687.23,mada,large_sport,new,False
-MOTO-20250511-001,2025-05-11 10:49:12,2127.23,mada,accessories_only,accessories,True
-MOTO-20250511-002,2025-05-11 11:12:57,10202.82,cash,entry_bike,new,False
-MOTO-20250511-003,2025-05-11 12:24:02,183.42,mada,accessories_only,accessories,True
-MOTO-20250511-004,2025-05-11 17:22:17,13660.63,cash,entry_bike,new,True
-MOTO-20250511-005,2025-05-11 19:06:47,1692.41,mada,accessories_only,accessories,True
-MOTO-20250511-006,2025-05-11 19:27:52,10097.91,mada,entry_bike,new,True
-MOTO-20250511-007,2025-05-11 20:39:57,49492.66,cash,large_sport,new,True
-MOTO-20250511-008,2025-05-11 21:56:03,15492.55,cash,mid_sport,used,False
-MOTO-20250512-001,2025-05-12 11:44:43,37989.67,cash,large_sport,new,False
-MOTO-20250512-002,2025-05-12 14:17:28,5903.26,cash,scooter,used,False
-MOTO-20250512-003,2025-05-12 18:53:31,1297.84,cash,accessories_only,accessories,True
-MOTO-20250512-004,2025-05-12 19:13:49,24696.68,cash,mid_sport,new,False
-MOTO-20250513-001,2025-05-13 13:51:07,33532.45,cash,large_sport,used,False
-MOTO-20250513-002,2025-05-13 15:05:38,13927.23,mada,entry_bike,new,False
-MOTO-20250513-003,2025-05-13 16:06:43,15045.27,bank_transfer,mid_sport,new,False
-MOTO-20250513-004,2025-05-13 16:13:04,43023.46,cash,large_sport,new,False
-MOTO-20250513-005,2025-05-13 16:54:18,6057.55,bank_transfer,scooter,new,True
-MOTO-20250513-006,2025-05-13 17:52:38,662.84,bank_transfer,accessories_only,accessories,True
-MOTO-20250513-007,2025-05-13 20:53:39,10446.44,credit,entry_bike,new,False
-MOTO-20250514-001,2025-05-14 10:51:32,31098.53,cash,large_sport,new,False
-MOTO-20250514-002,2025-05-14 11:09:04,880.18,cash,accessories_only,accessories,True
-MOTO-20250514-003,2025-05-14 14:44:07,12440.14,mada,entry_bike,new,False
-MOTO-20250514-004,2025-05-14 16:04:53,7124.86,mada,scooter,new,True
-MOTO-20250514-005,2025-05-14 16:17:28,1745.51,mada,accessories_only,accessories,True
-MOTO-20250514-006,2025-05-14 21:45:01,10809.86,cash,entry_bike,used,True
-MOTO-20250515-001,2025-05-15 10:13:35,42562.07,cash,large_sport,new,True
-MOTO-20250515-002,2025-05-15 11:36:49,1123.25,mada,accessories_only,accessories,True
-MOTO-20250515-003,2025-05-15 11:44:47,7651.46,cash,scooter,new,False
-MOTO-20250515-004,2025-05-15 12:04:40,373.43,cash,accessories_only,accessories,True
-MOTO-20250515-005,2025-05-15 12:27:20,14033.75,mada,entry_bike,used,False
-MOTO-20250515-006,2025-05-15 14:03:25,868.05,cash,accessories_only,accessories,True
-MOTO-20250515-007,2025-05-15 16:48:22,5041.73,mada,scooter,new,False
-MOTO-20250515-008,2025-05-15 17:04:35,6442.33,bank_transfer,scooter,new,False
-MOTO-20250515-009,2025-05-15 19:40:27,22298.34,mada,mid_sport,used,False
-MOTO-20250516-001,2025-05-16 10:19:41,270.0,mada,accessories_only,accessories,True
-MOTO-20250516-002,2025-05-16 13:24:26,27795.85,cash,mid_sport,new,False
-MOTO-20250516-003,2025-05-16 13:41:48,1616.45,mada,accessories_only,accessories,True
-MOTO-20250516-004,2025-05-16 13:54:41,6738.43,mada,scooter,new,False
-MOTO-20250516-005,2025-05-16 15:45:24,7883.67,cash,scooter,used,False
-MOTO-20250516-006,2025-05-16 15:59:27,4859.8,mada,scooter,used,False
-MOTO-20250516-007,2025-05-16 16:39:07,33889.64,mada,large_sport,new,False
-MOTO-20250516-008,2025-05-16 18:34:01,1587.62,bank_transfer,accessories_only,accessories,True
-MOTO-20250516-009,2025-05-16 19:44:58,6060.09,mada,scooter,used,False
-MOTO-20250516-010,2025-05-16 20:31:00,21604.13,mada,mid_sport,new,False
-MOTO-20250517-001,2025-05-17 11:11:19,30978.4,mada,large_sport,new,False
-MOTO-20250517-002,2025-05-17 12:37:13,6844.61,cash,scooter,used,False
-MOTO-20250517-003,2025-05-17 13:53:35,7068.64,mada,scooter,new,False
-MOTO-20250517-004,2025-05-17 13:55:26,45863.82,cash,large_sport,used,False
-MOTO-20250517-005,2025-05-17 18:41:20,39312.1,cash,large_sport,new,False
-MOTO-20250517-006,2025-05-17 19:23:26,74781.43,credit,premium,used,False
-MOTO-20250518-001,2025-05-18 10:07:27,11476.88,mada,entry_bike,used,True
-MOTO-20250518-002,2025-05-18 10:29:57,32649.77,cash,large_sport,new,True
-MOTO-20250518-003,2025-05-18 13:52:41,1239.77,cash,accessories_only,accessories,True
-MOTO-20250518-004,2025-05-18 14:18:41,6791.2,cash,scooter,used,True
-MOTO-20250518-005,2025-05-18 14:53:03,257.41,cash,accessories_only,accessories,True
-MOTO-20250518-006,2025-05-18 16:23:22,1887.56,mada,accessories_only,accessories,True
-MOTO-20250518-007,2025-05-18 17:37:33,2436.39,cash,accessories_only,accessories,True
-MOTO-20250518-008,2025-05-18 18:34:12,4918.79,mada,scooter,new,False
-MOTO-20250518-009,2025-05-18 19:21:23,13167.74,mada,entry_bike,new,False
-MOTO-20250518-010,2025-05-18 21:39:58,15974.76,cash,mid_sport,used,False
-MOTO-20250519-001,2025-05-19 11:16:40,6185.28,cash,scooter,used,False
-MOTO-20250519-002,2025-05-19 12:48:23,10419.72,bank_transfer,entry_bike,new,False
-MOTO-20250519-003,2025-05-19 14:27:22,2019.06,mada,accessories_only,accessories,True
-MOTO-20250519-004,2025-05-19 14:43:41,42218.53,bank_transfer,large_sport,new,False
-MOTO-20250519-005,2025-05-19 17:26:14,6183.54,cash,scooter,new,True
-MOTO-20250519-006,2025-05-19 18:03:51,20528.86,mada,mid_sport,new,False
-MOTO-20250519-007,2025-05-19 19:50:20,31315.91,bank_transfer,large_sport,used,True
-MOTO-20250520-001,2025-05-20 10:06:32,1627.35,cash,accessories_only,accessories,True
-MOTO-20250520-002,2025-05-20 11:08:53,13145.47,cash,entry_bike,used,False
-MOTO-20250520-003,2025-05-20 17:05:46,46723.62,bank_transfer,premium,used,False
-MOTO-20250520-004,2025-05-20 17:24:39,4688.0,cash,scooter,new,True
-MOTO-20250520-005,2025-05-20 19:19:18,86020.69,bank_transfer,premium,new,True
-MOTO-20250520-006,2025-05-20 19:24:27,11255.24,credit,entry_bike,new,False
-MOTO-20250520-007,2025-05-20 20:33:32,20815.6,cash,mid_sport,new,True
-MOTO-20250521-001,2025-05-21 11:18:45,1843.1,mada,accessories_only,accessories,True
-MOTO-20250521-002,2025-05-21 13:50:34,627.99,mada,accessories_only,accessories,True
-MOTO-20250521-003,2025-05-21 16:42:15,305.35,mada,accessories_only,accessories,True
-MOTO-20250522-001,2025-05-22 11:17:56,2311.84,cash,accessories_only,accessories,True
-MOTO-20250522-002,2025-05-22 13:02:21,5735.76,mada,scooter,used,False
-MOTO-20250522-003,2025-05-22 13:29:04,1656.81,mada,accessories_only,accessories,True
-MOTO-20250522-004,2025-05-22 13:52:07,96653.87,mada,premium,new,False
-MOTO-20250522-005,2025-05-22 15:09:03,19145.61,cash,mid_sport,used,True
-MOTO-20250522-006,2025-05-22 15:20:01,990.19,mada,accessories_only,accessories,True
-MOTO-20250522-007,2025-05-22 16:25:44,29983.4,mada,mid_sport,used,False
-MOTO-20250522-008,2025-05-22 17:42:36,613.95,mada,accessories_only,accessories,True
-MOTO-20250522-009,2025-05-22 19:33:33,7245.18,mada,scooter,new,False
-MOTO-20250522-010,2025-05-22 19:38:10,6505.11,cash,scooter,new,True
-MOTO-20250522-011,2025-05-22 20:45:04,10721.2,bank_transfer,entry_bike,new,False
-MOTO-20250522-012,2025-05-22 21:20:53,13953.37,mada,entry_bike,new,True
-MOTO-20250522-013,2025-05-22 21:21:08,1647.47,mada,accessories_only,accessories,True
-MOTO-20250523-001,2025-05-23 10:02:38,64030.7,mada,premium,new,False
-MOTO-20250523-002,2025-05-23 10:41:07,29652.53,cash,large_sport,new,True
-MOTO-20250523-003,2025-05-23 11:34:35,6762.98,mada,scooter,new,False
-MOTO-20250523-004,2025-05-23 14:35:56,5764.07,bank_transfer,scooter,new,False
-MOTO-20250523-005,2025-05-23 15:15:17,74758.39,credit,premium,used,False
-MOTO-20250523-006,2025-05-23 15:37:26,51991.43,bank_transfer,premium,new,True
-MOTO-20250523-007,2025-05-23 16:25:02,10262.32,mada,entry_bike,new,False
-MOTO-20250523-008,2025-05-23 16:32:32,1397.02,bank_transfer,accessories_only,accessories,True
-MOTO-20250523-009,2025-05-23 18:22:29,194.36,mada,accessories_only,accessories,True
-MOTO-20250523-010,2025-05-23 20:14:32,1728.8,mada,accessories_only,accessories,True
-MOTO-20250523-011,2025-05-23 20:53:51,12997.02,mada,entry_bike,used,False
-MOTO-20250523-012,2025-05-23 21:24:42,1657.48,mada,accessories_only,accessories,True
-MOTO-20250524-001,2025-05-24 10:42:35,62066.11,bank_transfer,premium,used,False
-MOTO-20250524-002,2025-05-24 13:18:29,43640.94,mada,large_sport,used,True
-MOTO-20250524-003,2025-05-24 15:01:52,885.98,cash,accessories_only,accessories,True
-MOTO-20250524-004,2025-05-24 18:13:31,71488.53,mada,premium,new,False
-MOTO-20250524-005,2025-05-24 18:43:59,12879.25,credit,entry_bike,new,False
-MOTO-20250524-006,2025-05-24 19:51:44,21083.52,cash,mid_sport,new,True
-MOTO-20250524-007,2025-05-24 21:53:55,1365.53,mada,accessories_only,accessories,True
-MOTO-20250525-001,2025-05-25 12:36:57,94085.15,cash,premium,new,True
-MOTO-20250525-002,2025-05-25 16:28:14,2009.99,bank_transfer,accessories_only,accessories,True
-MOTO-20250525-003,2025-05-25 17:18:19,14842.5,cash,entry_bike,new,False
-MOTO-20250525-004,2025-05-25 17:34:27,995.25,cash,accessories_only,accessories,True
-MOTO-20250526-001,2025-05-26 15:36:44,13635.87,mada,entry_bike,used,False
-MOTO-20250526-002,2025-05-26 16:28:27,6936.03,bank_transfer,scooter,new,False
-MOTO-20250526-003,2025-05-26 16:48:09,99136.0,cash,premium,new,False
-MOTO-20250526-004,2025-05-26 17:29:45,82488.94,bank_transfer,premium,used,True
-MOTO-20250526-005,2025-05-26 20:10:22,23266.51,bank_transfer,mid_sport,used,False
-MOTO-20250527-001,2025-05-27 10:55:54,12407.15,bank_transfer,entry_bike,new,False
-MOTO-20250527-002,2025-05-27 11:07:51,792.79,mada,accessories_only,accessories,True
-MOTO-20250527-003,2025-05-27 11:08:07,29344.6,cash,mid_sport,new,True
-MOTO-20250527-004,2025-05-27 12:08:11,25126.77,bank_transfer,mid_sport,new,False
-MOTO-20250527-005,2025-05-27 14:12:51,22937.38,bank_transfer,mid_sport,used,True
-MOTO-20250527-006,2025-05-27 14:41:48,22516.21,cash,mid_sport,new,False
-MOTO-20250527-007,2025-05-27 16:27:29,13965.44,credit,entry_bike,new,False
-MOTO-20250527-008,2025-05-27 19:59:42,13695.68,mada,entry_bike,used,False
-MOTO-20250528-001,2025-05-28 12:08:20,5093.76,mada,scooter,new,False
-MOTO-20250528-002,2025-05-28 12:21:36,2123.29,cash,accessories_only,accessories,True
-MOTO-20250528-003,2025-05-28 15:32:14,859.17,mada,accessories_only,accessories,True
-MOTO-20250528-004,2025-05-28 16:24:33,12882.33,mada,entry_bike,used,True
-MOTO-20250528-005,2025-05-28 18:30:59,1681.4,cash,accessories_only,accessories,True
-MOTO-20250528-006,2025-05-28 18:48:36,407.92,mada,accessories_only,accessories,True
-MOTO-20250528-007,2025-05-28 19:19:00,15255.59,bank_transfer,mid_sport,used,True
-MOTO-20250528-008,2025-05-28 21:51:43,449.58,bank_transfer,accessories_only,accessories,True
-MOTO-20250529-001,2025-05-29 10:20:36,10955.31,mada,entry_bike,used,False
-MOTO-20250529-002,2025-05-29 11:01:43,2380.67,cash,accessories_only,accessories,True
-MOTO-20250529-003,2025-05-29 11:17:11,2285.28,cash,accessories_only,accessories,True
-MOTO-20250529-004,2025-05-29 12:31:21,32664.05,bank_transfer,large_sport,used,True
-MOTO-20250529-005,2025-05-29 13:56:39,26131.49,mada,mid_sport,used,False
-MOTO-20250529-006,2025-05-29 14:40:44,547.0,cash,accessories_only,accessories,True
-MOTO-20250529-007,2025-05-29 16:57:01,2468.47,cash,accessories_only,accessories,True
-MOTO-20250529-008,2025-05-29 19:05:57,59350.21,mada,premium,new,False
-MOTO-20250529-009,2025-05-29 19:34:28,4611.36,mada,scooter,used,False
-MOTO-20250529-010,2025-05-29 20:07:03,13072.96,cash,entry_bike,new,False
-MOTO-20250530-001,2025-05-30 10:51:00,23417.26,bank_transfer,mid_sport,new,False
-MOTO-20250530-002,2025-05-30 11:57:40,1432.69,mada,accessories_only,accessories,True
-MOTO-20250530-003,2025-05-30 12:47:23,1836.69,cash,accessories_only,accessories,True
-MOTO-20250530-004,2025-05-30 13:42:47,1253.69,bank_transfer,accessories_only,accessories,True
-MOTO-20250530-005,2025-05-30 13:43:44,28749.78,cash,mid_sport,used,False
-MOTO-20250530-006,2025-05-30 14:05:44,196.98,bank_transfer,accessories_only,accessories,True
-MOTO-20250530-007,2025-05-30 14:40:14,29764.71,cash,mid_sport,new,False
-MOTO-20250530-008,2025-05-30 14:57:39,2228.27,cash,accessories_only,accessories,True
-MOTO-20250530-009,2025-05-30 15:14:31,1755.14,mada,accessories_only,accessories,True
-MOTO-20250530-010,2025-05-30 17:58:02,77291.35,bank_transfer,premium,new,False
-MOTO-20250530-011,2025-05-30 18:35:08,34299.82,bank_transfer,large_sport,used,False
-MOTO-20250530-012,2025-05-30 18:35:26,179.22,cash,accessories_only,accessories,True
-MOTO-20250530-013,2025-05-30 20:05:54,4937.8,cash,scooter,used,False
-MOTO-20250530-014,2025-05-30 20:41:23,21761.16,cash,mid_sport,new,False
-MOTO-20250530-015,2025-05-30 21:49:47,1268.94,mada,accessories_only,accessories,True
-MOTO-20250531-001,2025-05-31 11:12:27,63509.43,bank_transfer,premium,new,False
-MOTO-20250531-002,2025-05-31 13:31:01,751.56,mada,accessories_only,accessories,True
-MOTO-20250531-003,2025-05-31 14:09:32,84532.5,credit,premium,new,False
-MOTO-20250531-004,2025-05-31 16:00:11,29148.9,cash,mid_sport,used,True
-MOTO-20250531-005,2025-05-31 17:00:52,1631.68,mada,accessories_only,accessories,True
-MOTO-20250531-006,2025-05-31 17:20:21,2323.12,mada,accessories_only,accessories,True
-MOTO-20250531-007,2025-05-31 17:25:48,51405.5,mada,premium,new,False
-MOTO-20250531-008,2025-05-31 20:29:01,6663.8,mada,scooter,new,True
-MOTO-20250531-009,2025-05-31 20:30:56,1110.37,mada,accessories_only,accessories,True
-MOTO-20250531-010,2025-05-31 20:50:17,1948.29,credit,accessories_only,accessories,True
-MOTO-20250601-001,2025-06-01 10:55:21,42408.8,mada,large_sport,new,False
-MOTO-20250601-002,2025-06-01 11:19:56,22503.63,mada,mid_sport,new,False
-MOTO-20250601-003,2025-06-01 11:34:53,25781.12,mada,mid_sport,new,True
-MOTO-20250601-004,2025-06-01 12:21:26,55537.33,mada,premium,used,False
-MOTO-20250601-005,2025-06-01 14:12:41,680.53,cash,accessories_only,accessories,True
-MOTO-20250601-006,2025-06-01 16:23:34,1032.35,cash,accessories_only,accessories,True
-MOTO-20250601-007,2025-06-01 16:59:46,2170.59,mada,accessories_only,accessories,True
-MOTO-20250601-008,2025-06-01 17:59:58,13225.79,mada,entry_bike,new,True
-MOTO-20250601-009,2025-06-01 18:15:33,294.93,bank_transfer,accessories_only,accessories,True
-MOTO-20250601-010,2025-06-01 20:24:59,19622.65,cash,mid_sport,used,False
-MOTO-20250602-001,2025-06-02 10:33:23,34396.38,bank_transfer,large_sport,new,True
-MOTO-20250602-002,2025-06-02 10:40:30,13297.57,cash,entry_bike,new,False
-MOTO-20250602-003,2025-06-02 10:52:45,906.27,bank_transfer,accessories_only,accessories,True
-MOTO-20250602-004,2025-06-02 11:08:12,15414.87,mada,mid_sport,used,False
-MOTO-20250602-005,2025-06-02 11:24:28,37137.0,cash,large_sport,new,False
-MOTO-20250602-006,2025-06-02 13:30:58,16054.12,bank_transfer,mid_sport,used,False
-MOTO-20250602-007,2025-06-02 14:22:01,1023.12,cash,accessories_only,accessories,True
-MOTO-20250602-008,2025-06-02 19:57:30,5559.57,mada,scooter,used,False
-MOTO-20250602-009,2025-06-02 20:40:34,23567.99,cash,mid_sport,new,False
-MOTO-20250602-010,2025-06-02 21:24:55,1610.62,bank_transfer,accessories_only,accessories,True
-MOTO-20250603-001,2025-06-03 12:24:48,11096.78,bank_transfer,entry_bike,new,True
-MOTO-20250603-002,2025-06-03 18:19:15,373.86,credit,accessories_only,accessories,True
-MOTO-20250603-003,2025-06-03 18:53:34,1800.18,mada,accessories_only,accessories,True
-MOTO-20250604-001,2025-06-04 12:46:35,14773.64,cash,entry_bike,new,False
-MOTO-20250604-002,2025-06-04 14:55:44,66218.42,credit,premium,new,False
-MOTO-20250604-003,2025-06-04 14:59:09,28141.57,mada,large_sport,new,True
-MOTO-20250604-004,2025-06-04 15:04:58,1554.58,cash,accessories_only,accessories,True
-MOTO-20250604-005,2025-06-04 16:09:38,7601.17,cash,scooter,used,False
-MOTO-20250605-001,2025-06-05 10:18:45,5087.94,bank_transfer,scooter,new,True
-MOTO-20250605-002,2025-06-05 11:27:12,14173.67,mada,entry_bike,new,False
-MOTO-20250605-003,2025-06-05 13:06:17,13690.59,mada,entry_bike,new,False
-MOTO-20250605-004,2025-06-05 15:01:01,7239.89,mada,scooter,used,True
-MOTO-20250605-005,2025-06-05 16:15:38,1499.89,cash,accessories_only,accessories,True
-MOTO-20250605-006,2025-06-05 18:11:08,32227.15,mada,large_sport,new,True
-MOTO-20250605-007,2025-06-05 21:20:48,2060.04,mada,accessories_only,accessories,True
-MOTO-20250606-001,2025-06-06 10:59:39,34147.8,mada,large_sport,new,True
-MOTO-20250606-002,2025-06-06 16:00:42,11659.64,cash,entry_bike,new,False
-MOTO-20250606-003,2025-06-06 16:15:31,509.67,cash,accessories_only,accessories,True
-MOTO-20250606-004,2025-06-06 21:01:30,39166.54,cash,large_sport,new,False
-MOTO-20250607-001,2025-06-07 11:49:50,10782.25,mada,entry_bike,new,True
-MOTO-20250607-002,2025-06-07 13:49:32,1556.19,cash,accessories_only,accessories,True
-MOTO-20250607-003,2025-06-07 17:47:00,7285.01,mada,scooter,used,False
-MOTO-20250607-004,2025-06-07 17:52:14,1726.15,cash,accessories_only,accessories,True
-MOTO-20250607-005,2025-06-07 19:04:19,22726.39,mada,mid_sport,new,True
-MOTO-20250607-BULK,2025-06-07 23:03:40,8906.08,cash,accessories_only,accessories,True
-MOTO-20250608-001,2025-06-08 10:03:14,21239.86,cash,mid_sport,used,True
-MOTO-20250608-002,2025-06-08 11:18:32,6389.99,cash,scooter,new,True
-MOTO-20250608-003,2025-06-08 12:06:47,11987.37,cash,entry_bike,new,False
-MOTO-20250608-004,2025-06-08 15:07:49,25166.11,cash,mid_sport,used,False
-MOTO-20250608-005,2025-06-08 18:04:16,43741.08,mada,large_sport,used,True
-MOTO-20250608-006,2025-06-08 18:46:32,19414.83,mada,mid_sport,new,True
-MOTO-20250608-007,2025-06-08 20:45:47,518.33,mada,accessories_only,accessories,True
-MOTO-20250609-001,2025-06-09 16:16:32,23384.67,cash,mid_sport,used,False
-MOTO-20250609-002,2025-06-09 16:17:04,409.53,bank_transfer,accessories_only,accessories,True
-MOTO-20250609-003,2025-06-09 17:06:29,13975.2,cash,entry_bike,used,False
-MOTO-20250609-004,2025-06-09 20:10:13,49371.88,cash,large_sport,used,False
-MOTO-20250609-005,2025-06-09 21:15:06,883.29,bank_transfer,accessories_only,accessories,True
-MOTO-20250609-006,2025-06-09 21:47:42,4969.15,credit,scooter,new,True
-MOTO-20250610-001,2025-06-10 13:34:04,29523.81,mada,large_sport,new,False
-MOTO-20250610-002,2025-06-10 15:22:19,16348.37,cash,mid_sport,new,True
-MOTO-20250610-003,2025-06-10 16:32:00,1920.06,mada,accessories_only,accessories,True
-MOTO-20250610-004,2025-06-10 17:13:22,1807.16,bank_transfer,accessories_only,accessories,True
-MOTO-20250610-005,2025-06-10 17:49:51,733.65,mada,accessories_only,accessories,True
-MOTO-20250610-006,2025-06-10 17:55:04,10072.68,cash,entry_bike,new,True
-MOTO-20250610-007,2025-06-10 21:52:39,12831.85,mada,entry_bike,new,True
-MOTO-20250611-001,2025-06-11 10:58:38,6864.4,cash,scooter,new,False
-MOTO-20250611-002,2025-06-11 14:21:19,33349.07,cash,large_sport,new,True
-MOTO-20250611-003,2025-06-11 17:24:36,45593.26,mada,large_sport,new,False
-MOTO-20250612-001,2025-06-12 10:08:41,1924.47,cash,accessories_only,accessories,True
-MOTO-20250612-002,2025-06-12 11:21:15,33799.78,mada,large_sport,new,False
-MOTO-20250612-003,2025-06-12 13:42:26,14422.88,mada,entry_bike,new,False
-MOTO-20250612-004,2025-06-12 14:37:14,373.12,cash,accessories_only,accessories,True
-MOTO-20250612-005,2025-06-12 18:19:30,56798.2,mada,premium,new,False
-MOTO-20250612-006,2025-06-12 19:19:25,605.97,cash,accessories_only,accessories,True
-MOTO-20250612-007,2025-06-12 19:50:47,1076.8,bank_transfer,accessories_only,accessories,True
-MOTO-20250612-008,2025-06-12 20:09:16,14760.1,bank_transfer,entry_bike,used,True
-MOTO-20250612-009,2025-06-12 20:23:12,42897.84,mada,premium,new,False
-MOTO-20250612-010,2025-06-12 20:38:38,46594.26,mada,large_sport,used,True
-MOTO-20250612-011,2025-06-12 20:40:38,1505.86,cash,accessories_only,accessories,True
-MOTO-20250612-012,2025-06-12 21:35:37,1559.81,cash,accessories_only,accessories,True
-MOTO-20250612-013,2025-06-12 21:51:58,566.46,bank_transfer,accessories_only,accessories,True
-MOTO-20250613-001,2025-06-13 13:59:47,6033.87,credit,scooter,used,True
-MOTO-20250613-002,2025-06-13 14:17:42,7311.36,cash,scooter,new,False
-MOTO-20250613-003,2025-06-13 16:09:04,25807.36,credit,mid_sport,new,False
-MOTO-20250613-004,2025-06-13 16:38:19,1921.93,cash,accessories_only,accessories,True
-MOTO-20250613-005,2025-06-13 18:27:59,10508.23,credit,entry_bike,new,False
-MOTO-20250613-006,2025-06-13 20:33:38,96382.65,mada,premium,new,False
-MOTO-20250614-001,2025-06-14 14:27:12,1652.27,credit,accessories_only,accessories,True
-MOTO-20250614-002,2025-06-14 15:36:10,1772.85,bank_transfer,accessories_only,accessories,True
-MOTO-20250614-003,2025-06-14 20:21:25,1612.51,bank_transfer,accessories_only,accessories,True
-MOTO-20250615-001,2025-06-15 11:37:13,774.8,cash,accessories_only,accessories,True
-MOTO-20250615-002,2025-06-15 12:40:17,1570.07,mada,accessories_only,accessories,True
-MOTO-20250615-003,2025-06-15 12:58:43,2207.04,bank_transfer,accessories_only,accessories,True
-MOTO-20250615-004,2025-06-15 14:21:29,52404.2,cash,premium,new,False
-MOTO-20250615-005,2025-06-15 15:36:58,1214.61,cash,accessories_only,accessories,True
-MOTO-20250615-006,2025-06-15 17:54:37,7090.98,mada,scooter,used,True
-MOTO-20250615-007,2025-06-15 18:51:54,20446.22,cash,mid_sport,used,False
-MOTO-20250615-008,2025-06-15 20:37:18,2036.65,cash,accessories_only,accessories,True
-MOTO-20250615-009,2025-06-15 21:22:20,24437.19,bank_transfer,mid_sport,new,True
-MOTO-20250616-001,2025-06-16 10:41:26,48078.18,cash,large_sport,new,False
-MOTO-20250616-002,2025-06-16 10:57:24,16311.87,mada,mid_sport,new,False
-MOTO-20250616-003,2025-06-16 11:15:24,40788.99,mada,large_sport,new,False
-MOTO-20250616-004,2025-06-16 12:03:18,2028.32,bank_transfer,accessories_only,accessories,True
-MOTO-20250616-005,2025-06-16 12:35:09,752.49,mada,accessories_only,accessories,True
-MOTO-20250616-006,2025-06-16 14:28:51,2207.15,mada,accessories_only,accessories,True
-MOTO-20250616-007,2025-06-16 16:32:22,24444.0,bank_transfer,mid_sport,new,True
-MOTO-20250616-008,2025-06-16 17:21:20,23194.86,mada,mid_sport,used,False
-MOTO-20250616-009,2025-06-16 21:25:17,1112.44,cash,accessories_only,accessories,True
-MOTO-20250617-001,2025-06-17 10:08:35,16068.1,cash,mid_sport,new,True
-MOTO-20250617-002,2025-06-17 16:40:55,24423.5,cash,mid_sport,new,False
-MOTO-20250617-003,2025-06-17 17:13:59,46554.11,cash,large_sport,new,False
-MOTO-20250617-004,2025-06-17 19:42:43,1698.01,mada,accessories_only,accessories,True
-MOTO-20250617-005,2025-06-17 20:59:12,2491.63,mada,accessories_only,accessories,True
-MOTO-20250618-001,2025-06-18 14:52:21,77532.6,mada,premium,new,False
-MOTO-20250618-002,2025-06-18 16:51:12,2002.19,credit,accessories_only,accessories,True
-MOTO-20250618-003,2025-06-18 21:49:26,13455.05,mada,entry_bike,used,False
-MOTO-20250619-001,2025-06-19 12:39:48,585.62,cash,accessories_only,accessories,True
-MOTO-20250619-002,2025-06-19 14:24:41,30639.3,cash,large_sport,new,False
-MOTO-20250619-003,2025-06-19 14:57:29,39779.84,mada,large_sport,new,False
-MOTO-20250619-004,2025-06-19 15:35:02,1467.14,credit,accessories_only,accessories,True
-MOTO-20250619-005,2025-06-19 16:26:43,91788.24,bank_transfer,premium,used,False
-MOTO-20250619-006,2025-06-19 17:05:59,29779.25,bank_transfer,mid_sport,new,False
-MOTO-20250619-007,2025-06-19 19:37:44,358.13,mada,accessories_only,accessories,True
-MOTO-20250619-008,2025-06-19 19:59:29,23748.98,mada,mid_sport,new,False
-MOTO-20250619-009,2025-06-19 20:13:53,2219.89,mada,accessories_only,accessories,True
-MOTO-20250619-010,2025-06-19 20:39:48,28375.96,mada,mid_sport,new,False
-MOTO-20250619-011,2025-06-19 20:40:27,198.67,bank_transfer,accessories_only,accessories,True
-MOTO-20250619-012,2025-06-19 20:41:09,40353.45,cash,large_sport,used,False
-MOTO-20250619-013,2025-06-19 21:26:35,1939.76,mada,accessories_only,accessories,True
-MOTO-20250620-001,2025-06-20 12:36:25,2135.22,mada,accessories_only,accessories,True
-MOTO-20250620-002,2025-06-20 13:09:11,18737.58,cash,mid_sport,new,False
-MOTO-20250620-003,2025-06-20 15:43:16,56058.66,bank_transfer,premium,new,False
-MOTO-20250620-004,2025-06-20 19:01:26,1068.84,mada,accessories_only,accessories,True
-MOTO-20250620-005,2025-06-20 21:05:41,83828.73,mada,premium,used,True
-MOTO-20250620-006,2025-06-20 21:12:04,14834.64,mada,entry_bike,new,False
-MOTO-20250621-001,2025-06-21 14:45:04,7199.62,mada,scooter,new,True
-MOTO-20250621-002,2025-06-21 15:24:17,24872.52,mada,mid_sport,used,False
-MOTO-20250621-003,2025-06-21 17:35:34,12154.06,mada,entry_bike,new,False
-MOTO-20250621-004,2025-06-21 19:51:26,4620.56,cash,scooter,new,True
-MOTO-20250622-001,2025-06-22 16:55:10,2335.75,cash,accessories_only,accessories,True
-MOTO-20250622-002,2025-06-22 18:21:18,1263.99,cash,accessories_only,accessories,True
-MOTO-20250622-003,2025-06-22 19:23:21,755.81,cash,accessories_only,accessories,True
-MOTO-20250622-004,2025-06-22 21:16:53,59708.83,mada,premium,used,False
-MOTO-20250623-001,2025-06-23 12:00:41,1380.31,mada,accessories_only,accessories,True
-MOTO-20250623-002,2025-06-23 14:06:37,1831.52,mada,accessories_only,accessories,True
-MOTO-20250623-003,2025-06-23 19:52:44,42998.96,mada,large_sport,used,False
-MOTO-20250623-004,2025-06-23 20:14:05,1651.4,cash,accessories_only,accessories,True
-MOTO-20250623-005,2025-06-23 21:35:11,19699.28,cash,mid_sport,used,False
-MOTO-20250623-006,2025-06-23 21:36:12,90289.61,mada,premium,used,False
-MOTO-20250624-001,2025-06-24 13:05:19,5907.55,mada,scooter,new,False
-MOTO-20250624-002,2025-06-24 14:19:11,1230.64,mada,accessories_only,accessories,True
-MOTO-20250624-003,2025-06-24 19:30:44,20218.51,mada,mid_sport,new,False
-MOTO-20250625-001,2025-06-25 15:06:31,25384.56,mada,mid_sport,new,False
-MOTO-20250625-002,2025-06-25 17:52:48,40257.82,mada,large_sport,new,False
-MOTO-20250625-003,2025-06-25 20:15:58,429.65,cash,accessories_only,accessories,True
-MOTO-20250625-004,2025-06-25 20:58:31,753.75,mada,accessories_only,accessories,True
-MOTO-20250625-005,2025-06-25 21:02:45,21621.43,cash,mid_sport,used,True
-MOTO-20250625-006,2025-06-25 21:24:08,6541.58,cash,scooter,new,False
-MOTO-20250625-007,2025-06-25 21:29:37,13800.29,mada,entry_bike,used,False
-MOTO-20250626-001,2025-06-26 10:19:36,1893.25,mada,accessories_only,accessories,True
-MOTO-20250626-002,2025-06-26 11:10:18,506.61,cash,accessories_only,accessories,True
-MOTO-20250626-003,2025-06-26 12:38:02,2019.49,credit,accessories_only,accessories,True
-MOTO-20250626-004,2025-06-26 12:51:27,14454.85,cash,entry_bike,new,True
-MOTO-20250626-005,2025-06-26 14:29:34,24718.47,mada,mid_sport,new,True
-MOTO-20250626-006,2025-06-26 15:22:56,12668.47,credit,entry_bike,used,False
-MOTO-20250626-007,2025-06-26 15:27:54,47707.87,mada,premium,used,True
-MOTO-20250626-008,2025-06-26 15:56:52,1817.98,credit,accessories_only,accessories,True
-MOTO-20250626-009,2025-06-26 21:29:35,43309.41,bank_transfer,large_sport,new,False
-MOTO-20250627-001,2025-06-27 10:34:07,41872.6,cash,large_sport,new,True
-MOTO-20250627-002,2025-06-27 11:04:22,89897.86,credit,premium,new,False
-MOTO-20250627-003,2025-06-27 11:14:32,521.74,mada,accessories_only,accessories,True
-MOTO-20250627-004,2025-06-27 13:58:12,770.36,mada,accessories_only,accessories,True
-MOTO-20250627-005,2025-06-27 14:36:18,800.85,mada,accessories_only,accessories,True
-MOTO-20250627-006,2025-06-27 14:43:30,2391.33,mada,accessories_only,accessories,True
-MOTO-20250627-007,2025-06-27 16:42:40,28488.62,cash,large_sport,new,True
-MOTO-20250627-008,2025-06-27 16:50:08,37996.98,cash,large_sport,new,True
-MOTO-20250627-009,2025-06-27 19:13:29,629.64,bank_transfer,accessories_only,accessories,True
-MOTO-20250627-010,2025-06-27 20:48:27,1586.25,cash,accessories_only,accessories,True
-MOTO-20250627-011,2025-06-27 21:36:34,6531.14,cash,scooter,used,True
-MOTO-20250627-012,2025-06-27 21:56:00,6926.07,mada,scooter,used,False
-MOTO-20250628-001,2025-06-28 10:58:37,1799.71,credit,accessories_only,accessories,True
-MOTO-20250628-002,2025-06-28 18:50:33,15616.03,mada,mid_sport,new,False
-MOTO-20250628-003,2025-06-28 19:22:10,22635.93,cash,mid_sport,new,True
-MOTO-20250629-001,2025-06-29 12:05:56,11522.59,cash,entry_bike,used,False
-MOTO-20250629-002,2025-06-29 15:17:26,19758.05,bank_transfer,mid_sport,new,False
-MOTO-20250629-003,2025-06-29 17:17:08,23005.43,mada,mid_sport,used,False
-MOTO-20250629-004,2025-06-29 20:37:42,28299.11,credit,mid_sport,new,False
+transaction_id,timestamp,amount_sar,payment_method,bike_type,sale_type,accessories_included,counterparty_raw
+MOTO-20250401-001,2025-04-01 10:30:42,1706.76,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250401-002,2025-04-01 10:51:25,505.17,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250401-003,2025-04-01 11:10:35,12165.67,cash,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250401-004,2025-04-01 12:31:29,472.14,mada,accessories_only,accessories,True,
+MOTO-20250401-005,2025-04-01 13:50:34,1645.23,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250401-006,2025-04-01 13:56:01,19096.71,mada,mid_sport,new,False,STC INVOICE 5541
+MOTO-20250401-007,2025-04-01 15:22:04,1023.95,cash,accessories_only,accessories,True,
+MOTO-20250401-008,2025-04-01 17:30:31,13675.4,bank_transfer,entry_bike,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250401-009,2025-04-01 17:40:48,5428.86,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250401-010,2025-04-01 19:52:08,572.78,cash,accessories_only,accessories,True,
+MOTO-20250402-001,2025-04-02 10:11:21,2172.03,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250402-002,2025-04-02 10:37:26,18717.33,cash,mid_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250402-003,2025-04-02 13:08:06,47153.7,mada,large_sport,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250402-004,2025-04-02 13:12:55,1589.28,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250402-005,2025-04-02 13:43:33,73937.31,cash,premium,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250402-006,2025-04-02 15:15:36,86129.34,mada,premium,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250402-007,2025-04-02 15:36:26,29114.14,cash,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250402-008,2025-04-02 19:38:13,1082.28,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250402-009,2025-04-02 20:36:31,987.08,cash,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250403-001,2025-04-03 12:14:46,33089.77,mada,large_sport,new,True,SEC ELECTRICITY BILL 3320
+MOTO-20250403-002,2025-04-03 14:44:53,1098.83,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250403-003,2025-04-03 14:53:19,67407.04,bank_transfer,premium,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250403-004,2025-04-03 15:46:13,1457.99,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250403-005,2025-04-03 16:23:59,53638.0,mada,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250403-006,2025-04-03 17:45:03,666.57,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250403-007,2025-04-03 19:21:48,32053.02,mada,large_sport,used,False,SEC ELECTRICITY BILL 3320
+MOTO-20250403-008,2025-04-03 20:00:56,7804.81,cash,scooter,used,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250403-009,2025-04-03 20:48:39,986.55,mada,accessories_only,accessories,True,
+MOTO-20250403-010,2025-04-03 21:18:28,29967.44,cash,mid_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250404-001,2025-04-04 10:33:06,1174.65,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250404-002,2025-04-04 11:01:42,868.3,cash,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250404-003,2025-04-04 11:13:23,417.08,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250404-004,2025-04-04 12:17:57,14920.13,cash,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250404-005,2025-04-04 12:44:17,2058.06,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250404-006,2025-04-04 13:51:52,5519.55,cash,scooter,new,False,شركة قطع الغيار المتحدة
+MOTO-20250404-007,2025-04-04 15:12:18,2061.51,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250404-008,2025-04-04 15:14:51,6438.35,credit,scooter,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250404-009,2025-04-04 17:44:46,378.31,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250404-010,2025-04-04 19:35:18,811.21,cash,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250404-011,2025-04-04 19:54:18,69455.97,mada,premium,used,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250404-012,2025-04-04 20:46:42,47180.24,mada,large_sport,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250405-001,2025-04-05 11:29:41,93025.29,bank_transfer,premium,new,True,SEC ELECTRICITY BILL 3320
+MOTO-20250405-002,2025-04-05 13:03:03,25589.9,bank_transfer,mid_sport,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250405-003,2025-04-05 13:29:29,12716.56,cash,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250405-004,2025-04-05 16:53:10,28955.95,mada,mid_sport,new,True,TRF TO 6612231 SUPPLIER
+MOTO-20250405-005,2025-04-05 18:47:45,27525.32,cash,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250405-006,2025-04-05 18:54:05,1708.06,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250405-007,2025-04-05 19:35:08,13110.97,cash,entry_bike,new,True,STC INVOICE 5541
+MOTO-20250405-008,2025-04-05 21:37:24,1051.9,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250406-001,2025-04-06 11:04:52,11302.22,mada,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250406-002,2025-04-06 11:18:57,2481.68,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250406-003,2025-04-06 19:22:42,11373.49,mada,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250406-004,2025-04-06 20:10:05,11065.23,mada,entry_bike,new,True,LUBRICANTS WHOLESALE 337
+MOTO-20250407-001,2025-04-07 14:02:57,24030.27,cash,mid_sport,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250407-002,2025-04-07 15:12:17,1766.84,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250407-003,2025-04-07 18:56:34,16840.73,mada,mid_sport,new,True,
+MOTO-20250407-004,2025-04-07 21:34:18,561.31,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250408-001,2025-04-08 13:09:24,313.56,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250408-002,2025-04-08 16:19:41,10752.46,mada,entry_bike,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250408-003,2025-04-08 17:24:30,19087.18,bank_transfer,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250408-004,2025-04-08 20:20:55,33054.38,mada,large_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250408-005,2025-04-08 21:25:06,10004.8,mada,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250409-001,2025-04-09 10:42:38,90035.9,mada,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250409-002,2025-04-09 14:21:28,1012.85,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250409-003,2025-04-09 15:19:42,1440.28,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250409-004,2025-04-09 15:28:19,22190.94,mada,mid_sport,new,True,TRF TO 6612231 SUPPLIER
+MOTO-20250409-005,2025-04-09 15:36:02,12516.19,mada,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250409-006,2025-04-09 16:25:20,96834.36,mada,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250409-007,2025-04-09 19:04:15,13272.98,cash,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250409-008,2025-04-09 19:44:32,37421.79,cash,large_sport,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250409-009,2025-04-09 21:36:47,7768.6,cash,scooter,used,False,مؤسسة الإيجار التجاري
+MOTO-20250409-010,2025-04-09 21:58:16,812.97,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250410-001,2025-04-10 12:55:23,695.75,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250410-002,2025-04-10 18:50:23,1075.79,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250410-003,2025-04-10 21:12:09,22770.53,mada,mid_sport,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250410-004,2025-04-10 21:55:37,49565.74,bank_transfer,large_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250411-001,2025-04-11 11:21:17,1478.86,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250411-002,2025-04-11 12:05:45,98810.9,mada,premium,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250411-003,2025-04-11 12:56:52,49446.32,mada,premium,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250411-004,2025-04-11 13:20:02,444.37,cash,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250411-005,2025-04-11 14:53:08,19667.73,mada,mid_sport,used,False,STC INVOICE 5541
+MOTO-20250411-006,2025-04-11 15:58:41,306.57,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250411-007,2025-04-11 18:48:00,1598.45,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250411-008,2025-04-11 19:16:24,1398.45,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250411-009,2025-04-11 19:16:28,1665.5,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250411-010,2025-04-11 20:34:12,84462.83,cash,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250412-001,2025-04-12 11:54:12,14939.3,mada,entry_bike,used,True,SADAD BILL PAYMENT 9921
+MOTO-20250412-002,2025-04-12 16:10:13,18245.72,bank_transfer,mid_sport,new,False,STC INVOICE 5541
+MOTO-20250413-001,2025-04-13 17:02:05,5760.21,mada,scooter,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250413-002,2025-04-13 18:56:24,1020.76,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250414-001,2025-04-14 21:41:40,1452.46,cash,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250415-001,2025-04-15 14:07:04,43982.72,mada,premium,new,True,مؤسسة الإيجار التجاري
+MOTO-20250415-002,2025-04-15 15:28:34,1940.18,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250415-003,2025-04-15 16:35:57,1883.77,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250415-004,2025-04-15 16:58:56,87884.92,bank_transfer,premium,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250415-005,2025-04-15 17:35:46,25359.01,cash,mid_sport,new,False,LUBRICANTS WHOLESALE 337
+MOTO-20250415-006,2025-04-15 18:33:57,12193.24,mada,entry_bike,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250415-007,2025-04-15 18:57:11,7978.13,cash,scooter,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250416-001,2025-04-16 12:06:08,1964.68,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250416-002,2025-04-16 17:36:33,23220.34,cash,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250416-003,2025-04-16 18:13:17,10569.03,cash,entry_bike,new,False,مؤسسة الإيجار التجاري
+MOTO-20250416-004,2025-04-16 20:29:14,25083.12,mada,mid_sport,new,True,TRF TO 6612231 SUPPLIER
+MOTO-20250417-001,2025-04-17 11:08:34,2012.6,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250417-002,2025-04-17 12:01:31,21588.74,bank_transfer,mid_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250417-003,2025-04-17 12:48:30,2351.56,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250417-004,2025-04-17 13:57:18,1126.18,mada,accessories_only,accessories,True,
+MOTO-20250417-005,2025-04-17 15:02:29,31916.46,cash,large_sport,new,True,شركة قطع الغيار المتحدة
+MOTO-20250417-006,2025-04-17 15:35:01,733.9,bank_transfer,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250417-007,2025-04-17 16:23:18,13838.15,cash,entry_bike,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250417-008,2025-04-17 17:30:28,18687.04,cash,mid_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250417-009,2025-04-17 17:50:41,851.12,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250417-010,2025-04-17 18:06:46,2135.55,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250417-011,2025-04-17 21:04:39,431.65,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250417-012,2025-04-17 21:40:51,15558.04,cash,mid_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250418-001,2025-04-18 10:30:18,27283.01,mada,mid_sport,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250418-002,2025-04-18 10:43:43,2030.79,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250418-003,2025-04-18 11:02:03,523.54,mada,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250418-004,2025-04-18 11:07:02,1778.38,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250418-005,2025-04-18 13:44:24,2374.41,cash,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250418-006,2025-04-18 14:21:02,23985.92,cash,mid_sport,new,False,STC INVOICE 5541
+MOTO-20250418-007,2025-04-18 15:54:15,15292.87,bank_transfer,mid_sport,used,False,STC INVOICE 5541
+MOTO-20250418-008,2025-04-18 16:06:28,21720.1,mada,mid_sport,new,False,LUBRICANTS WHOLESALE 337
+MOTO-20250418-009,2025-04-18 16:45:09,318.17,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250418-010,2025-04-18 17:50:39,43402.11,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250418-011,2025-04-18 20:06:29,5053.57,mada,scooter,used,True,HELMET IMPORTS TRADING 88
+MOTO-20250418-012,2025-04-18 21:54:10,1436.01,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250419-001,2025-04-19 10:38:53,1043.61,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250419-002,2025-04-19 11:44:44,1490.3,bank_transfer,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250419-003,2025-04-19 11:54:14,14337.56,bank_transfer,entry_bike,used,False,STC INVOICE 5541
+MOTO-20250419-004,2025-04-19 12:25:59,20892.34,cash,mid_sport,used,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250419-005,2025-04-19 13:08:45,1657.99,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250419-006,2025-04-19 14:46:21,14212.39,bank_transfer,entry_bike,new,True,شركة قطع الغيار المتحدة
+MOTO-20250419-007,2025-04-19 15:27:26,831.73,cash,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250419-008,2025-04-19 20:55:37,29282.41,credit,mid_sport,used,True,HELMET IMPORTS TRADING 88
+MOTO-20250420-001,2025-04-20 10:38:32,56985.15,credit,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250420-002,2025-04-20 11:04:32,5006.89,mada,scooter,used,False,HELMET IMPORTS TRADING 88
+MOTO-20250420-003,2025-04-20 11:45:18,49282.46,cash,premium,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250420-004,2025-04-20 12:31:10,11350.23,mada,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250420-005,2025-04-20 14:38:08,17910.49,bank_transfer,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250420-006,2025-04-20 14:49:38,10309.06,cash,entry_bike,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250420-007,2025-04-20 15:15:56,28455.71,cash,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250420-008,2025-04-20 15:16:23,45613.72,cash,large_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250420-009,2025-04-20 16:50:59,838.14,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250420-010,2025-04-20 17:59:33,32779.09,credit,large_sport,new,False,مؤسسة الإيجار التجاري
+MOTO-20250421-001,2025-04-21 10:15:17,18045.59,cash,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250421-002,2025-04-21 10:36:58,768.26,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250421-003,2025-04-21 13:30:24,5359.37,credit,scooter,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250421-004,2025-04-21 15:02:24,18496.18,mada,mid_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250421-005,2025-04-21 17:33:38,75068.97,bank_transfer,premium,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250421-006,2025-04-21 20:41:00,22771.47,mada,mid_sport,new,True,SEC ELECTRICITY BILL 3320
+MOTO-20250422-001,2025-04-22 11:38:07,30010.04,bank_transfer,large_sport,new,False,
+MOTO-20250422-002,2025-04-22 11:44:11,202.01,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250422-003,2025-04-22 15:13:21,2137.25,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250422-004,2025-04-22 17:55:16,23328.4,cash,mid_sport,used,True,SADAD BILL PAYMENT 9921
+MOTO-20250422-005,2025-04-22 19:56:13,4713.9,mada,scooter,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250423-001,2025-04-23 10:14:36,22730.85,mada,mid_sport,new,False,مؤسسة الإيجار التجاري
+MOTO-20250423-002,2025-04-23 16:23:16,49529.31,mada,premium,used,False,مؤسسة الإيجار التجاري
+MOTO-20250423-003,2025-04-23 16:25:08,1182.03,cash,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250423-004,2025-04-23 16:47:51,165.97,cash,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250423-005,2025-04-23 17:44:36,72818.12,mada,premium,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250423-006,2025-04-23 18:30:48,2144.05,cash,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250423-007,2025-04-23 21:04:20,61274.83,credit,premium,new,False,
+MOTO-20250424-001,2025-04-24 14:04:04,22854.47,mada,mid_sport,used,False,SEC ELECTRICITY BILL 3320
+MOTO-20250424-002,2025-04-24 14:34:43,22841.18,cash,mid_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250424-003,2025-04-24 14:52:54,1493.91,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250424-004,2025-04-24 21:59:39,32923.46,mada,large_sport,used,True,SEC ELECTRICITY BILL 3320
+MOTO-20250425-001,2025-04-25 10:10:01,489.04,credit,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250425-002,2025-04-25 10:31:57,6743.34,cash,scooter,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250425-003,2025-04-25 12:09:58,13640.44,mada,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250425-004,2025-04-25 13:14:22,1910.1,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250425-005,2025-04-25 14:10:59,12725.0,mada,entry_bike,used,False,STC INVOICE 5541
+MOTO-20250425-006,2025-04-25 15:17:11,2068.52,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250425-007,2025-04-25 18:09:18,2166.64,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250426-001,2025-04-26 10:45:04,1495.38,credit,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250426-002,2025-04-26 13:54:22,84462.78,cash,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250426-003,2025-04-26 15:40:19,11849.16,cash,entry_bike,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250426-004,2025-04-26 17:20:57,674.26,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250426-005,2025-04-26 19:35:09,29883.16,mada,large_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250426-006,2025-04-26 19:45:01,594.21,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250426-007,2025-04-26 21:10:49,5830.17,mada,scooter,used,False,STC INVOICE 5541
+MOTO-20250427-001,2025-04-27 10:08:22,12979.56,mada,entry_bike,new,True,مؤسسة الإيجار التجاري
+MOTO-20250427-002,2025-04-27 10:30:41,5663.51,cash,scooter,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250427-003,2025-04-27 12:38:32,1185.25,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250427-004,2025-04-27 12:49:24,2421.55,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250427-005,2025-04-27 12:52:52,2045.94,cash,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250427-006,2025-04-27 18:23:32,7377.33,cash,scooter,used,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250427-007,2025-04-27 19:09:33,26890.1,cash,mid_sport,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250427-008,2025-04-27 19:11:58,1994.34,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250428-001,2025-04-28 12:49:55,19765.75,cash,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250428-002,2025-04-28 13:18:05,1202.93,mada,accessories_only,accessories,True,
+MOTO-20250428-003,2025-04-28 13:21:31,6231.86,mada,scooter,new,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250428-004,2025-04-28 16:17:51,23489.49,mada,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250428-005,2025-04-28 16:21:33,14337.2,bank_transfer,entry_bike,used,False,HELMET IMPORTS TRADING 88
+MOTO-20250428-006,2025-04-28 17:44:29,1244.94,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250428-007,2025-04-28 17:56:50,27049.57,bank_transfer,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250428-008,2025-04-28 18:28:10,11789.95,cash,entry_bike,used,True,STC INVOICE 5541
+MOTO-20250428-009,2025-04-28 19:42:53,2415.74,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250428-010,2025-04-28 19:51:03,14644.94,mada,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250429-001,2025-04-29 10:53:55,10288.49,mada,entry_bike,used,True,شركة قطع الغيار المتحدة
+MOTO-20250429-002,2025-04-29 14:42:37,26230.95,mada,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250429-003,2025-04-29 15:21:04,1671.96,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250430-001,2025-04-30 16:02:44,21658.01,cash,mid_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250430-002,2025-04-30 16:03:47,2479.39,bank_transfer,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250430-003,2025-04-30 16:18:51,1982.11,credit,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250430-004,2025-04-30 16:37:48,61799.59,mada,premium,new,True,شركة قطع الغيار المتحدة
+MOTO-20250430-005,2025-04-30 16:42:07,26413.72,cash,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250430-006,2025-04-30 17:03:10,1114.65,mada,accessories_only,accessories,True,
+MOTO-20250430-007,2025-04-30 17:40:07,2360.06,cash,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250430-008,2025-04-30 19:54:23,42123.8,cash,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250501-001,2025-05-01 11:21:50,5798.64,mada,scooter,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250501-002,2025-05-01 12:30:57,1361.69,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250501-003,2025-05-01 13:31:06,13675.95,mada,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250501-004,2025-05-01 13:55:14,1232.77,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250501-005,2025-05-01 14:09:04,6084.13,mada,scooter,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250501-006,2025-05-01 14:23:04,13882.69,cash,entry_bike,new,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250501-007,2025-05-01 15:17:48,28950.66,mada,mid_sport,new,True,مؤسسة الإيجار التجاري
+MOTO-20250501-008,2025-05-01 15:28:15,1857.28,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250501-009,2025-05-01 15:50:25,2199.79,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250501-010,2025-05-01 17:29:16,6023.47,credit,scooter,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250501-011,2025-05-01 17:44:19,45663.52,credit,large_sport,new,False,LUBRICANTS WHOLESALE 337
+MOTO-20250501-012,2025-05-01 19:36:34,49565.02,mada,large_sport,used,True,
+MOTO-20250502-001,2025-05-02 11:16:31,2149.19,cash,accessories_only,accessories,True,
+MOTO-20250502-002,2025-05-02 12:02:32,10665.71,cash,entry_bike,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250502-003,2025-05-02 13:42:13,5876.92,cash,scooter,new,False,STC INVOICE 5541
+MOTO-20250502-004,2025-05-02 15:34:38,1354.06,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250502-005,2025-05-02 17:00:54,496.33,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250502-006,2025-05-02 17:42:51,1470.82,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250502-007,2025-05-02 19:25:30,18320.55,mada,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250502-008,2025-05-02 20:33:43,14367.43,mada,entry_bike,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250502-009,2025-05-02 20:36:56,39203.06,cash,large_sport,new,False,
+MOTO-20250502-010,2025-05-02 20:43:46,2283.34,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250502-011,2025-05-02 21:14:57,65129.63,bank_transfer,premium,new,False,STC INVOICE 5541
+MOTO-20250502-012,2025-05-02 21:18:57,10967.73,mada,entry_bike,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250502-013,2025-05-02 21:51:04,91379.36,cash,premium,used,False,شركة قطع الغيار المتحدة
+MOTO-20250503-001,2025-05-03 10:38:38,5843.58,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250503-002,2025-05-03 17:44:36,80131.32,cash,premium,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250503-003,2025-05-03 20:53:09,931.55,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250503-004,2025-05-03 21:36:48,14813.54,mada,entry_bike,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250504-001,2025-05-04 11:02:35,2149.98,mada,accessories_only,accessories,True,
+MOTO-20250504-002,2025-05-04 13:21:42,386.29,mada,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250504-003,2025-05-04 17:16:48,4674.51,cash,scooter,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250504-004,2025-05-04 18:16:14,1821.76,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250504-005,2025-05-04 18:31:37,14367.36,mada,entry_bike,new,True,STC INVOICE 5541
+MOTO-20250504-006,2025-05-04 19:23:21,1730.93,mada,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250504-007,2025-05-04 19:24:15,10667.83,mada,entry_bike,new,False,STC INVOICE 5541
+MOTO-20250505-001,2025-05-05 11:43:20,29709.4,bank_transfer,mid_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250505-002,2025-05-05 13:13:55,641.84,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250505-003,2025-05-05 14:58:59,1743.89,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250505-004,2025-05-05 16:00:59,1388.96,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250505-005,2025-05-05 16:17:39,15989.66,credit,mid_sport,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250505-006,2025-05-05 17:00:22,11234.29,cash,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250505-007,2025-05-05 19:11:41,28430.76,mada,mid_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250505-008,2025-05-05 19:31:19,15090.58,cash,mid_sport,new,True,شركة قطع الغيار المتحدة
+MOTO-20250506-001,2025-05-06 10:47:54,23090.95,mada,mid_sport,new,True,
+MOTO-20250506-002,2025-05-06 14:58:30,2325.01,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250506-003,2025-05-06 18:50:43,1499.02,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250506-004,2025-05-06 19:28:12,157.62,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250507-001,2025-05-07 12:11:14,1775.52,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250507-002,2025-05-07 12:25:32,96736.05,cash,premium,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250507-003,2025-05-07 15:09:25,268.98,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250507-004,2025-05-07 16:10:22,26711.58,cash,mid_sport,new,False,STC INVOICE 5541
+MOTO-20250507-005,2025-05-07 17:39:06,7982.2,mada,scooter,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250507-006,2025-05-07 21:58:20,68000.54,cash,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250508-001,2025-05-08 11:26:37,29207.47,cash,large_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250508-002,2025-05-08 14:17:29,88828.5,cash,premium,new,False,شركة قطع الغيار المتحدة
+MOTO-20250508-003,2025-05-08 14:46:45,47237.94,credit,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250508-004,2025-05-08 18:53:03,33793.66,cash,large_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250508-005,2025-05-08 19:28:32,595.2,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250508-006,2025-05-08 21:00:35,27643.82,mada,mid_sport,new,True,STC INVOICE 5541
+MOTO-20250508-007,2025-05-08 21:46:53,464.01,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-001,2025-05-09 13:35:10,31019.28,cash,large_sport,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250509-002,2025-05-09 14:54:04,29124.05,mada,large_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250509-003,2025-05-09 15:02:02,29237.02,mada,large_sport,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-004,2025-05-09 16:36:23,2324.01,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-005,2025-05-09 16:57:26,51052.72,mada,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-006,2025-05-09 17:39:10,17257.76,cash,mid_sport,new,False,
+MOTO-20250509-007,2025-05-09 18:19:53,831.19,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-008,2025-05-09 18:28:59,48901.23,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250509-009,2025-05-09 18:32:11,11428.35,cash,entry_bike,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250509-010,2025-05-09 18:53:15,14274.73,cash,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250509-011,2025-05-09 20:04:15,1596.8,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250509-012,2025-05-09 20:56:47,35107.63,cash,large_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250510-001,2025-05-10 13:16:07,10754.47,mada,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250510-002,2025-05-10 13:34:37,1446.75,credit,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250510-003,2025-05-10 13:36:32,21301.75,cash,mid_sport,used,True,شركة قطع الغيار المتحدة
+MOTO-20250510-004,2025-05-10 17:43:51,25679.06,mada,mid_sport,used,True,شركة قطع الغيار المتحدة
+MOTO-20250510-005,2025-05-10 18:53:08,802.08,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250510-006,2025-05-10 20:11:14,47687.23,mada,large_sport,new,False,
+MOTO-20250511-001,2025-05-11 10:49:12,2127.23,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250511-002,2025-05-11 11:12:57,10202.82,cash,entry_bike,new,False,
+MOTO-20250511-003,2025-05-11 12:24:02,183.42,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250511-004,2025-05-11 17:22:17,13660.63,cash,entry_bike,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250511-005,2025-05-11 19:06:47,1692.41,mada,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250511-006,2025-05-11 19:27:52,10097.91,mada,entry_bike,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250511-007,2025-05-11 20:39:57,49492.66,cash,large_sport,new,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250511-008,2025-05-11 21:56:03,15492.55,cash,mid_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250512-001,2025-05-12 11:44:43,37989.67,cash,large_sport,new,False,
+MOTO-20250512-002,2025-05-12 14:17:28,5903.26,cash,scooter,used,False,
+MOTO-20250512-003,2025-05-12 18:53:31,1297.84,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250512-004,2025-05-12 19:13:49,24696.68,cash,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250513-001,2025-05-13 13:51:07,33532.45,cash,large_sport,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250513-002,2025-05-13 15:05:38,13927.23,mada,entry_bike,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250513-003,2025-05-13 16:06:43,15045.27,bank_transfer,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250513-004,2025-05-13 16:13:04,43023.46,cash,large_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250513-005,2025-05-13 16:54:18,6057.55,bank_transfer,scooter,new,True,SEC ELECTRICITY BILL 3320
+MOTO-20250513-006,2025-05-13 17:52:38,662.84,bank_transfer,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250513-007,2025-05-13 20:53:39,10446.44,credit,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250514-001,2025-05-14 10:51:32,31098.53,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250514-002,2025-05-14 11:09:04,880.18,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250514-003,2025-05-14 14:44:07,12440.14,mada,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250514-004,2025-05-14 16:04:53,7124.86,mada,scooter,new,True,STC INVOICE 5541
+MOTO-20250514-005,2025-05-14 16:17:28,1745.51,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250514-006,2025-05-14 21:45:01,10809.86,cash,entry_bike,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250515-001,2025-05-15 10:13:35,42562.07,cash,large_sport,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250515-002,2025-05-15 11:36:49,1123.25,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250515-003,2025-05-15 11:44:47,7651.46,cash,scooter,new,False,شركة قطع الغيار المتحدة
+MOTO-20250515-004,2025-05-15 12:04:40,373.43,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250515-005,2025-05-15 12:27:20,14033.75,mada,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250515-006,2025-05-15 14:03:25,868.05,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250515-007,2025-05-15 16:48:22,5041.73,mada,scooter,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250515-008,2025-05-15 17:04:35,6442.33,bank_transfer,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250515-009,2025-05-15 19:40:27,22298.34,mada,mid_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250516-001,2025-05-16 10:19:41,270.0,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250516-002,2025-05-16 13:24:26,27795.85,cash,mid_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250516-003,2025-05-16 13:41:48,1616.45,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250516-004,2025-05-16 13:54:41,6738.43,mada,scooter,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250516-005,2025-05-16 15:45:24,7883.67,cash,scooter,used,False,LUBRICANTS WHOLESALE 337
+MOTO-20250516-006,2025-05-16 15:59:27,4859.8,mada,scooter,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250516-007,2025-05-16 16:39:07,33889.64,mada,large_sport,new,False,
+MOTO-20250516-008,2025-05-16 18:34:01,1587.62,bank_transfer,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250516-009,2025-05-16 19:44:58,6060.09,mada,scooter,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250516-010,2025-05-16 20:31:00,21604.13,mada,mid_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250517-001,2025-05-17 11:11:19,30978.4,mada,large_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250517-002,2025-05-17 12:37:13,6844.61,cash,scooter,used,False,مؤسسة الإيجار التجاري
+MOTO-20250517-003,2025-05-17 13:53:35,7068.64,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250517-004,2025-05-17 13:55:26,45863.82,cash,large_sport,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250517-005,2025-05-17 18:41:20,39312.1,cash,large_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250517-006,2025-05-17 19:23:26,74781.43,credit,premium,used,False,شركة قطع الغيار المتحدة
+MOTO-20250518-001,2025-05-18 10:07:27,11476.88,mada,entry_bike,used,True,SADAD BILL PAYMENT 9921
+MOTO-20250518-002,2025-05-18 10:29:57,32649.77,cash,large_sport,new,True,STC INVOICE 5541
+MOTO-20250518-003,2025-05-18 13:52:41,1239.77,cash,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250518-004,2025-05-18 14:18:41,6791.2,cash,scooter,used,True,شركة قطع الغيار المتحدة
+MOTO-20250518-005,2025-05-18 14:53:03,257.41,cash,accessories_only,accessories,True,
+MOTO-20250518-006,2025-05-18 16:23:22,1887.56,mada,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250518-007,2025-05-18 17:37:33,2436.39,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250518-008,2025-05-18 18:34:12,4918.79,mada,scooter,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250518-009,2025-05-18 19:21:23,13167.74,mada,entry_bike,new,False,
+MOTO-20250518-010,2025-05-18 21:39:58,15974.76,cash,mid_sport,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250519-001,2025-05-19 11:16:40,6185.28,cash,scooter,used,False,شركة قطع الغيار المتحدة
+MOTO-20250519-002,2025-05-19 12:48:23,10419.72,bank_transfer,entry_bike,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250519-003,2025-05-19 14:27:22,2019.06,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250519-004,2025-05-19 14:43:41,42218.53,bank_transfer,large_sport,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250519-005,2025-05-19 17:26:14,6183.54,cash,scooter,new,True,مؤسسة الإيجار التجاري
+MOTO-20250519-006,2025-05-19 18:03:51,20528.86,mada,mid_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250519-007,2025-05-19 19:50:20,31315.91,bank_transfer,large_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250520-001,2025-05-20 10:06:32,1627.35,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250520-002,2025-05-20 11:08:53,13145.47,cash,entry_bike,used,False,شركة قطع الغيار المتحدة
+MOTO-20250520-003,2025-05-20 17:05:46,46723.62,bank_transfer,premium,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250520-004,2025-05-20 17:24:39,4688.0,cash,scooter,new,True,شركة قطع الغيار المتحدة
+MOTO-20250520-005,2025-05-20 19:19:18,86020.69,bank_transfer,premium,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250520-006,2025-05-20 19:24:27,11255.24,credit,entry_bike,new,False,شركة قطع الغيار المتحدة
+MOTO-20250520-007,2025-05-20 20:33:32,20815.6,cash,mid_sport,new,True,مؤسسة الإيجار التجاري
+MOTO-20250521-001,2025-05-21 11:18:45,1843.1,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250521-002,2025-05-21 13:50:34,627.99,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250521-003,2025-05-21 16:42:15,305.35,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250522-001,2025-05-22 11:17:56,2311.84,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250522-002,2025-05-22 13:02:21,5735.76,mada,scooter,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250522-003,2025-05-22 13:29:04,1656.81,mada,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250522-004,2025-05-22 13:52:07,96653.87,mada,premium,new,False,شركة قطع الغيار المتحدة
+MOTO-20250522-005,2025-05-22 15:09:03,19145.61,cash,mid_sport,used,True,HELMET IMPORTS TRADING 88
+MOTO-20250522-006,2025-05-22 15:20:01,990.19,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250522-007,2025-05-22 16:25:44,29983.4,mada,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250522-008,2025-05-22 17:42:36,613.95,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250522-009,2025-05-22 19:33:33,7245.18,mada,scooter,new,False,STC INVOICE 5541
+MOTO-20250522-010,2025-05-22 19:38:10,6505.11,cash,scooter,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250522-011,2025-05-22 20:45:04,10721.2,bank_transfer,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250522-012,2025-05-22 21:20:53,13953.37,mada,entry_bike,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250522-013,2025-05-22 21:21:08,1647.47,mada,accessories_only,accessories,True,
+MOTO-20250523-001,2025-05-23 10:02:38,64030.7,mada,premium,new,False,
+MOTO-20250523-002,2025-05-23 10:41:07,29652.53,cash,large_sport,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250523-003,2025-05-23 11:34:35,6762.98,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250523-004,2025-05-23 14:35:56,5764.07,bank_transfer,scooter,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250523-005,2025-05-23 15:15:17,74758.39,credit,premium,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250523-006,2025-05-23 15:37:26,51991.43,bank_transfer,premium,new,True,مؤسسة الإيجار التجاري
+MOTO-20250523-007,2025-05-23 16:25:02,10262.32,mada,entry_bike,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250523-008,2025-05-23 16:32:32,1397.02,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250523-009,2025-05-23 18:22:29,194.36,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250523-010,2025-05-23 20:14:32,1728.8,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250523-011,2025-05-23 20:53:51,12997.02,mada,entry_bike,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250523-012,2025-05-23 21:24:42,1657.48,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250524-001,2025-05-24 10:42:35,62066.11,bank_transfer,premium,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250524-002,2025-05-24 13:18:29,43640.94,mada,large_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250524-003,2025-05-24 15:01:52,885.98,cash,accessories_only,accessories,True,
+MOTO-20250524-004,2025-05-24 18:13:31,71488.53,mada,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250524-005,2025-05-24 18:43:59,12879.25,credit,entry_bike,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250524-006,2025-05-24 19:51:44,21083.52,cash,mid_sport,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250524-007,2025-05-24 21:53:55,1365.53,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250525-001,2025-05-25 12:36:57,94085.15,cash,premium,new,True,HELMET IMPORTS TRADING 88
+MOTO-20250525-002,2025-05-25 16:28:14,2009.99,bank_transfer,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250525-003,2025-05-25 17:18:19,14842.5,cash,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250525-004,2025-05-25 17:34:27,995.25,cash,accessories_only,accessories,True,
+MOTO-20250526-001,2025-05-26 15:36:44,13635.87,mada,entry_bike,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250526-002,2025-05-26 16:28:27,6936.03,bank_transfer,scooter,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250526-003,2025-05-26 16:48:09,99136.0,cash,premium,new,False,STC INVOICE 5541
+MOTO-20250526-004,2025-05-26 17:29:45,82488.94,bank_transfer,premium,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250526-005,2025-05-26 20:10:22,23266.51,bank_transfer,mid_sport,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250527-001,2025-05-27 10:55:54,12407.15,bank_transfer,entry_bike,new,False,STC INVOICE 5541
+MOTO-20250527-002,2025-05-27 11:07:51,792.79,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250527-003,2025-05-27 11:08:07,29344.6,cash,mid_sport,new,True,
+MOTO-20250527-004,2025-05-27 12:08:11,25126.77,bank_transfer,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250527-005,2025-05-27 14:12:51,22937.38,bank_transfer,mid_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250527-006,2025-05-27 14:41:48,22516.21,cash,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250527-007,2025-05-27 16:27:29,13965.44,credit,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250527-008,2025-05-27 19:59:42,13695.68,mada,entry_bike,used,False,مؤسسة الإيجار التجاري
+MOTO-20250528-001,2025-05-28 12:08:20,5093.76,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250528-002,2025-05-28 12:21:36,2123.29,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250528-003,2025-05-28 15:32:14,859.17,mada,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250528-004,2025-05-28 16:24:33,12882.33,mada,entry_bike,used,True,STC INVOICE 5541
+MOTO-20250528-005,2025-05-28 18:30:59,1681.4,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250528-006,2025-05-28 18:48:36,407.92,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250528-007,2025-05-28 19:19:00,15255.59,bank_transfer,mid_sport,used,True,STC INVOICE 5541
+MOTO-20250528-008,2025-05-28 21:51:43,449.58,bank_transfer,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250529-001,2025-05-29 10:20:36,10955.31,mada,entry_bike,used,False,شركة قطع الغيار المتحدة
+MOTO-20250529-002,2025-05-29 11:01:43,2380.67,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250529-003,2025-05-29 11:17:11,2285.28,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250529-004,2025-05-29 12:31:21,32664.05,bank_transfer,large_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250529-005,2025-05-29 13:56:39,26131.49,mada,mid_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250529-006,2025-05-29 14:40:44,547.0,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250529-007,2025-05-29 16:57:01,2468.47,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250529-008,2025-05-29 19:05:57,59350.21,mada,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250529-009,2025-05-29 19:34:28,4611.36,mada,scooter,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250529-010,2025-05-29 20:07:03,13072.96,cash,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250530-001,2025-05-30 10:51:00,23417.26,bank_transfer,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250530-002,2025-05-30 11:57:40,1432.69,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250530-003,2025-05-30 12:47:23,1836.69,cash,accessories_only,accessories,True,
+MOTO-20250530-004,2025-05-30 13:42:47,1253.69,bank_transfer,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250530-005,2025-05-30 13:43:44,28749.78,cash,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250530-006,2025-05-30 14:05:44,196.98,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250530-007,2025-05-30 14:40:14,29764.71,cash,mid_sport,new,False,LUBRICANTS WHOLESALE 337
+MOTO-20250530-008,2025-05-30 14:57:39,2228.27,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250530-009,2025-05-30 15:14:31,1755.14,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250530-010,2025-05-30 17:58:02,77291.35,bank_transfer,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250530-011,2025-05-30 18:35:08,34299.82,bank_transfer,large_sport,used,False,LUBRICANTS WHOLESALE 337
+MOTO-20250530-012,2025-05-30 18:35:26,179.22,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250530-013,2025-05-30 20:05:54,4937.8,cash,scooter,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250530-014,2025-05-30 20:41:23,21761.16,cash,mid_sport,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250530-015,2025-05-30 21:49:47,1268.94,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250531-001,2025-05-31 11:12:27,63509.43,bank_transfer,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250531-002,2025-05-31 13:31:01,751.56,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250531-003,2025-05-31 14:09:32,84532.5,credit,premium,new,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250531-004,2025-05-31 16:00:11,29148.9,cash,mid_sport,used,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250531-005,2025-05-31 17:00:52,1631.68,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250531-006,2025-05-31 17:20:21,2323.12,mada,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250531-007,2025-05-31 17:25:48,51405.5,mada,premium,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250531-008,2025-05-31 20:29:01,6663.8,mada,scooter,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250531-009,2025-05-31 20:30:56,1110.37,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250531-010,2025-05-31 20:50:17,1948.29,credit,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250601-001,2025-06-01 10:55:21,42408.8,mada,large_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250601-002,2025-06-01 11:19:56,22503.63,mada,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250601-003,2025-06-01 11:34:53,25781.12,mada,mid_sport,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250601-004,2025-06-01 12:21:26,55537.33,mada,premium,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250601-005,2025-06-01 14:12:41,680.53,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250601-006,2025-06-01 16:23:34,1032.35,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250601-007,2025-06-01 16:59:46,2170.59,mada,accessories_only,accessories,True,
+MOTO-20250601-008,2025-06-01 17:59:58,13225.79,mada,entry_bike,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250601-009,2025-06-01 18:15:33,294.93,bank_transfer,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250601-010,2025-06-01 20:24:59,19622.65,cash,mid_sport,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250602-001,2025-06-02 10:33:23,34396.38,bank_transfer,large_sport,new,True,
+MOTO-20250602-002,2025-06-02 10:40:30,13297.57,cash,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250602-003,2025-06-02 10:52:45,906.27,bank_transfer,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250602-004,2025-06-02 11:08:12,15414.87,mada,mid_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250602-005,2025-06-02 11:24:28,37137.0,cash,large_sport,new,False,HELMET IMPORTS TRADING 88
+MOTO-20250602-006,2025-06-02 13:30:58,16054.12,bank_transfer,mid_sport,used,False,STC INVOICE 5541
+MOTO-20250602-007,2025-06-02 14:22:01,1023.12,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250602-008,2025-06-02 19:57:30,5559.57,mada,scooter,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250602-009,2025-06-02 20:40:34,23567.99,cash,mid_sport,new,False,
+MOTO-20250602-010,2025-06-02 21:24:55,1610.62,bank_transfer,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250603-001,2025-06-03 12:24:48,11096.78,bank_transfer,entry_bike,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250603-002,2025-06-03 18:19:15,373.86,credit,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250603-003,2025-06-03 18:53:34,1800.18,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250604-001,2025-06-04 12:46:35,14773.64,cash,entry_bike,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250604-002,2025-06-04 14:55:44,66218.42,credit,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250604-003,2025-06-04 14:59:09,28141.57,mada,large_sport,new,True,شركة قطع الغيار المتحدة
+MOTO-20250604-004,2025-06-04 15:04:58,1554.58,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250604-005,2025-06-04 16:09:38,7601.17,cash,scooter,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250605-001,2025-06-05 10:18:45,5087.94,bank_transfer,scooter,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250605-002,2025-06-05 11:27:12,14173.67,mada,entry_bike,new,False,STC INVOICE 5541
+MOTO-20250605-003,2025-06-05 13:06:17,13690.59,mada,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250605-004,2025-06-05 15:01:01,7239.89,mada,scooter,used,True,شركة قطع الغيار المتحدة
+MOTO-20250605-005,2025-06-05 16:15:38,1499.89,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250605-006,2025-06-05 18:11:08,32227.15,mada,large_sport,new,True,مؤسسة الإيجار التجاري
+MOTO-20250605-007,2025-06-05 21:20:48,2060.04,mada,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250606-001,2025-06-06 10:59:39,34147.8,mada,large_sport,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250606-002,2025-06-06 16:00:42,11659.64,cash,entry_bike,new,False,LUBRICANTS WHOLESALE 337
+MOTO-20250606-003,2025-06-06 16:15:31,509.67,cash,accessories_only,accessories,True,مؤسسة الإيجار التجاري
+MOTO-20250606-004,2025-06-06 21:01:30,39166.54,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250607-001,2025-06-07 11:49:50,10782.25,mada,entry_bike,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250607-002,2025-06-07 13:49:32,1556.19,cash,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250607-003,2025-06-07 17:47:00,7285.01,mada,scooter,used,False,
+MOTO-20250607-004,2025-06-07 17:52:14,1726.15,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250607-005,2025-06-07 19:04:19,22726.39,mada,mid_sport,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250607-BULK,2025-06-07 23:03:40,8906.08,cash,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250608-001,2025-06-08 10:03:14,21239.86,cash,mid_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250608-002,2025-06-08 11:18:32,6389.99,cash,scooter,new,True,SEC ELECTRICITY BILL 3320
+MOTO-20250608-003,2025-06-08 12:06:47,11987.37,cash,entry_bike,new,False,
+MOTO-20250608-004,2025-06-08 15:07:49,25166.11,cash,mid_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250608-005,2025-06-08 18:04:16,43741.08,mada,large_sport,used,True,
+MOTO-20250608-006,2025-06-08 18:46:32,19414.83,mada,mid_sport,new,True,
+MOTO-20250608-007,2025-06-08 20:45:47,518.33,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250609-001,2025-06-09 16:16:32,23384.67,cash,mid_sport,used,False,STC INVOICE 5541
+MOTO-20250609-002,2025-06-09 16:17:04,409.53,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250609-003,2025-06-09 17:06:29,13975.2,cash,entry_bike,used,False,GAZT ZATCA VAT PAYMENT
+MOTO-20250609-004,2025-06-09 20:10:13,49371.88,cash,large_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250609-005,2025-06-09 21:15:06,883.29,bank_transfer,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250609-006,2025-06-09 21:47:42,4969.15,credit,scooter,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250610-001,2025-06-10 13:34:04,29523.81,mada,large_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250610-002,2025-06-10 15:22:19,16348.37,cash,mid_sport,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250610-003,2025-06-10 16:32:00,1920.06,mada,accessories_only,accessories,True,
+MOTO-20250610-004,2025-06-10 17:13:22,1807.16,bank_transfer,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250610-005,2025-06-10 17:49:51,733.65,mada,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250610-006,2025-06-10 17:55:04,10072.68,cash,entry_bike,new,True,STC INVOICE 5541
+MOTO-20250610-007,2025-06-10 21:52:39,12831.85,mada,entry_bike,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250611-001,2025-06-11 10:58:38,6864.4,cash,scooter,new,False,شركة قطع الغيار المتحدة
+MOTO-20250611-002,2025-06-11 14:21:19,33349.07,cash,large_sport,new,True,شركة قطع الغيار المتحدة
+MOTO-20250611-003,2025-06-11 17:24:36,45593.26,mada,large_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250612-001,2025-06-12 10:08:41,1924.47,cash,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250612-002,2025-06-12 11:21:15,33799.78,mada,large_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250612-003,2025-06-12 13:42:26,14422.88,mada,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250612-004,2025-06-12 14:37:14,373.12,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250612-005,2025-06-12 18:19:30,56798.2,mada,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250612-006,2025-06-12 19:19:25,605.97,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250612-007,2025-06-12 19:50:47,1076.8,bank_transfer,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250612-008,2025-06-12 20:09:16,14760.1,bank_transfer,entry_bike,used,True,SADAD BILL PAYMENT 9921
+MOTO-20250612-009,2025-06-12 20:23:12,42897.84,mada,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250612-010,2025-06-12 20:38:38,46594.26,mada,large_sport,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250612-011,2025-06-12 20:40:38,1505.86,cash,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250612-012,2025-06-12 21:35:37,1559.81,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250612-013,2025-06-12 21:51:58,566.46,bank_transfer,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250613-001,2025-06-13 13:59:47,6033.87,credit,scooter,used,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250613-002,2025-06-13 14:17:42,7311.36,cash,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250613-003,2025-06-13 16:09:04,25807.36,credit,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250613-004,2025-06-13 16:38:19,1921.93,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250613-005,2025-06-13 18:27:59,10508.23,credit,entry_bike,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250613-006,2025-06-13 20:33:38,96382.65,mada,premium,new,False,شركة قطع الغيار المتحدة
+MOTO-20250614-001,2025-06-14 14:27:12,1652.27,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250614-002,2025-06-14 15:36:10,1772.85,bank_transfer,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250614-003,2025-06-14 20:21:25,1612.51,bank_transfer,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250615-001,2025-06-15 11:37:13,774.8,cash,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250615-002,2025-06-15 12:40:17,1570.07,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250615-003,2025-06-15 12:58:43,2207.04,bank_transfer,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250615-004,2025-06-15 14:21:29,52404.2,cash,premium,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250615-005,2025-06-15 15:36:58,1214.61,cash,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250615-006,2025-06-15 17:54:37,7090.98,mada,scooter,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250615-007,2025-06-15 18:51:54,20446.22,cash,mid_sport,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250615-008,2025-06-15 20:37:18,2036.65,cash,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250615-009,2025-06-15 21:22:20,24437.19,bank_transfer,mid_sport,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250616-001,2025-06-16 10:41:26,48078.18,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250616-002,2025-06-16 10:57:24,16311.87,mada,mid_sport,new,False,
+MOTO-20250616-003,2025-06-16 11:15:24,40788.99,mada,large_sport,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250616-004,2025-06-16 12:03:18,2028.32,bank_transfer,accessories_only,accessories,True,
+MOTO-20250616-005,2025-06-16 12:35:09,752.49,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250616-006,2025-06-16 14:28:51,2207.15,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250616-007,2025-06-16 16:32:22,24444.0,bank_transfer,mid_sport,new,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250616-008,2025-06-16 17:21:20,23194.86,mada,mid_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250616-009,2025-06-16 21:25:17,1112.44,cash,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250617-001,2025-06-17 10:08:35,16068.1,cash,mid_sport,new,True,
+MOTO-20250617-002,2025-06-17 16:40:55,24423.5,cash,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250617-003,2025-06-17 17:13:59,46554.11,cash,large_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250617-004,2025-06-17 19:42:43,1698.01,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250617-005,2025-06-17 20:59:12,2491.63,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250618-001,2025-06-18 14:52:21,77532.6,mada,premium,new,False,SADAD BILL PAYMENT 9921
+MOTO-20250618-002,2025-06-18 16:51:12,2002.19,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250618-003,2025-06-18 21:49:26,13455.05,mada,entry_bike,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250619-001,2025-06-19 12:39:48,585.62,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250619-002,2025-06-19 14:24:41,30639.3,cash,large_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250619-003,2025-06-19 14:57:29,39779.84,mada,large_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250619-004,2025-06-19 15:35:02,1467.14,credit,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250619-005,2025-06-19 16:26:43,91788.24,bank_transfer,premium,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250619-006,2025-06-19 17:05:59,29779.25,bank_transfer,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250619-007,2025-06-19 19:37:44,358.13,mada,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250619-008,2025-06-19 19:59:29,23748.98,mada,mid_sport,new,False,شركة قطع الغيار المتحدة
+MOTO-20250619-009,2025-06-19 20:13:53,2219.89,mada,accessories_only,accessories,True,HELMET IMPORTS TRADING 88
+MOTO-20250619-010,2025-06-19 20:39:48,28375.96,mada,mid_sport,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250619-011,2025-06-19 20:40:27,198.67,bank_transfer,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250619-012,2025-06-19 20:41:09,40353.45,cash,large_sport,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250619-013,2025-06-19 21:26:35,1939.76,mada,accessories_only,accessories,True,GAZT ZATCA VAT PAYMENT
+MOTO-20250620-001,2025-06-20 12:36:25,2135.22,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250620-002,2025-06-20 13:09:11,18737.58,cash,mid_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250620-003,2025-06-20 15:43:16,56058.66,bank_transfer,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250620-004,2025-06-20 19:01:26,1068.84,mada,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250620-005,2025-06-20 21:05:41,83828.73,mada,premium,used,True,مؤسسة الإيجار التجاري
+MOTO-20250620-006,2025-06-20 21:12:04,14834.64,mada,entry_bike,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250621-001,2025-06-21 14:45:04,7199.62,mada,scooter,new,True,STC INVOICE 5541
+MOTO-20250621-002,2025-06-21 15:24:17,24872.52,mada,mid_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250621-003,2025-06-21 17:35:34,12154.06,mada,entry_bike,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250621-004,2025-06-21 19:51:26,4620.56,cash,scooter,new,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250622-001,2025-06-22 16:55:10,2335.75,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250622-002,2025-06-22 18:21:18,1263.99,cash,accessories_only,accessories,True,SADAD BILL PAYMENT 9921
+MOTO-20250622-003,2025-06-22 19:23:21,755.81,cash,accessories_only,accessories,True,شركة قطع الغيار المتحدة
+MOTO-20250622-004,2025-06-22 21:16:53,59708.83,mada,premium,used,False,STC INVOICE 5541
+MOTO-20250623-001,2025-06-23 12:00:41,1380.31,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250623-002,2025-06-23 14:06:37,1831.52,mada,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250623-003,2025-06-23 19:52:44,42998.96,mada,large_sport,used,False,شركة قطع الغيار المتحدة
+MOTO-20250623-004,2025-06-23 20:14:05,1651.4,cash,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250623-005,2025-06-23 21:35:11,19699.28,cash,mid_sport,used,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250623-006,2025-06-23 21:36:12,90289.61,mada,premium,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250624-001,2025-06-24 13:05:19,5907.55,mada,scooter,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250624-002,2025-06-24 14:19:11,1230.64,mada,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250624-003,2025-06-24 19:30:44,20218.51,mada,mid_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250625-001,2025-06-25 15:06:31,25384.56,mada,mid_sport,new,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250625-002,2025-06-25 17:52:48,40257.82,mada,large_sport,new,False,SEC ELECTRICITY BILL 3320
+MOTO-20250625-003,2025-06-25 20:15:58,429.65,cash,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250625-004,2025-06-25 20:58:31,753.75,mada,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250625-005,2025-06-25 21:02:45,21621.43,cash,mid_sport,used,True,TRF TO 6612231 SUPPLIER
+MOTO-20250625-006,2025-06-25 21:24:08,6541.58,cash,scooter,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250625-007,2025-06-25 21:29:37,13800.29,mada,entry_bike,used,False,شركة قطع الغيار المتحدة
+MOTO-20250626-001,2025-06-26 10:19:36,1893.25,mada,accessories_only,accessories,True,LUBRICANTS WHOLESALE 337
+MOTO-20250626-002,2025-06-26 11:10:18,506.61,cash,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250626-003,2025-06-26 12:38:02,2019.49,credit,accessories_only,accessories,True,
+MOTO-20250626-004,2025-06-26 12:51:27,14454.85,cash,entry_bike,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250626-005,2025-06-26 14:29:34,24718.47,mada,mid_sport,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250626-006,2025-06-26 15:22:56,12668.47,credit,entry_bike,used,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250626-007,2025-06-26 15:27:54,47707.87,mada,premium,used,True,SEC ELECTRICITY BILL 3320
+MOTO-20250626-008,2025-06-26 15:56:52,1817.98,credit,accessories_only,accessories,True,STC INVOICE 5541
+MOTO-20250626-009,2025-06-26 21:29:35,43309.41,bank_transfer,large_sport,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250627-001,2025-06-27 10:34:07,41872.6,cash,large_sport,new,True,LUBRICANTS WHOLESALE 337
+MOTO-20250627-002,2025-06-27 11:04:22,89897.86,credit,premium,new,False,HONDA MOTORS SUPPLY 2231
+MOTO-20250627-003,2025-06-27 11:14:32,521.74,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250627-004,2025-06-27 13:58:12,770.36,mada,accessories_only,accessories,True,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250627-005,2025-06-27 14:36:18,800.85,mada,accessories_only,accessories,True,SEC ELECTRICITY BILL 3320
+MOTO-20250627-006,2025-06-27 14:43:30,2391.33,mada,accessories_only,accessories,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250627-007,2025-06-27 16:42:40,28488.62,cash,large_sport,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250627-008,2025-06-27 16:50:08,37996.98,cash,large_sport,new,True,SADAD BILL PAYMENT 9921
+MOTO-20250627-009,2025-06-27 19:13:29,629.64,bank_transfer,accessories_only,accessories,True,TRF TO 6612231 SUPPLIER
+MOTO-20250627-010,2025-06-27 20:48:27,1586.25,cash,accessories_only,accessories,True,
+MOTO-20250627-011,2025-06-27 21:36:34,6531.14,cash,scooter,used,True,HONDA MOTORS SUPPLY 2231
+MOTO-20250627-012,2025-06-27 21:56:00,6926.07,mada,scooter,used,False,TRF TO 6612231 SUPPLIER
+MOTO-20250628-001,2025-06-28 10:58:37,1799.71,credit,accessories_only,accessories,True,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250628-002,2025-06-28 18:50:33,15616.03,mada,mid_sport,new,False,YAMAHA PARTS DISTRIBUTOR 4410
+MOTO-20250628-003,2025-06-28 19:22:10,22635.93,cash,mid_sport,new,True,STC INVOICE 5541
+MOTO-20250629-001,2025-06-29 12:05:56,11522.59,cash,entry_bike,used,False,SADAD BILL PAYMENT 9921
+MOTO-20250629-002,2025-06-29 15:17:26,19758.05,bank_transfer,mid_sport,new,False,TRF TO 6612231 SUPPLIER
+MOTO-20250629-003,2025-06-29 17:17:08,23005.43,mada,mid_sport,used,False,POS PURCHASE 4412 AL AZIZIYAH
+MOTO-20250629-004,2025-06-29 20:37:42,28299.11,credit,mid_sport,new,False,شركة قطع الغيار المتحدة

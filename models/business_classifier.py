@@ -124,6 +124,48 @@ def _apply_license_cross_check(result: dict, archetype_label, registration, bid=
     }
 
 
+def _apply_supplier_profile(result: dict, transactions_df, bid="unknown"):
+    """
+    Optional COUNTERPARTY/SUPPLIER enrichment. Detected from a transaction-level
+    `counterparty_raw` column — no new parameter. Additive metadata only; the
+    classifier's inference is never changed. No-op (and no new keys) when the
+    column is absent, so the no-counterparty path is exactly as it is today.
+
+    A supplier_profile is only generated at >= COUNTERPARTY_COVERAGE_MIN coverage
+    (thin data would be misleading); coverage_pct is still reported honestly.
+    """
+    if transactions_df is None or "counterparty_raw" not in getattr(transactions_df, "columns", []):
+        return
+    try:
+        from data.counterparty_utils import build_supplier_profile, COUNTERPARTY_COVERAGE_MIN
+        prof = build_supplier_profile(transactions_df["counterparty_raw"].tolist())
+    except Exception as exc:                        # never crash on enrichment
+        _log.warning(f"model=classifier | bid={bid} | rule=counterparty_enrichment_failed | detail={exc!r}")
+        return
+
+    coverage_frac = prof["coverage_pct"] / 100.0
+    used      = prof["transactions_with_counterparty"] > 0
+    generated = coverage_frac >= COUNTERPARTY_COVERAGE_MIN
+
+    dq = result.setdefault("data_quality", make_data_quality([]))
+    dq["counterparty_enrichment_used"] = used
+    dq["counterparty_coverage_pct"]    = prof["coverage_pct"]
+    dq["supplier_profile_generated"]   = generated
+
+    if generated:
+        result["supplier_profile"] = {
+            "distinct_suppliers_count":   prof["distinct_suppliers_count"],
+            "top_supplier_fingerprints":  [x["fingerprint"] for x in prof["top_supplier_fingerprints"]],
+            "supplier_kind_distribution": prof["supplier_kind_distribution"],
+            "concentration_ratio":        prof["concentration_ratio"],
+        }
+    elif used:
+        _log.warning(
+            f"model=classifier | bid={bid} | rule=counterparty_coverage_below_threshold | "
+            f"coverage_pct={prof['coverage_pct']} | min_required={COUNTERPARTY_COVERAGE_MIN*100:.0f}"
+        )
+
+
 class InsufficientDataError(Exception):
     """Raised when a model receives fewer rows than its minimum threshold."""
     def __init__(self, model: str, bid: str, reason: str, detail: dict = None):
@@ -789,6 +831,9 @@ class BusinessClassifier:
 
         # ── Optional registration / licensing cross-check ─────────────────────
         _apply_license_cross_check(result, result.get("archetype_label"), registration, bid)
+
+        # ── Optional counterparty / supplier profile (additive metadata) ──────
+        _apply_supplier_profile(result, transactions_df, bid)
         return result
 
     def classify_from_intake(self, intake_dict: dict,

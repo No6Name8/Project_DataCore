@@ -37,6 +37,20 @@ DISTRICT_SCALE_ABOVE_X      = 5
 # classic "brand new + suspiciously high activity" pattern.
 NEW_BUSINESS_MAX_AGE_DAYS = 180
 
+# Business types where paying nearly everything to 1-3 counterparties is NORMAL
+# (e.g. a real-estate office paying one property manager). Concentration on these
+# is NOT flagged. Everything else with >CONCENTRATION_THRESHOLD is suspicious.
+EXPECTED_HIGH_CONCENTRATION_TYPES = {"real_estate"}
+_TYPE_ALIASES = {"realestate": "real_estate", "cardealer": "auto_gallery",
+                 "motorbike": "motorbike_shop"}
+
+
+def _canonical_business_type(business_type):
+    if not business_type:
+        return None
+    bt = str(business_type).strip().lower()
+    return _TYPE_ALIASES.get(bt, bt)
+
 
 def _get_location_context():
     global _LOCATION_CTX
@@ -669,10 +683,99 @@ class FraudDetector:
             })
         return report
 
+    # ── Optional counterparty / supplier enrichment ───────────────────────────
+
+    def _apply_counterparty_enrichment(self, report: dict, tx: pd.DataFrame,
+                                       business_type, bid: str) -> dict:
+        """
+        Adds two ADDITIONAL fraud signals from transaction-level counterparty data
+        (detected via a `counterparty_raw` column — no new parameter needed):
+          1. supplier_instability_flag — >INSTABILITY_THRESHOLD of distinct
+             suppliers first appear in the recent INSTABILITY_RECENT_FRACTION of
+             the window (erratic new payees = shell-like pattern).
+          2. counterparty_concentration_flag — >CONCENTRATION_THRESHOLD of supplier
+             transactions go to the top-3 counterparties AND the business type is
+             not one where such concentration is expected.
+        Isolation Forest scoring is never touched. Absent column / thin coverage →
+        flags stay False, evidence null. No column at all → no-op.
+        """
+        if "counterparty_raw" not in tx.columns:
+            return report
+        try:
+            from data.counterparty_utils import (
+                build_supplier_profile, supplier_instability_ratio,
+                COUNTERPARTY_COVERAGE_MIN, INSTABILITY_THRESHOLD, CONCENTRATION_THRESHOLD,
+                INSTABILITY_RECENT_FRACTION)
+            prof = build_supplier_profile(tx["counterparty_raw"].tolist())
+        except Exception as exc:                    # never crash on enrichment
+            _log.warning(f"model=fraud | bid={bid} | rule=counterparty_enrichment_failed | detail={exc!r}")
+            return report
+
+        coverage_frac = prof["coverage_pct"] / 100.0
+        used = prof["transactions_with_counterparty"] > 0
+
+        dq = dict(report.get("data_quality") or make_data_quality([]))
+        dq["counterparty_enrichment_used"]     = used
+        dq["supplier_instability_flag"]        = False
+        dq["counterparty_concentration_flag"]  = False
+        dq["supplier_instability_ratio"]       = None
+        dq["top_concentration_ratio"]          = None
+        report["data_quality"] = dq
+
+        if not used or coverage_frac < COUNTERPARTY_COVERAGE_MIN:
+            return report   # thin data → report coverage but never fire flags
+
+        tx_ord = tx.copy()
+        tx_ord["timestamp"] = pd.to_datetime(tx_ord["timestamp"], errors="coerce")
+        tx_ord = tx_ord.sort_values("timestamp")
+        instab = supplier_instability_ratio(tx_ord["counterparty_raw"].tolist())
+        conc   = prof["concentration_ratio"]
+
+        instab_flag = instab is not None and instab > INSTABILITY_THRESHOLD
+        canon = _canonical_business_type(business_type)
+        expected_concentration = canon in EXPECTED_HIGH_CONCENTRATION_TYPES
+        conc_flag = conc > CONCENTRATION_THRESHOLD and not expected_concentration
+
+        dq["supplier_instability_ratio"]      = instab
+        dq["top_concentration_ratio"]         = conc
+        dq["supplier_instability_flag"]       = instab_flag
+        dq["counterparty_concentration_flag"] = conc_flag
+
+        report["counterparty_context"] = {
+            "coverage_pct":               prof["coverage_pct"],
+            "distinct_suppliers_count":   prof["distinct_suppliers_count"],
+            "top_supplier_fingerprints":  [x["fingerprint"] for x in prof["top_supplier_fingerprints"]],
+            "supplier_kind_distribution": prof["supplier_kind_distribution"],
+            "concentration_ratio":        conc,
+            "supplier_instability_ratio": instab,
+            "business_type_for_concentration": canon,
+            "concentration_expected_for_type": expected_concentration,
+            "supplier_instability_flag":       instab_flag,
+            "counterparty_concentration_flag": conc_flag,
+        }
+
+        if instab_flag:
+            report.setdefault("reasons", []).append({
+                "condition": "supplier_instability",
+                "severity":  "high",
+                "detail":    (f"{instab*100:.0f}% of distinct suppliers first appeared in the "
+                              f"most recent {int(INSTABILITY_RECENT_FRACTION*100)}% of the window — "
+                              f"erratic new-counterparty pattern"),
+            })
+        if conc_flag:
+            report.setdefault("reasons", []).append({
+                "condition": "counterparty_concentration",
+                "severity":  "high",
+                "detail":    (f"{conc*100:.0f}% of supplier payments go to the top 3 counterparties, "
+                              f"unexpected for business type '{canon}'"),
+            })
+        return report
+
     # ── Full pipeline ─────────────────────────────────────────────────────────
 
     def assess(self, business_id: str, transactions_df: pd.DataFrame = None,
-               cluster_id: int = None, location=None, registration=None) -> dict:
+               cluster_id: int = None, location=None, registration=None,
+               business_type=None) -> dict:
         if transactions_df is None:
             tx = pd.read_csv(os.path.join(DATA_DIR, f"{business_id}_transactions.csv"))
         else:
@@ -705,6 +808,8 @@ class FraudDetector:
         # Additive registration signals (age + license status) — reuses the
         # district-scale result above, so it must run after location enrichment.
         report = self._apply_registration_enrichment(report, tx, registration, business_id)
+        # Additive counterparty/supplier signals (instability + concentration).
+        report = self._apply_counterparty_enrichment(report, tx, business_type, business_id)
         return report
 
     # ── Persistence ───────────────────────────────────────────────────────────
