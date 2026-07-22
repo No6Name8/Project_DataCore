@@ -36,3 +36,11 @@ desktop.ini
 # Raw datasets — large files (two exceed GitHub's 100 MB hard limit).
 # Re-download with: bash scripts/download_real_datasets.sh
 data/real/
+
+# Local Claude Code / agent tooling — should not be committed.
+# .claude/launch.json is intentionally kept (dev-server preview config); every
+# other local artefact (installed skills, machine-local settings) is ignored.
+.claude/*
+!.claude/launch.json
+.claude/skills/
+.claude/settings.local.json

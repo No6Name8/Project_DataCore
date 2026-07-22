@@ -3,6 +3,12 @@
     "description": "Illustrative Riyadh district reference data for the DataCore demo. Values (household income, density/commercial tiers, per-business-type competitor counts) are ROUGH ILLUSTRATIVE ESTIMATES for demonstration only. In production these fields would be replaced by the bank's own market data, census/GASTAT figures, and commercial-registry counts.",
     "avg_household_income_sar": "interpreted as approximate MONTHLY household income in SAR",
     "competitor_tier_thresholds": {"underserved_max": 2, "saturated_min": 7},
+    "coverage_note": "All 8 districts carry a full competitor count for all 6 demo business types (48/48 district x type pairs seeded). No demo claim relies on ABSENCE of data — an absent (district, type) pair resolves to density_tier 'unknown', never 'underserved'.",
+    "demo_claims_backed_by_counts": {
+      "Baraka Minimarket @ Al Naseem": "minimarket count = 2 (<= 2) -> underserved / market gap (genuine low count, not missing data)",
+      "Qahwa Corner Cafe @ Al Olaya": "cafe count = 9 (>= 7) -> saturated",
+      "Rawabi Auto Gallery @ Al Batha": "auto_gallery count = 4 -> balanced; district-scale fraud signal comes from low household income, not competitor count"
+    },
     "business_type_aliases": {
       "cardealer": "auto_gallery",
       "realestate": "real_estate",

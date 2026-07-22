@@ -13,6 +13,49 @@ sys.path.insert(0, ROOT)
 from models._guardrails import get_logger, make_data_quality
 _log = get_logger("estimator")
 
+# ── Optional location enrichment (lazy, offline) ──────────────────────────────
+# A district's commercial-activity tier anchors the FIXED (rent/overhead) cost
+# component. Higher-activity districts carry higher rents; lower-activity ones
+# cheaper. This is an ADJUSTMENT to the transaction-pattern estimate, not a
+# replacement — behaviour still drives the base ratio, location just anchors the
+# overhead portion.
+RENT_TIER_MULTIPLIER = {"low": 0.8, "medium": 1.0, "high": 1.3}
+_LOCATION_CTX = None
+
+
+def _get_location_context():
+    global _LOCATION_CTX
+    if _LOCATION_CTX is None:
+        from data.location_context import LocationContext
+        _LOCATION_CTX = LocationContext()
+    return _LOCATION_CTX
+
+
+def _resolve_rent_tier(location, bid="unknown"):
+    """
+    Returns (overhead_multiplier, tier_applied|None, enrichment_used).
+    Missing district / unknown lookup → neutral (1.0, None, False): the estimate
+    is left exactly as it would be without location.
+    """
+    if not location:
+        return 1.0, None, False
+    district = location.get("location_district") or location.get("district")
+    if not district:
+        return 1.0, None, False
+    try:
+        profile = _get_location_context().get_district_profile(district)
+    except Exception as exc:                       # never crash on enrichment
+        _log.warning(f"model=estimator | bid={bid} | rule=location_lookup_failed | detail={exc!r}")
+        return 1.0, None, False
+    if profile is None:
+        _log.warning(f"model=estimator | bid={bid} | rule=location_district_unknown | district={district}")
+        return 1.0, None, False
+    tier = profile.get("commercial_activity_tier")
+    if tier not in RENT_TIER_MULTIPLIER:
+        _log.warning(f"model=estimator | bid={bid} | rule=unknown_commercial_tier | tier={tier!r}")
+        return 1.0, None, False
+    return RENT_TIER_MULTIPLIER[tier], tier, True
+
 
 class ExpenseEstimator:
 
@@ -199,15 +242,33 @@ class ExpenseEstimator:
 
     def estimate(self, behavioral_profile: dict,
                  holds_inventory: bool = False,
-                 bid: str = "unknown") -> dict:
+                 bid: str = "unknown", location=None) -> dict:
         """
         Derives an expense ratio from behavioral tags.
         Input dict must contain: ticket_size, transaction_velocity,
         revenue_stability. Optional: payment_mix, nocturnal_activity,
         profile_source, is_outlier.
         Unknown tags fall back to safe defaults with a logged warning.
+
+        `location` (optional): dict with location_district / location_city /
+        location_lat / location_lng. When a known district is present, its
+        commercial-activity tier scales the fixed overhead component (rent proxy)
+        via RENT_TIER_MULTIPLIER. Absent → identical to the pre-enrichment output.
         """
         _dq_warnings = list(behavioral_profile.get("_data_quality_warnings", []))
+
+        # ── Optional location enrichment: anchor the fixed/overhead cost ──────
+        rent_mult, rent_tier, loc_used = (1.0, None, False)
+        if location is not None:
+            rent_mult, rent_tier, loc_used = _resolve_rent_tier(location, bid)
+
+        def _add_location_dq(dq: dict) -> dict:
+            # Only surface the fields when a location was actually supplied, so
+            # the no-location path stays byte-for-byte as it is today.
+            if location is not None:
+                dq["location_enrichment_used"]   = loc_used
+                dq["district_rent_tier_applied"] = rent_tier
+            return dq
 
         VALID_TICKET    = {"very_low", "low", "mid", "high", "very_high"}
         VALID_VELOCITY  = {"very_high", "high", "moderate", "low", "very_low"}
@@ -241,7 +302,8 @@ class ExpenseEstimator:
         if is_commission:
             cogs_ratio  = self.COMMISSION_EXPENSES["cogs"]
             labor_ratio = self.COMMISSION_EXPENSES["labor"]
-            overhead    = self.COMMISSION_EXPENSES["overhead"]
+            # Fixed overhead (rent proxy) anchored by district commercial tier.
+            overhead    = round(self.COMMISSION_EXPENSES["overhead"] * rent_mult, 4)
             total       = float(np.clip(cogs_ratio + labor_ratio + overhead,
                                         self.min_ratio, self.max_ratio))
             confidence  = 0.85 if profile_src == "real_data" else 0.85 * 0.75
@@ -271,7 +333,7 @@ class ExpenseEstimator:
                 "derived_from":         "behavioral_profile",
                 "profile_source":       profile_src,
                 "expense_source":       "commission_based_lookup",
-                "data_quality":         make_data_quality(_dq_warnings),
+                "data_quality":         _add_location_dq(make_data_quality(_dq_warnings)),
             }
 
         cogs_ratio  = self.cogs_by_ticket.get(ticket_size, 0.35)
@@ -304,7 +366,9 @@ class ExpenseEstimator:
         if temporal_pattern == "sharp_peaks" and ticket_size == "very_low":
             labor_ratio *= 0.80
 
-        total = cogs_ratio + labor_ratio + self.overhead + stab_adj
+        # Fixed overhead (rent proxy) anchored by district commercial tier.
+        overhead_used = round(self.overhead * rent_mult, 4)
+        total = cogs_ratio + labor_ratio + overhead_used + stab_adj
         total = float(np.clip(total, self.min_ratio, self.max_ratio))
 
         # Breakdown reflects all adjustments
@@ -325,7 +389,7 @@ class ExpenseEstimator:
             "breakdown": {
                 "cogs_ratio":     round(cogs_ratio, 4),
                 "labor_ratio":    round(adjusted_labor, 4),
-                "overhead_ratio": self.overhead,
+                "overhead_ratio": overhead_used,
                 "stability_adj":  round(stab_adj, 4),
             },
             "net_margin_estimate":  round(1.0 - total, 4),
@@ -343,7 +407,7 @@ class ExpenseEstimator:
             "derived_from":         "behavioral_profile",
             "profile_source":       profile_src,
             "expense_source":       "behavioral_three_layer",
-            "data_quality":         make_data_quality(_dq_warnings),
+            "data_quality":         _add_location_dq(make_data_quality(_dq_warnings)),
         }
 
     # ── Benchmark validation ──────────────────────────────────────────────────
@@ -389,15 +453,20 @@ class ExpenseEstimator:
     # ── Full pipeline: real transaction data ──────────────────────────────────
 
     def estimate_from_classifier(self, transactions_df, classifier,
-                                  holds_inventory: bool = False) -> dict:
-        """Full pipeline: classify business then estimate expenses."""
+                                  holds_inventory: bool = False,
+                                  location=None) -> dict:
+        """Full pipeline: classify business then estimate expenses.
+
+        `location` (optional) is passed through to estimate() to anchor the
+        fixed overhead component; absent → unchanged behaviour.
+        """
         result  = classifier.classify_from_data(transactions_df)
         profile = self._derive_profile(
             result["raw_features"],
             profile_source=result.get("profile_source", "real_data"),
             is_outlier=result.get("was_noise", False),
         )
-        expense = self.estimate(profile, holds_inventory=holds_inventory)
+        expense = self.estimate(profile, holds_inventory=holds_inventory, location=location)
         expense["profile_source"]            = result.get("profile_source", "real_data")
         expense["cluster_id"]                = result["cluster_id"]
         expense["archetype"]                 = result.get(
@@ -408,8 +477,12 @@ class ExpenseEstimator:
 
     # ── Full pipeline: intake form ────────────────────────────────────────────
 
-    def estimate_from_intake(self, intake_dict: dict, classifier) -> dict:
-        """For new businesses using intake form."""
+    def estimate_from_intake(self, intake_dict: dict, classifier, location=None) -> dict:
+        """For new businesses using intake form.
+
+        `location` (optional) is passed through to estimate() to anchor the
+        fixed overhead component; absent → unchanged behaviour.
+        """
         holds_inventory = intake_dict.get("holds_physical_inventory", False)
         result  = classifier.classify_from_intake(intake_dict)
         profile = self._derive_profile(
@@ -417,7 +490,7 @@ class ExpenseEstimator:
             profile_source="intake_form",
             is_outlier=result.get("is_outlier", False),
         )
-        expense = self.estimate(profile, holds_inventory=holds_inventory)
+        expense = self.estimate(profile, holds_inventory=holds_inventory, location=location)
         expense["profile_source"]  = "intake_form"
         expense["confidence"]     *= 0.75   # additional intake penalty
         expense["confidence"]      = round(

@@ -177,6 +177,95 @@ class TestForecasterSeasonal:
         assert "trend_direction" in s
 
 
+# ── Model 2: ExpenseEstimator — location (rent tier) enrichment ───────────────
+
+class TestExpenseEstimatorLocation:
+
+    @pytest.fixture(scope="class")
+    def est(self):
+        from models.expense_estimator import ExpenseEstimator
+        return ExpenseEstimator()
+
+    _PROFILE = {
+        "ticket_size": "low", "transaction_velocity": "moderate",
+        "revenue_stability": "stable", "payment_mix": "mixed",
+        "nocturnal_activity": "minimal", "temporal_pattern": "distributed",
+    }
+
+    # ── enrichment present ──
+    def test_high_tier_scales_overhead_up(self, est):
+        base = est.estimate(dict(self._PROFILE), bid="x")
+        hi   = est.estimate(dict(self._PROFILE), bid="x",
+                            location={"location_district": "Al Olaya"})  # commercial tier = high
+        # high tier → 1.3x on the 0.08 overhead baseline
+        assert hi["breakdown"]["overhead_ratio"] == round(0.08 * 1.3, 4)
+        assert hi["breakdown"]["overhead_ratio"] > base["breakdown"]["overhead_ratio"]
+        assert hi["data_quality"]["location_enrichment_used"] is True
+        assert hi["data_quality"]["district_rent_tier_applied"] == "high"
+
+    def test_medium_tier_is_neutral_multiplier(self, est):
+        # Al Aziziyah commercial tier = medium → 1.0x (overhead unchanged) but flagged used
+        r = est.estimate(dict(self._PROFILE), bid="x",
+                         location={"location_district": "Al Aziziyah"})
+        assert r["breakdown"]["overhead_ratio"] == 0.08
+        assert r["data_quality"]["location_enrichment_used"] is True
+        assert r["data_quality"]["district_rent_tier_applied"] == "medium"
+
+    # ── graceful degradation (absent) ──
+    def test_no_location_identical_to_today(self, est):
+        base = est.estimate(dict(self._PROFILE), bid="x")
+        assert base["breakdown"]["overhead_ratio"] == 0.08
+        # No location supplied → no enrichment keys at all
+        assert "location_enrichment_used" not in base["data_quality"]
+        assert "district_rent_tier_applied" not in base["data_quality"]
+
+    def test_unknown_district_degrades_neutral(self, est):
+        base = est.estimate(dict(self._PROFILE), bid="x")
+        r    = est.estimate(dict(self._PROFILE), bid="x",
+                            location={"location_district": "Nowhereville"})
+        # Unknown district → neutral overhead, transparent used=False, tier=null
+        assert r["breakdown"]["overhead_ratio"] == base["breakdown"]["overhead_ratio"]
+        assert r["total_expense_ratio"] == base["total_expense_ratio"]
+        assert r["data_quality"]["location_enrichment_used"] is False
+        assert r["data_quality"]["district_rent_tier_applied"] is None
+
+
+# ── LocationContext: honest market-gap logic (evidence + unknown case) ────────
+
+class TestCompetitorDensityHonesty:
+
+    @pytest.fixture(scope="class")
+    def loc(self):
+        from data.location_context import LocationContext
+        return LocationContext()
+
+    def test_data_absent_returns_unknown_not_underserved(self, loc):
+        # Known district, business type with NO seeded entry → unknown, not a gap
+        r = loc.get_competitor_density("Al Olaya", "florist")
+        assert r["density_tier"] == "unknown"
+        assert r["market_gap_flag"] is False
+        assert "insufficient reference data" in r["evidence"]
+
+    def test_unknown_district_returns_unknown(self, loc):
+        r = loc.get_competitor_density("Nowhereville", "cafe")
+        assert r["density_tier"] == "unknown"
+        assert r["market_gap_flag"] is False
+        assert r["similar_businesses_in_district"] is None
+
+    def test_underserved_is_backed_by_a_real_count(self, loc):
+        r = loc.get_competitor_density("Al Naseem", "minimarket")
+        assert r["density_tier"] == "underserved"
+        assert r["market_gap_flag"] is True
+        assert r["similar_businesses_in_district"] == 2      # genuine low count
+        assert "2 similar" in r["evidence"]
+
+    def test_saturated_is_backed_by_a_real_count(self, loc):
+        r = loc.get_competitor_density("Al Olaya", "cafe")
+        assert r["density_tier"] == "saturated"
+        assert r["market_gap_flag"] is False
+        assert r["similar_businesses_in_district"] == 9
+
+
 # ── Cross-model: Rawabi combines existing + district-scale signal ─────────────
 
 def test_rawabi_combines_existing_and_district_signal():

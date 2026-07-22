@@ -83,30 +83,52 @@ class LocationContext:
     # ── Public: competitor density ─────────────────────────────────────────────
     def get_competitor_density(self, district_name, business_type):
         """
-        Returns:
-          { "similar_businesses_in_district": int,
-            "density_tier": "underserved"|"balanced"|"saturated",
-            "market_gap_flag": bool }   # true only when tier == "underserved"
-        or None when the district (or its data for this type) is unknown.
+        Returns a dict with an explicit three-way outcome plus a plain-language
+        `evidence` string explaining WHY the flag did (or didn't) fire:
+
+          { "similar_businesses_in_district": int | None,
+            "density_tier": "underserved"|"balanced"|"saturated"|"unknown",
+            "market_gap_flag": bool,   # true ONLY for a data-backed "underserved"
+            "evidence": str }
+
+        The three cases are distinguished explicitly so absence of data is never
+        mistaken for an underserved market:
+          * data present + few competitors  → "underserved", market_gap True
+          * data present + many/moderate     → "saturated"/"balanced", flag False
+          * data absent (no entry)           → "unknown", flag False
         """
         d = self._district(district_name)
-        if not d:
-            return None
         key = self._norm_type(business_type)
-        competitors = d.get("competitors", {})
-        if key not in competitors:
-            return None
+        competitors = (d or {}).get("competitors", {})
+
+        # ── Case 3: data absent — honest "unknown", never a false gap ─────────
+        if not d or key not in competitors:
+            return {
+                "similar_businesses_in_district": None,
+                "density_tier":                   "unknown",
+                "market_gap_flag":                False,
+                "evidence": "insufficient reference data for this district/business type",
+            }
+
         count = int(competitors[key])
+        # ── Cases 1 & 2: data present ─────────────────────────────────────────
         if count <= _UNDERSERVED_MAX:
             tier = "underserved"
+            evidence = (f"{count} similar business(es) recorded in this district "
+                        f"(<= {_UNDERSERVED_MAX}, underserved / potential market gap)")
         elif count >= _SATURATED_MIN:
             tier = "saturated"
+            evidence = (f"{count} similar businesses recorded in this district "
+                        f"(>= {_SATURATED_MIN}, saturated)")
         else:
             tier = "balanced"
+            evidence = (f"{count} similar businesses recorded in this district "
+                        f"(balanced supply)")
         return {
             "similar_businesses_in_district": count,
             "density_tier":                   tier,
             "market_gap_flag":                tier == "underserved",
+            "evidence":                       evidence,
         }
 
 
