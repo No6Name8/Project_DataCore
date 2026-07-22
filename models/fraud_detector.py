@@ -25,6 +25,22 @@ from models._guardrails import (
 )
 _log = get_logger("fraud")
 
+# ── Optional location enrichment (lazy, offline) ──────────────────────────────
+_LOCATION_CTX = None
+# A transaction at/above this multiple of the district's avg monthly household
+# income is "well above" local norm (conservative — legitimate for some sectors,
+# but notable as an additional signal alongside the behavioral model).
+DISTRICT_SCALE_WELL_ABOVE_X = 20
+DISTRICT_SCALE_ABOVE_X      = 5
+
+
+def _get_location_context():
+    global _LOCATION_CTX
+    if _LOCATION_CTX is None:
+        from data.location_context import LocationContext
+        _LOCATION_CTX = LocationContext()
+    return _LOCATION_CTX
+
 # ── Feature engineering ───────────────────────────────────────────────────────
 
 class TransactionFeatureEngineer:
@@ -497,10 +513,84 @@ class FraudDetector:
             "data_quality":       make_data_quality([]),
         }
 
+    # ── Optional location enrichment ──────────────────────────────────────────
+
+    def _apply_location_enrichment(self, report: dict, tx: pd.DataFrame,
+                                   location, bid: str) -> dict:
+        """
+        Augments (never replaces) the fraud report with a district-scale signal.
+        Present location → derives `transaction_scale_vs_district_norm`; absent or
+        unknown district → report is returned unchanged except for a transparent
+        location_enrichment_used=False flag.
+        """
+        if location is None:
+            return report
+
+        district = location.get("location_district") or location.get("district")
+        profile = None
+        try:
+            if district:
+                profile = _get_location_context().get_district_profile(district)
+        except Exception as exc:                      # never crash on enrichment
+            _log.warning(f"model=fraud | bid={bid} | rule=location_lookup_failed | detail={exc!r}")
+            profile = None
+
+        used = profile is not None
+        dq = dict(report.get("data_quality") or make_data_quality([]))
+        dq["location_enrichment_used"]      = used
+        dq["district_scale_flag_triggered"] = False
+        report["data_quality"] = dq
+        if not used:
+            if district:
+                _log.warning(f"model=fraud | bid={bid} | rule=location_district_unknown | district={district}")
+            return report
+
+        monthly_income = profile["avg_household_income_sar"]
+        amounts = pd.to_numeric(tx["amount_sar"], errors="coerce").fillna(0.0)
+        amounts = amounts[amounts >= 0]
+
+        within = above = well_above = 0
+        if monthly_income > 0 and len(amounts) > 0:
+            ratio      = amounts / float(monthly_income)
+            well_above = int((ratio >= DISTRICT_SCALE_WELL_ABOVE_X).sum())
+            above      = int(((ratio >= DISTRICT_SCALE_ABOVE_X) & (ratio < DISTRICT_SCALE_WELL_ABOVE_X)).sum())
+            within     = int((ratio < DISTRICT_SCALE_ABOVE_X).sum())
+
+        triggered = well_above > 0
+        dq["district_scale_flag_triggered"] = triggered
+
+        report["location_context"] = {
+            "district":          district,
+            "city":              location.get("location_city"),
+            "district_profile":  profile,
+            "transaction_scale_vs_district_norm": {
+                "within_range":                within,
+                "above_range":                 above,
+                "well_above_range":            well_above,
+                "well_above_threshold_x_income": DISTRICT_SCALE_WELL_ABOVE_X,
+                "reference_monthly_income_sar":  monthly_income,
+            },
+            "district_scale_flag": triggered,
+        }
+
+        # Augment existing explainability with the district-scale reason. The
+        # behavioral fraud_score/status from the Isolation Forest are unchanged —
+        # this is an additional signal for the credit officer, not a replacement.
+        if triggered:
+            report.setdefault("reasons", []).append({
+                "condition": "district_scale_anomaly",
+                "severity":  "high" if well_above >= 3 else "medium",
+                "detail":    (f"{well_above} transaction(s) exceed "
+                              f"{DISTRICT_SCALE_WELL_ABOVE_X}x the district's avg monthly "
+                              f"household income (SAR {monthly_income:,}) for {district} — "
+                              f"unusual transaction scale for the local income tier"),
+            })
+        return report
+
     # ── Full pipeline ─────────────────────────────────────────────────────────
 
     def assess(self, business_id: str, transactions_df: pd.DataFrame = None,
-               cluster_id: int = None) -> dict:
+               cluster_id: int = None, location=None) -> dict:
         if transactions_df is None:
             tx = pd.read_csv(os.path.join(DATA_DIR, f"{business_id}_transactions.csv"))
         else:
@@ -527,7 +617,9 @@ class FraudDetector:
 
         scored = self.score_transactions(tx, business_id=business_id,
                                          cluster_id=effective_cluster_id)
-        return self.generate_fraud_report(scored, business_id, stats)
+        report = self.generate_fraud_report(scored, business_id, stats)
+        # Additive location signal — no-op when location is absent.
+        return self._apply_location_enrichment(report, tx, location, business_id)
 
     # ── Persistence ───────────────────────────────────────────────────────────
 

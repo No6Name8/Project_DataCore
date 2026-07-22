@@ -19,7 +19,28 @@ from models._guardrails import (
     make_data_quality, make_insufficient_result,
     MIN_ACTIVE_DAYS, MIN_ACTIVE_DAYS_WARN,
 )
+from data.calendar_context import get_calendar_features, REGRESSOR_KEYS
 _log = get_logger("forecaster")
+
+
+def _seasonal_enabled(location) -> bool:
+    """
+    Seasonal calendar context applies to Saudi businesses.  If a country is
+    given and is not 'SA', skip enrichment; if no country is supplied we default
+    to SA (this is a Saudi product).
+    """
+    country = None
+    if location:
+        country = location.get("country") or location.get("location_country")
+    return country is None or str(country).strip().upper() == "SA"
+
+
+def _add_calendar_regressors(daily: pd.DataFrame) -> pd.DataFrame:
+    """Adds the four boolean Saudi-calendar regressor columns keyed on `ds`."""
+    feats = daily["ds"].apply(lambda d: get_calendar_features(d))
+    for key in REGRESSOR_KEYS:
+        daily[key] = feats.apply(lambda f: 1.0 if f[key] else 0.0)
+    return daily
 
 ALL_HIST_DATES = pd.date_range("2025-04-01", "2025-06-30").strftime("%Y-%m-%d").tolist()
 FORECAST_START = "2025-07-01"
@@ -57,11 +78,12 @@ class RevenueForecaster:
         self.forecasts       = {}   # {business_id: forecast DataFrame}
         self.summaries       = {}   # {business_id: summary dict}
         self._fit_dq_warnings = {}  # {business_id: list of dq warning dicts}
+        self._active_regressors = {} # {business_id: [regressor cols used]}
 
     # ── Data preparation ──────────────────────────────────────────────────────
 
     def prepare_data(self, transactions_df: pd.DataFrame,
-                     bid: str = "unknown") -> pd.DataFrame:
+                     bid: str = "unknown", location=None) -> pd.DataFrame:
         # ── Guard 1: required columns ─────────────────────────────────────────
         missing = check_required_columns(
             transactions_df, ["timestamp", "amount_sar"], "forecaster", bid, _log)
@@ -89,14 +111,28 @@ class RevenueForecaster:
                    .reset_index())
         daily.columns = ["ds", "y"]
         daily["ds"]   = pd.to_datetime(daily["ds"])
+
+        # ── Optional enrichment: Saudi seasonal/calendar regressors ───────────
+        # Additive only — absent or non-SA → identical to pre-enrichment output.
+        self._active_regressors[bid] = []
+        if _seasonal_enabled(location):
+            try:
+                daily = _add_calendar_regressors(daily)
+                self._active_regressors[bid] = list(REGRESSOR_KEYS)
+            except Exception as exc:  # never let enrichment crash the model
+                _log.warning(
+                    f"model=forecaster | bid={bid} | rule=seasonal_enrichment_failed | "
+                    f"detail={exc!r} — falling back to generic forecast"
+                )
+                self._active_regressors[bid] = []
         return daily
 
     # ── Fit ───────────────────────────────────────────────────────────────────
 
-    def fit(self, business_id: str, transactions_df: pd.DataFrame):
+    def fit(self, business_id: str, transactions_df: pd.DataFrame, location=None):
         from prophet import Prophet
 
-        df = self.prepare_data(transactions_df, bid=business_id)
+        df = self.prepare_data(transactions_df, bid=business_id, location=location)
 
         # ── Guard 3: minimum active days ──────────────────────────────────────
         active_days = int((df["y"] > 0).sum())
@@ -133,6 +169,14 @@ class RevenueForecaster:
         )
         model.add_seasonality(name="saudi_weekly", period=7, fourier_order=3)
 
+        # ── Optional enrichment: register Saudi-calendar regressors ───────────
+        # standardize=False keeps binary 0/1 regressors stable even when a given
+        # window (e.g. Ramadan) never occurs inside the fitted date range.
+        active = [c for c in self._active_regressors.get(business_id, []) if c in df.columns]
+        for col in active:
+            model.add_regressor(col, standardize=False)
+        self._active_regressors[business_id] = active
+
         with suppress_stdout_stderr():
             model.fit(df)
 
@@ -145,7 +189,13 @@ class RevenueForecaster:
     def forecast(self, business_id: str, periods: int = 30) -> pd.DataFrame:
         model = self.models[business_id]
 
-        future       = model.make_future_dataframe(periods=periods)
+        future = model.make_future_dataframe(periods=periods)
+
+        # Regressor columns must be present for every row Prophet predicts.
+        active = self._active_regressors.get(business_id, [])
+        if active:
+            future = _add_calendar_regressors(future)
+
         forecast_df  = model.predict(future)
 
         # Extract only the future period (last `periods` rows)
@@ -180,6 +230,11 @@ class RevenueForecaster:
         else:                  trend = "flat"
 
         dq_warnings = self._fit_dq_warnings.get(business_id, [])
+        seasonal_used = bool(self._active_regressors.get(business_id))
+        data_quality = make_data_quality(dq_warnings)
+        # Enrichment flag: downstream/frontend can show locally-aware vs generic.
+        data_quality["seasonal_context_used"] = seasonal_used
+
         self.summaries[business_id] = {
             "business_id":           business_id,
             "historical_avg_daily":  round(historical_avg, 2),
@@ -193,7 +248,8 @@ class RevenueForecaster:
             "peak_forecast_amount":  round(peak_amount, 2),
             "confidence_band_width": round(band_width, 2),
             "forecast_period":       f"{FORECAST_START} to {FORECAST_END}",
-            "data_quality":          make_data_quality(dq_warnings),
+            "seasonal_context_used": seasonal_used,
+            "data_quality":          data_quality,
         }
 
         return future_fc
@@ -285,6 +341,11 @@ class RevenueForecaster:
         for s in self.summaries.values():
             if "data_quality" not in s and s.get("status") != "insufficient_data":
                 s["data_quality"] = make_data_quality([])
+            # backfill seasonal enrichment flag for summaries persisted pre-enrichment
+            if s.get("status") != "insufficient_data" and "seasonal_context_used" not in s:
+                s["seasonal_context_used"] = False
+                if isinstance(s.get("data_quality"), dict):
+                    s["data_quality"].setdefault("seasonal_context_used", False)
         print(f"Revenue forecaster loaded — {len(self.models)} business models")
         return self
 

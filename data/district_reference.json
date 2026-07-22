@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "description": "Illustrative Riyadh district reference data for the DataCore demo. Values (household income, density/commercial tiers, per-business-type competitor counts) are ROUGH ILLUSTRATIVE ESTIMATES for demonstration only. In production these fields would be replaced by the bank's own market data, census/GASTAT figures, and commercial-registry counts.",
+    "avg_household_income_sar": "interpreted as approximate MONTHLY household income in SAR",
+    "competitor_tier_thresholds": {"underserved_max": 2, "saturated_min": 7},
+    "business_type_aliases": {
+      "cardealer": "auto_gallery",
+      "realestate": "real_estate",
+      "motorbike": "motorbike_shop"
+    },
+    "generated_for": "demo",
+    "not_authoritative": true
+  },
+  "districts": {
+    "Al Olaya": {
+      "avg_household_income_sar": 32000,
+      "population_density_tier": "high",
+      "commercial_activity_tier": "high",
+      "competitors": {
+        "cafe": 9, "minimarket": 6, "laundromat": 4,
+        "real_estate": 8, "auto_gallery": 2, "motorbike_shop": 1
+      }
+    },
+    "Al Malaz": {
+      "avg_household_income_sar": 17000,
+      "population_density_tier": "high",
+      "commercial_activity_tier": "high",
+      "competitors": {
+        "cafe": 5, "minimarket": 7, "laundromat": 4,
+        "real_estate": 5, "auto_gallery": 3, "motorbike_shop": 3
+      }
+    },
+    "Al Nakheel": {
+      "avg_household_income_sar": 41000,
+      "population_density_tier": "medium",
+      "commercial_activity_tier": "high",
+      "competitors": {
+        "cafe": 7, "minimarket": 4, "laundromat": 3,
+        "real_estate": 6, "auto_gallery": 2, "motorbike_shop": 1
+      }
+    },
+    "Al Sulimaniyah": {
+      "avg_household_income_sar": 26000,
+      "population_density_tier": "high",
+      "commercial_activity_tier": "high",
+      "competitors": {
+        "cafe": 8, "minimarket": 6, "laundromat": 5,
+        "real_estate": 7, "auto_gallery": 2, "motorbike_shop": 2
+      }
+    },
+    "Diplomatic Quarter": {
+      "avg_household_income_sar": 55000,
+      "population_density_tier": "low",
+      "commercial_activity_tier": "medium",
+      "competitors": {
+        "cafe": 3, "minimarket": 2, "laundromat": 1,
+        "real_estate": 2, "auto_gallery": 1, "motorbike_shop": 1
+      }
+    },
+    "Al Batha": {
+      "avg_household_income_sar": 9000,
+      "population_density_tier": "high",
+      "commercial_activity_tier": "high",
+      "competitors": {
+        "cafe": 6, "minimarket": 8, "laundromat": 6,
+        "real_estate": 3, "auto_gallery": 4, "motorbike_shop": 5
+      }
+    },
+    "Al Aziziyah": {
+      "avg_household_income_sar": 12000,
+      "population_density_tier": "medium",
+      "commercial_activity_tier": "medium",
+      "competitors": {
+        "cafe": 4, "minimarket": 5, "laundromat": 3,
+        "real_estate": 3, "auto_gallery": 2, "motorbike_shop": 2
+      }
+    },
+    "Al Naseem": {
+      "avg_household_income_sar": 15000,
+      "population_density_tier": "high",
+      "commercial_activity_tier": "medium",
+      "competitors": {
+        "cafe": 3, "minimarket": 2, "laundromat": 2,
+        "real_estate": 3, "auto_gallery": 1, "motorbike_shop": 2
+      }
+    }
+  }
+}

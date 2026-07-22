@@ -47,6 +47,7 @@ with app.test_client() as client:
             "summary":             dash["summary"],
             "dscr":                dash["dscr"],
             "fraud":               dash["fraud"],
+            "classification":      dash.get("classification"),
             "forecast": {
                 "summary": fore.get("summary", dash["forecast"]["summary"]),
                 "series":  fore.get("series",  dash["forecast"]["series"]),

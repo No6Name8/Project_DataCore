@@ -37,13 +37,22 @@ _cors_origins = "*" if _raw_origins == "*" else [o.strip() for o in _raw_origins
 CORS(app, origins=_cors_origins)
 
 # ── Business registry ─────────────────────────────────────────────────────────
+# Optional demo location assignments (Part 3). Districts chosen to surface a
+# mix of enriched outcomes: minimarket in an underserved area (market-gap flag),
+# cafe in a saturated area, and Rawabi in a low-income district where its
+# large car sales also trip the fraud district-scale signal. These are demo
+# placements — production would use the bank's own customer address data.
+_LOC = lambda district, lat, lng: {
+    "location_district": district, "location_city": "Riyadh",
+    "location_lat": lat, "location_lng": lng,
+}
 BUSINESSES = {
-    "laundromat":   {"id":"laundromat",  "name":"Al Noor Laundromat",     "type":"laundromat", "sector":"services",     "loan_pipeline":"sme"},
-    "cafe":         {"id":"cafe",        "name":"Qahwa Corner Cafe",       "type":"cafe",       "sector":"food_beverage","loan_pipeline":"sme"},
-    "minimarket":   {"id":"minimarket",  "name":"Baraka Minimarket",       "type":"minimarket", "sector":"retail",       "loan_pipeline":"sme"},
-    "realestate":   {"id":"realestate",  "name":"Majd Real Estate Office", "type":"realestate", "sector":"real_estate",  "loan_pipeline":"sme"},
-    "cardealer":    {"id":"cardealer",   "name":"Rawabi Auto Gallery",     "type":"cardealer",  "sector":"automotive",   "loan_pipeline":"sme"},
-    "motorbike":    {"id":"motorbike",   "name":"Saqr Motorbikes",         "type":"motorbike",  "sector":"automotive",   "loan_pipeline":"sme"},
+    "laundromat":   {"id":"laundromat",  "name":"Al Noor Laundromat",     "type":"laundromat", "sector":"services",     "loan_pipeline":"sme", "location": _LOC("Al Malaz",       24.6636, 46.7361)},
+    "cafe":         {"id":"cafe",        "name":"Qahwa Corner Cafe",       "type":"cafe",       "sector":"food_beverage","loan_pipeline":"sme", "location": _LOC("Al Olaya",       24.6908, 46.6853)},
+    "minimarket":   {"id":"minimarket",  "name":"Baraka Minimarket",       "type":"minimarket", "sector":"retail",       "loan_pipeline":"sme", "location": _LOC("Al Naseem",      24.7736, 46.8294)},
+    "realestate":   {"id":"realestate",  "name":"Majd Real Estate Office", "type":"realestate", "sector":"real_estate",  "loan_pipeline":"sme", "location": _LOC("Al Sulimaniyah", 24.7050, 46.6900)},
+    "cardealer":    {"id":"cardealer",   "name":"Rawabi Auto Gallery",     "type":"cardealer",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Batha",       24.6300, 46.7150)},
+    "motorbike":    {"id":"motorbike",   "name":"Saqr Motorbikes",         "type":"motorbike",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Aziziyah",    24.5680, 46.7800)},
     "hilal_bakery": {"id":"hilal_bakery","name":"Hilal Bakery",            "type":"bakery",     "sector":"food_beverage","loan_pipeline":"sme"},
 }
 VALID_BUSINESSES = list(BUSINESSES.keys())
@@ -98,8 +107,22 @@ def get_model_result(bid):
 
 def get_fraud_result(bid):
     if bid not in _FRAUD_CACHE:
-        _FRAUD_CACHE[bid] = _detector.assess(bid)
+        # Optional location enrichment — passes the business's demo district (if any)
+        _FRAUD_CACHE[bid] = _detector.assess(bid, location=BUSINESSES.get(bid, {}).get("location"))
     return _FRAUD_CACHE[bid]
+
+
+_CLASSIFY_CACHE = {}
+
+
+def get_classification_result(bid):
+    """Classifier output enriched with optional location context (additive metadata)."""
+    if bid not in _CLASSIFY_CACHE:
+        meta = BUSINESSES.get(bid, {})
+        _CLASSIFY_CACHE[bid] = _classifier.classify_from_data(
+            load_tx(bid), bid=bid,
+            location=meta.get("location"), business_type=meta.get("type"))
+    return _CLASSIFY_CACHE[bid]
 
 
 def get_transition_result(bid):
@@ -320,6 +343,7 @@ def get_dashboard(business_id):
             "summary":             build_summary(business_id),
             "dscr":                shape_dscr(business_id, r),
             "fraud":               get_fraud_result(business_id),
+            "classification":      get_classification_result(business_id),
             "forecast": {
                 "summary": fc_summary,
                 "series":  fc_series,
@@ -436,9 +460,12 @@ def get_classify(business_id):
             return jsonify({"error": f"Unknown business: {business_id}"}), 404
         tx = load_tx(business_id)
         tx["timestamp"] = pd.to_datetime(tx["timestamp"])
-        result = _classifier.classify_from_data(tx)
+        meta = BUSINESSES[business_id]
+        result = _classifier.classify_from_data(
+            tx, bid=business_id,
+            location=meta.get("location"), business_type=meta.get("type"))
         result["business_id"] = business_id
-        result["business_name"] = BUSINESSES[business_id]["name"]
+        result["business_name"] = meta["name"]
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e), "business_id": business_id}), 500

@@ -25,6 +25,49 @@ from models._guardrails import (
 
 _log = get_logger("classifier")
 
+# ── Optional location enrichment (lazy, offline) ──────────────────────────────
+_LOCATION_CTX = None
+
+
+def _get_location_context():
+    global _LOCATION_CTX
+    if _LOCATION_CTX is None:
+        from data.location_context import LocationContext
+        _LOCATION_CTX = LocationContext()
+    return _LOCATION_CTX
+
+
+def _build_location_block(location, business_type, bid="unknown"):
+    """
+    Returns (location_context_block | None, enrichment_used, market_gap_detected).
+    Fully optional: a missing district or unknown lookup degrades to neutral.
+    """
+    if not location:
+        return None, False, False
+    district = location.get("location_district") or location.get("district")
+    if not district:
+        return None, False, False
+    try:
+        loc = _get_location_context()
+        profile = loc.get_district_profile(district)
+    except Exception as exc:                      # never crash on enrichment
+        _log.warning(f"model=classifier | bid={bid} | rule=location_lookup_failed | detail={exc!r}")
+        return None, False, False
+    if profile is None:
+        _log.warning(f"model=classifier | bid={bid} | rule=location_district_unknown | district={district}")
+        return None, False, False
+    density = loc.get_competitor_density(district, business_type) if business_type else None
+    block = {
+        "district":            district,
+        "city":                location.get("location_city"),
+        "coordinates":         {"lat": location.get("location_lat"),
+                                "lng": location.get("location_lng")},
+        "district_profile":    profile,
+        "competitor_density":  density,
+    }
+    market_gap = bool(density and density.get("market_gap_flag"))
+    return block, True, market_gap
+
 
 class InsufficientDataError(Exception):
     """Raised when a model receives fewer rows than its minimum threshold."""
@@ -635,8 +678,15 @@ class BusinessClassifier:
 
     def classify_from_data(self, transactions_df: pd.DataFrame,
                            period_days: int = 30,
-                           bid: str = "unknown") -> dict:
-        """Extracts features from a real transaction DataFrame, classifies, and enriches output."""
+                           bid: str = "unknown",
+                           location=None, business_type=None) -> dict:
+        """Extracts features from a real transaction DataFrame, classifies, and enriches output.
+
+        `location` (optional): dict with location_district / location_city /
+        location_lat / location_lng.  When present, a `location_context` block of
+        contextual metadata is attached to the output.  The core inference is
+        unchanged — location is metadata, the classifier is never retrained on it.
+        """
         try:
             features = self.extractor.extract(transactions_df, bid=bid)
         except InsufficientDataError as exc:
@@ -666,10 +716,19 @@ class BusinessClassifier:
         result["closest_archetype_features"] = self._closest_archetype_features(
             features, result["cluster_id"])
         result["data_quality"]               = dq
+
+        # ── Optional location enrichment (additive metadata) ──────────────────
+        if location is not None:
+            block, used, market_gap = _build_location_block(location, business_type, bid)
+            if block is not None:
+                result["location_context"] = block
+            result["data_quality"]["location_enrichment_used"] = used
+            result["data_quality"]["market_gap_detected"]      = market_gap
         return result
 
     def classify_from_intake(self, intake_dict: dict,
-                             bid: str = "unknown") -> dict:
+                             bid: str = "unknown",
+                             location=None, business_type=None) -> dict:
         """
         Track 2: classify a brand new business with zero transaction history.
         Uses intake form answers mapped to the same 15-feature vector.
@@ -692,7 +751,8 @@ class BusinessClassifier:
         profile = self.cluster_profiles.get(cluster_id, {})
         arch_label = profile.get("archetype_label", "unknown")
         conf_rounded = round(confidence, 4)
-        return {
+        dq = make_data_quality([])
+        result = {
             "cluster_id":                  cluster_id,
             "cluster_size":                profile.get("size", 0),
             "behavioral_profile":          profile.get("tags", {}),
@@ -709,8 +769,16 @@ class BusinessClassifier:
                 conf_rounded, arch_label, False, "intake_form"),
             "closest_archetype_features":  self._closest_archetype_features(
                 dict(features), cluster_id),
-            "data_quality":                make_data_quality([]),
+            "data_quality":                dq,
         }
+        # ── Optional location enrichment (additive metadata) ──────────────────
+        if location is not None:
+            block, used, market_gap = _build_location_block(location, business_type, bid)
+            if block is not None:
+                result["location_context"] = block
+            dq["location_enrichment_used"] = used
+            dq["market_gap_detected"]      = market_gap
+        return result
 
     def classify_hybrid(self, transactions_df: pd.DataFrame,
                         intake_dict: dict, period_days: int = 30,
