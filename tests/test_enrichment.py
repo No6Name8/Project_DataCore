@@ -266,6 +266,122 @@ class TestCompetitorDensityHonesty:
         assert r["similar_businesses_in_district"] == 9
 
 
+# ── Model 1: BusinessClassifier — registration / license cross-check ──────────
+
+REG_CONSISTENT_CAFE = {"license_category": "food_beverage", "license_status": "active",
+                       "registration_date": "2021-05-10", "registration_number": "1010556677"}
+# Laundromat DECLARED under a food_beverage license → inconsistent with its
+# services-personal transaction fingerprint.
+REG_INCONSISTENT_LAUNDRY = {"license_category": "food_beverage", "license_status": "active",
+                            "registration_date": "2020-08-05"}
+
+class TestClassifierLicenseCrossCheck:
+
+    @pytest.fixture(scope="class")
+    def clf(self):
+        from models.business_classifier import BusinessClassifier
+        c = BusinessClassifier()
+        c.load()
+        return c
+
+    # ── enrichment present ──
+    def test_consistent_license_keeps_inference(self, clf):
+        r = clf.classify_from_data(_tx("cafe"), bid="cafe", registration=REG_CONSISTENT_CAFE)
+        assert r["license_cross_check"] == "consistent"
+        assert r["business_type"] == "cafe"
+        assert r["type_source"] == "inference"
+        assert r["data_quality"]["registration_enrichment_used"] is True
+        assert r["data_quality"]["license_cross_check_result"] == "consistent"
+
+    def test_inconsistent_license_becomes_ground_truth(self, clf):
+        r = clf.classify_from_data(_tx("laundromat"), bid="laundromat",
+                                   registration=REG_INCONSISTENT_LAUNDRY)
+        assert r["license_cross_check"] == "inconsistent"
+        # License is ground truth → business_type overridden to license-implied type
+        assert r["type_source"] == "license"
+        assert r["business_type"] == "cafe"                      # food_beverage → cafe
+        assert r["inferred_type_before_license"] == "laundromat"  # inference preserved
+        assert r["data_quality"]["license_cross_check_result"] == "inconsistent"
+
+    # ── graceful degradation (absent) ──
+    def test_no_registration_identical_to_today(self, clf):
+        r = clf.classify_from_data(_tx("cafe"), bid="cafe")
+        assert "business_type" not in r
+        assert "type_source" not in r
+        assert "license_cross_check" not in r
+        assert "registration_enrichment_used" not in r["data_quality"]
+
+    def test_registration_without_license_category_degrades(self, clf):
+        r = clf.classify_from_data(_tx("cafe"), bid="cafe",
+                                   registration={"registration_number": "1010000000"})
+        assert r["data_quality"]["registration_enrichment_used"] is False
+        assert r["data_quality"]["license_cross_check_result"] is None
+        assert "license_cross_check" not in r        # nothing fabricated
+
+
+# ── Model 3: FraudDetector — registration (age + license status) signals ──────
+
+class TestFraudRegistration:
+
+    @pytest.fixture(scope="class")
+    def det(self):
+        from models.fraud_detector import FraudDetector
+        d = FraudDetector()
+        d.load()
+        return d
+
+    # ── enrichment present ──
+    def test_new_business_high_volume_flag_fires(self, det):
+        reg = {"license_category": "retail_specialty", "license_status": "active",
+               "registration_date": "2025-03-15"}   # < 180d before the data window
+        rep = det.assess("cardealer", location=LOC_RAWABI, registration=reg)
+        assert rep["data_quality"]["registration_enrichment_used"] is True
+        assert rep["data_quality"]["new_business_high_volume_flag"] is True
+        assert rep["registration_context"]["business_age_days"] < 180
+        assert "new_business_high_volume" in [r["condition"] for r in rep["reasons"]]
+
+    def test_license_status_flag_fires(self, det):
+        reg = {"license_category": "food_beverage", "license_status": "expired",
+               "registration_date": "2019-01-01"}
+        rep = det.assess("cafe", registration=reg)
+        assert rep["data_quality"]["license_status_flag"] is True
+        assert "license_status_flag" in [r["condition"] for r in rep["reasons"]]
+
+    # ── graceful degradation (absent) ──
+    def test_no_registration_identical_to_today(self, det):
+        base = det.assess("cardealer")
+        assert "registration_context" not in base
+        assert "registration_enrichment_used" not in base["data_quality"]
+        assert "new_business_high_volume_flag" not in base["data_quality"]
+
+    def test_old_active_business_no_flags(self, det):
+        reg = {"license_category": "food_beverage", "license_status": "active",
+               "registration_date": "2015-01-01"}   # old + active + no district scale
+        rep = det.assess("cafe", registration=reg)
+        assert rep["data_quality"]["registration_enrichment_used"] is True
+        assert rep["data_quality"]["new_business_high_volume_flag"] is False
+        assert rep["data_quality"]["license_status_flag"] is False
+
+
+# ── license_taxonomy mapping stability ────────────────────────────────────────
+
+def test_license_taxonomy_mapping_is_stable():
+    from data.license_taxonomy import (
+        get_expected_business_types, is_type_consistent_with_license,
+        business_type_to_license_category, archetype_label_to_business_type)
+    assert get_expected_business_types("food_beverage") == ["cafe", "restaurant"]
+    assert get_expected_business_types("retail_general") == ["minimarket", "supermarket"]
+    assert is_type_consistent_with_license("cafe", "food_beverage") is True
+    assert is_type_consistent_with_license("laundromat", "food_beverage") is False
+    assert is_type_consistent_with_license("auto_gallery", "retail_specialty") is True
+    # "other" / unknown categories can never be contradicted
+    assert is_type_consistent_with_license("cafe", "other") is True
+    assert is_type_consistent_with_license("cafe", "banana") is True
+    assert business_type_to_license_category("minimarket") == "retail_general"
+    assert archetype_label_to_business_type("high_freq_low_ticket_food") == "cafe"
+    assert archetype_label_to_business_type("low_ticket_steady_essential") == "laundromat"
+
+
 # ── Cross-model: Rawabi combines existing + district-scale signal ─────────────
 
 def test_rawabi_combines_existing_and_district_signal():
@@ -283,3 +399,21 @@ def test_rawabi_combines_existing_and_district_signal():
     # New district-scale signal is present AND combined (not replacing) the above
     assert rep["data_quality"]["district_scale_flag_triggered"] is True
     assert "district_scale_anomaly" in reason_conditions
+
+
+def test_rawabi_stacks_four_signals_with_registration():
+    """Rawabi + location + recent registration → 4 distinct stacked fraud signals."""
+    from models.fraud_detector import FraudDetector
+    d = FraudDetector()
+    d.load()
+    reg = {"license_category": "retail_specialty", "license_status": "active",
+           "registration_date": "2025-03-15"}
+    rep = d.assess("cardealer", location=LOC_RAWABI, registration=reg)
+
+    conditions = {r["condition"] for r in rep.get("reasons", [])}
+    expected = {"critical_amount_outlier", "high_behavioral_anomaly",
+                "district_scale_anomaly", "new_business_high_volume"}
+    assert expected.issubset(conditions), f"missing signals: {expected - conditions}"
+    # All three enrichment flags corroborate the stack
+    assert rep["data_quality"]["district_scale_flag_triggered"] is True
+    assert rep["data_quality"]["new_business_high_volume_flag"] is True

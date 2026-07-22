@@ -46,13 +46,23 @@ _LOC = lambda district, lat, lng: {
     "location_district": district, "location_city": "Riyadh",
     "location_lat": lat, "location_lng": lng,
 }
+_REG = lambda cat, status, date, cr, name: {
+    "license_category": cat, "license_status": status, "registration_date": date,
+    "registration_number": cr, "registered_business_name": name,
+}
+# Optional demo registration/licensing (Part 3). Five carry consistent, active
+# licenses registered > 2 years ago; Al Noor Laundromat is DELIBERATELY declared
+# under a food_beverage license (transactions look like a personal service) to
+# showcase the classifier's license-vs-inference cross-check "inconsistent" path;
+# Rawabi is registered < 180 days before its data window so the fraud detector's
+# new-business-high-volume flag stacks on its existing signals. Demo values.
 BUSINESSES = {
-    "laundromat":   {"id":"laundromat",  "name":"Al Noor Laundromat",     "type":"laundromat", "sector":"services",     "loan_pipeline":"sme", "location": _LOC("Al Malaz",       24.6636, 46.7361)},
-    "cafe":         {"id":"cafe",        "name":"Qahwa Corner Cafe",       "type":"cafe",       "sector":"food_beverage","loan_pipeline":"sme", "location": _LOC("Al Olaya",       24.6908, 46.6853)},
-    "minimarket":   {"id":"minimarket",  "name":"Baraka Minimarket",       "type":"minimarket", "sector":"retail",       "loan_pipeline":"sme", "location": _LOC("Al Naseem",      24.7736, 46.8294)},
-    "realestate":   {"id":"realestate",  "name":"Majd Real Estate Office", "type":"realestate", "sector":"real_estate",  "loan_pipeline":"sme", "location": _LOC("Al Sulimaniyah", 24.7050, 46.6900)},
-    "cardealer":    {"id":"cardealer",   "name":"Rawabi Auto Gallery",     "type":"cardealer",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Batha",       24.6300, 46.7150)},
-    "motorbike":    {"id":"motorbike",   "name":"Saqr Motorbikes",         "type":"motorbike",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Aziziyah",    24.5680, 46.7800)},
+    "laundromat":   {"id":"laundromat",  "name":"Al Noor Laundromat",     "type":"laundromat", "sector":"services",     "loan_pipeline":"sme", "location": _LOC("Al Malaz",       24.6636, 46.7361), "registration": _REG("food_beverage",    "active", "2020-08-05", "1010384756", "Al Noor Laundromat Est.")},
+    "cafe":         {"id":"cafe",        "name":"Qahwa Corner Cafe",       "type":"cafe",       "sector":"food_beverage","loan_pipeline":"sme", "location": _LOC("Al Olaya",       24.6908, 46.6853), "registration": _REG("food_beverage",    "active", "2021-05-10", "1010556677", "Qahwa Corner Cafe Co.")},
+    "minimarket":   {"id":"minimarket",  "name":"Baraka Minimarket",       "type":"minimarket", "sector":"retail",       "loan_pipeline":"sme", "location": _LOC("Al Naseem",      24.7736, 46.8294), "registration": _REG("retail_general",   "active", "2019-11-01", "1010223344", "Baraka Minimarket Trading")},
+    "realestate":   {"id":"realestate",  "name":"Majd Real Estate Office", "type":"realestate", "sector":"real_estate",  "loan_pipeline":"sme", "location": _LOC("Al Sulimaniyah", 24.7050, 46.6900), "registration": _REG("real_estate",      "active", "2018-03-20", "1010119988", "Majd Real Estate Office")},
+    "cardealer":    {"id":"cardealer",   "name":"Rawabi Auto Gallery",     "type":"cardealer",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Batha",       24.6300, 46.7150), "registration": _REG("retail_specialty", "active", "2025-03-15", "1010778899", "Rawabi Auto Gallery")},
+    "motorbike":    {"id":"motorbike",   "name":"Saqr Motorbikes",         "type":"motorbike",  "sector":"automotive",   "loan_pipeline":"sme", "location": _LOC("Al Aziziyah",    24.5680, 46.7800), "registration": _REG("retail_specialty", "active", "2022-01-15", "1010667788", "Saqr Motorbikes Co.")},
     "hilal_bakery": {"id":"hilal_bakery","name":"Hilal Bakery",            "type":"bakery",     "sector":"food_beverage","loan_pipeline":"sme"},
 }
 VALID_BUSINESSES = list(BUSINESSES.keys())
@@ -107,8 +117,10 @@ def get_model_result(bid):
 
 def get_fraud_result(bid):
     if bid not in _FRAUD_CACHE:
-        # Optional location enrichment — passes the business's demo district (if any)
-        _FRAUD_CACHE[bid] = _detector.assess(bid, location=BUSINESSES.get(bid, {}).get("location"))
+        # Optional location + registration enrichment (demo district / license, if any)
+        meta = BUSINESSES.get(bid, {})
+        _FRAUD_CACHE[bid] = _detector.assess(
+            bid, location=meta.get("location"), registration=meta.get("registration"))
     return _FRAUD_CACHE[bid]
 
 
@@ -121,7 +133,8 @@ def get_classification_result(bid):
         meta = BUSINESSES.get(bid, {})
         _CLASSIFY_CACHE[bid] = _classifier.classify_from_data(
             load_tx(bid), bid=bid,
-            location=meta.get("location"), business_type=meta.get("type"))
+            location=meta.get("location"), business_type=meta.get("type"),
+            registration=meta.get("registration"))
     return _CLASSIFY_CACHE[bid]
 
 
@@ -463,7 +476,8 @@ def get_classify(business_id):
         meta = BUSINESSES[business_id]
         result = _classifier.classify_from_data(
             tx, bid=business_id,
-            location=meta.get("location"), business_type=meta.get("type"))
+            location=meta.get("location"), business_type=meta.get("type"),
+            registration=meta.get("registration"))
         result["business_id"] = business_id
         result["business_name"] = meta["name"]
         return jsonify(result)

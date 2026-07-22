@@ -33,6 +33,10 @@ _LOCATION_CTX = None
 DISTRICT_SCALE_WELL_ABOVE_X = 20
 DISTRICT_SCALE_ABOVE_X      = 5
 
+# A business younger than this (days) trading at above-district-norm scale is the
+# classic "brand new + suspiciously high activity" pattern.
+NEW_BUSINESS_MAX_AGE_DAYS = 180
+
 
 def _get_location_context():
     global _LOCATION_CTX
@@ -587,10 +591,88 @@ class FraudDetector:
             })
         return report
 
+    # ── Optional registration / licensing enrichment ──────────────────────────
+
+    def _apply_registration_enrichment(self, report: dict, tx: pd.DataFrame,
+                                       registration, bid: str) -> dict:
+        """
+        Adds two ADDITIONAL fraud signals from registration/licensing data:
+          1. new_business_high_volume_flag — business age < NEW_BUSINESS_MAX_AGE_DAYS
+             AND transaction scale above the district norm (reuses the district
+             scale signal already computed by _apply_location_enrichment).
+          2. license_status_flag — license_status is "expired" or "suspended"
+             (direct signal, not inference).
+        The Isolation Forest score/status are never modified — these are extra
+        flags/reasons stacked alongside the behavioral output.
+        Absent registration → no-op (report unchanged).
+        """
+        if registration is None:
+            return report
+
+        dq = dict(report.get("data_quality") or make_data_quality([]))
+        dq["registration_enrichment_used"]  = True
+        dq["new_business_high_volume_flag"] = False
+        dq["license_status_flag"]           = False
+
+        # ── Signal 1: business age vs district-adjusted volume ────────────────
+        business_age_days = None
+        reg_date = registration.get("registration_date")
+        if reg_date:
+            try:
+                start = pd.to_datetime(reg_date)
+                # "Time of analysis" = latest observed activity in the window.
+                ts = pd.to_datetime(tx["timestamp"], errors="coerce").dropna()
+                as_of = ts.max() if len(ts) else pd.Timestamp.today()
+                business_age_days = int(max((as_of - start).days, 0))
+            except Exception as exc:               # never crash on enrichment
+                _log.warning(f"model=fraud | bid={bid} | rule=registration_date_unparseable | detail={exc!r}")
+                business_age_days = None
+
+        # Reuse the district-scale outcome as the "above district-adjusted norm" proxy.
+        above_district_norm = bool(dq.get("district_scale_flag_triggered"))
+        new_biz_high_volume = bool(
+            business_age_days is not None and
+            business_age_days < NEW_BUSINESS_MAX_AGE_DAYS and
+            above_district_norm
+        )
+        dq["new_business_high_volume_flag"] = new_biz_high_volume
+
+        # ── Signal 2: license status ──────────────────────────────────────────
+        license_status = str(registration.get("license_status", "unknown")).strip().lower()
+        license_flag   = license_status in ("expired", "suspended")
+        dq["license_status_flag"] = license_flag
+
+        report["data_quality"] = dq
+        report["registration_context"] = {
+            "business_age_days":  business_age_days,
+            "license_status":     license_status,
+            "license_category":   registration.get("license_category"),
+            "registration_number": registration.get("registration_number"),
+            "new_business_high_volume_flag": new_biz_high_volume,
+            "license_status_flag":           license_flag,
+        }
+
+        # Stack additional reasons (augment, never replace the behavioral score).
+        if new_biz_high_volume:
+            report.setdefault("reasons", []).append({
+                "condition": "new_business_high_volume",
+                "severity":  "high",
+                "detail":    (f"Business registered {business_age_days} days ago "
+                              f"(< {NEW_BUSINESS_MAX_AGE_DAYS}) is already trading above the "
+                              f"district-adjusted norm — brand-new + high-activity pattern"),
+            })
+        if license_flag:
+            report.setdefault("reasons", []).append({
+                "condition": "license_status_flag",
+                "severity":  "high" if license_status == "suspended" else "medium",
+                "detail":    f"License status is '{license_status}' — direct compliance/fraud signal",
+            })
+        return report
+
     # ── Full pipeline ─────────────────────────────────────────────────────────
 
     def assess(self, business_id: str, transactions_df: pd.DataFrame = None,
-               cluster_id: int = None, location=None) -> dict:
+               cluster_id: int = None, location=None, registration=None) -> dict:
         if transactions_df is None:
             tx = pd.read_csv(os.path.join(DATA_DIR, f"{business_id}_transactions.csv"))
         else:
@@ -619,7 +701,11 @@ class FraudDetector:
                                          cluster_id=effective_cluster_id)
         report = self.generate_fraud_report(scored, business_id, stats)
         # Additive location signal — no-op when location is absent.
-        return self._apply_location_enrichment(report, tx, location, business_id)
+        report = self._apply_location_enrichment(report, tx, location, business_id)
+        # Additive registration signals (age + license status) — reuses the
+        # district-scale result above, so it must run after location enrichment.
+        report = self._apply_registration_enrichment(report, tx, registration, business_id)
+        return report
 
     # ── Persistence ───────────────────────────────────────────────────────────
 

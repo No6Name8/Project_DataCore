@@ -69,6 +69,61 @@ def _build_location_block(location, business_type, bid="unknown"):
     return block, True, market_gap
 
 
+def _apply_license_cross_check(result: dict, archetype_label, registration, bid="unknown"):
+    """
+    Cross-checks the model's inferred type against a declared license category.
+    Mutates `result` in place — additive only, and a no-op when registration is
+    absent, so the no-registration path is exactly as it is today.
+
+    Consistent   → business_type = inferred type,  type_source = "inference"
+    Inconsistent → LICENSE is ground truth: business_type = license-implied type,
+                   inferred type preserved as inferred_type_before_license,
+                   type_source = "license". Logged for bank review.
+    """
+    if not registration:
+        return
+    from data.license_taxonomy import (
+        archetype_label_to_business_type, is_type_consistent_with_license,
+        get_expected_business_types)
+
+    license_category = registration.get("license_category")
+    dq = result.setdefault("data_quality", make_data_quality([]))
+    dq["registration_enrichment_used"] = bool(license_category)
+    dq["license_cross_check_result"]   = None
+    if not license_category:
+        return   # registration present but nothing to cross-check against
+
+    inferred_type = archetype_label_to_business_type(archetype_label)
+    consistent    = is_type_consistent_with_license(inferred_type, license_category)
+
+    if consistent:
+        result["business_type"]     = inferred_type
+        result["type_source"]       = "inference"
+        result["license_cross_check"] = "consistent"
+        dq["license_cross_check_result"] = "consistent"
+    else:
+        expected     = get_expected_business_types(license_category)
+        license_type = expected[0] if expected else inferred_type
+        result["inferred_type_before_license"] = inferred_type
+        result["business_type"]       = license_type
+        result["type_source"]         = "license"
+        result["license_cross_check"] = "inconsistent"
+        dq["license_cross_check_result"] = "inconsistent"
+        _log.warning(
+            f"model=classifier | bid={bid} | rule=license_type_mismatch | "
+            f"inferred={inferred_type} | license_category={license_category} | "
+            f"license_treated_as_ground_truth={license_type}"
+        )
+
+    result["registration_context"] = {
+        "license_category":         license_category,
+        "license_status":           registration.get("license_status", "unknown"),
+        "registration_number":      registration.get("registration_number"),
+        "registered_business_name": registration.get("registered_business_name"),
+        "cross_check":              result["license_cross_check"],
+    }
+
+
 class InsufficientDataError(Exception):
     """Raised when a model receives fewer rows than its minimum threshold."""
     def __init__(self, model: str, bid: str, reason: str, detail: dict = None):
@@ -679,13 +734,20 @@ class BusinessClassifier:
     def classify_from_data(self, transactions_df: pd.DataFrame,
                            period_days: int = 30,
                            bid: str = "unknown",
-                           location=None, business_type=None) -> dict:
+                           location=None, business_type=None,
+                           registration=None) -> dict:
         """Extracts features from a real transaction DataFrame, classifies, and enriches output.
 
         `location` (optional): dict with location_district / location_city /
         location_lat / location_lng.  When present, a `location_context` block of
         contextual metadata is attached to the output.  The core inference is
         unchanged — location is metadata, the classifier is never retrained on it.
+
+        `registration` (optional): dict with license_category / license_status /
+        registration_number / registration_date / registered_business_name. When
+        a license_category is present, the inferred type is cross-checked against
+        it; on mismatch the license is treated as ground truth (see
+        _apply_license_cross_check). Absent → exactly as today.
         """
         try:
             features = self.extractor.extract(transactions_df, bid=bid)
@@ -724,11 +786,15 @@ class BusinessClassifier:
                 result["location_context"] = block
             result["data_quality"]["location_enrichment_used"] = used
             result["data_quality"]["market_gap_detected"]      = market_gap
+
+        # ── Optional registration / licensing cross-check ─────────────────────
+        _apply_license_cross_check(result, result.get("archetype_label"), registration, bid)
         return result
 
     def classify_from_intake(self, intake_dict: dict,
                              bid: str = "unknown",
-                             location=None, business_type=None) -> dict:
+                             location=None, business_type=None,
+                             registration=None) -> dict:
         """
         Track 2: classify a brand new business with zero transaction history.
         Uses intake form answers mapped to the same 15-feature vector.
@@ -778,6 +844,9 @@ class BusinessClassifier:
                 result["location_context"] = block
             dq["location_enrichment_used"] = used
             dq["market_gap_detected"]      = market_gap
+
+        # ── Optional registration / licensing cross-check ─────────────────────
+        _apply_license_cross_check(result, result.get("archetype_description"), registration, bid)
         return result
 
     def classify_hybrid(self, transactions_df: pd.DataFrame,
